@@ -14,7 +14,11 @@ const userRoutes = require('./routes/userRoutes');
 const path = require('path');
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:4200', 'capacitor://localhost', 'http://localhost', 'https://yamishop.onrender.com'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
