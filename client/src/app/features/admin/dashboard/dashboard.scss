@@ -197,6 +197,47 @@
     }
 }
 
+/* --- ACTION BUTTONS (Edit/Delete) --- */
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-left: 8px;
+    /* Separation requested by user */
+}
+
+.btn-icon.edit {
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+    /* Indigo 400 */
+}
+
+.btn-icon.edit:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-icon.delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    /* Red 400 */
+}
+
+.btn-icon.delete:hover {
+    background: var(--error-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
 /* Default: Hide mobile tabs on desktop */
 .mobile-tabs {
     display: none;

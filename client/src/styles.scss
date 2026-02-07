@@ -98,12 +98,24 @@
   }
 }
 
+html {
+  height: 100%;
+}
+
+html {
+  height: 100%;
+}
+
 body {
   margin: 0;
   font-family: var(--font-family);
   background-color: var(--background-color);
   color: var(--text-color);
   overflow-x: hidden;
+  min-height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* iOS Momentum Scrolling */
 }
 
 /* Glassmorphism Card */
