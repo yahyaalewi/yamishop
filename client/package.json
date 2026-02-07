@@ -33,7 +33,6 @@
     "@capacitor/android": "^8.0.2",
     "@capacitor/cli": "^8.0.2",
     "@capacitor/core": "^8.0.2",
-    "@capacitor/http": "^8.0.2",
     "@ionic/angular": "^8.7.17",
     "jwt-decode": "^4.0.0",
     "ngx-toastr": "^20.0.4",
