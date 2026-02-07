@@ -1,0 +1,67 @@
+name: Android Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: |
+          cd client
+          npm install
+
+      - name: Build Angular App
+        run: |
+          cd client
+          npm run build -- --configuration=production
+
+      - name: Sync Capacitor
+        run: |
+          cd client
+          npx cap sync android
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Build Android App Bundle (AAB)
+        run: |
+          cd client/android
+          chmod +x gradlew
+          ./gradlew bundleRelease
+
+      - name: Build Android APK (Debug)
+        run: |
+          cd client/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload AAB (For Play Store)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-bundle
+          path: client/android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Upload APK (For Testing)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: client/android/app/build/outputs/apk/debug/app-debug.apk
