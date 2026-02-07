@@ -19,11 +19,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Dependencies
         run: |
           cd client
+          rm package-lock.json
           npm install --legacy-peer-deps
 
       - name: Build Angular App
