@@ -1,0 +1,273 @@
+<div class="admin-layout">
+    <!-- Premium Sidebar (Desktop only) -->
+    <aside class="sidebar glass-card" [class.mobile-open]="mobileMenuOpen">
+        <div class="sidebar-header">
+            <div class="brand">
+                <i class="fas fa-cube text-gradient"></i>
+                <span>Yami<b class="text-white">Admin</b></span>
+            </div>
+            <button class="mobile-close-btn" (click)="closeMobileMenu()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="profile-section fade-in">
+            <div class="avatar-circle">A</div>
+            <div class="profile-info">
+                <span class="name">Administrateur</span>
+                <span class="role">Manager</span>
+            </div>
+        </div>
+
+        <div class="menu-label">PRINCIPAL</div>
+        <ul class="sidebar-menu">
+            <li [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
+                <div class="icon-box"><i class="fas fa-th-large"></i></div>
+                <span>Vue d'ensemble</span>
+                <div class="active-indicator"></div>
+            </li>
+        </ul>
+
+        <div class="menu-label">GESTION</div>
+        <ul class="sidebar-menu">
+            <li [class.active]="activeTab === 'products'" (click)="activeTab = 'products'">
+                <div class="icon-box"><i class="fas fa-box"></i></div>
+                <span>Mes Produits</span>
+                <div class="active-indicator"></div>
+            </li>
+            <li [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'">
+                <div class="icon-box"><i class="fas fa-shopping-bag"></i></div>
+                <span>Commandes</span>
+                <span class="badge" *ngIf="pendingOrdersCount > 0">{{ pendingOrdersCount }}</span>
+                <div class="active-indicator"></div>
+            </li>
+        </ul>
+
+        <div class="menu-label">SYSTÈME</div>
+        <ul class="sidebar-menu">
+            <li>
+                <div class="icon-box"><i class="fas fa-cog"></i></div>
+                <span>Paramètres</span>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout-premium" routerLink="/">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Déconnexion</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content fade-in">
+
+        <!-- Top Header Mobile Only (or Breadcrumb) -->
+        <div class="content-header">
+            <div>
+                <h1 class="page-title">
+                    {{ activeTab === 'overview' ? 'Vue d\'ensemble' :
+                    activeTab === 'products' ? 'Catalogue Produits' : 'Commandes Clients' }}
+                </h1>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Tabs -->
+        <div class="mobile-tabs glass-card">
+            <button [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
+                <i class="fas fa-th-large"></i> Vue
+            </button>
+            <button [class.active]="activeTab === 'products'" (click)="activeTab = 'products'">
+                <i class="fas fa-box"></i> Produits
+            </button>
+            <button [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'">
+                <i class="fas fa-shopping-bag"></i> Commandes
+                <span class="badge-dot" *ngIf="pendingOrdersCount > 0"></span>
+            </button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div *ngIf="activeTab === 'overview'" class="tab-pane fade-in">
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="glass-card kpi-card purple">
+                    <div class="kpi-icon"><i class="fas fa-wallet"></i></div>
+                    <div class="kpi-info">
+                        <h3>Revenu Total</h3>
+                        <p class="kpi-value">{{ totalRevenue }} UM</p>
+                        <span class="kpi-trend positive"><i class="fas fa-arrow-up"></i> +12% ce mois</span>
+                    </div>
+                </div>
+                <div class="glass-card kpi-card blue">
+                    <div class="kpi-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="kpi-info">
+                        <h3>Commandes</h3>
+                        <p class="kpi-value">{{ orders.length }}</p>
+                        <span class="kpi-trend"><small>{{ pendingOrdersCount }} en attente</small></span>
+                    </div>
+                </div>
+                <div class="glass-card kpi-card orange">
+                    <div class="kpi-icon"><i class="fas fa-box-open"></i></div>
+                    <div class="kpi-info">
+                        <h3>Produits</h3>
+                        <p class="kpi-value">{{ products.length }}</p>
+                        <span class="kpi-trend negative" *ngIf="lowStockCount > 0">
+                            <i class="fas fa-exclamation-triangle"></i> {{ lowStockCount }} stock faible
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders Preview -->
+            <div class="section-title mt-4">Commandes Récentes</div>
+            <div class="glass-card table-card">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let order of orders.slice(0, 5)">
+                            <td>{{ order.user?.fullName || 'Client' }}</td>
+                            <td class="fw-bold">{{ order.totalAmount }} UM</td>
+                            <td><span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">{{
+                                    order.status }}</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PRODUCTS TAB -->
+        <div *ngIf="activeTab === 'products'" class="tab-pane fade-in">
+            <div class="actions-bar glass-card mb-4">
+                <button (click)="showForm = !showForm" class="btn-primary toggle-form-btn">
+                    <i class="fas" [class.fa-plus]="!showForm" [class.fa-times]="showForm"></i>
+                    {{ showForm ? 'Fermer' : 'Nouveau Produit' }}
+                </button>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Rechercher...">
+                </div>
+            </div>
+
+            <div *ngIf="showForm" class="glass-card form-card mb-4 slide-down">
+                <h3 class="card-title">{{ editingId ? 'Modifier' : 'Ajouter' }} Produit</h3>
+                <form [formGroup]="productForm" (ngSubmit)="onSubmitProduct()">
+                    <div class="form-grid">
+                        <input type="text" formControlName="name" class="form-control" placeholder="Nom du produit">
+                        <input type="text" formControlName="category" class="form-control" placeholder="Catégorie">
+                    </div>
+                    <textarea formControlName="description" class="form-control" placeholder="Description détaillée"
+                        rows="3"></textarea>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <span class="input-prefix">UM</span>
+                            <input type="number" formControlName="price" class="form-control" placeholder="Prix">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-prefix">Qty</span>
+                            <input type="number" formControlName="stock" class="form-control" placeholder="Stock">
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="d-block mb-2 file-label">Image du produit</label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" (change)="onFileSelected($event)" accept="image/*"
+                                class="form-control file-input">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <span class="upload-text">Glisser ou cliquer pour upload</span>
+                        </div>
+                        <input type="hidden" formControlName="image">
+                        <div *ngIf="imagePreview" class="preview-container mt-2">
+                            <img [src]="imagePreview" alt="Prévisualisation" class="preview-img">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+                            <i class="fas" [class.fa-spinner]="isSubmitting" [class.fa-spin]="isSubmitting"
+                                [class.fa-save]="!isSubmitting"></i>
+                            {{ isSubmitting ? ' Sauvegarde...' : ' Sauvegarder' }}
+                        </button>
+                        <button type="button" (click)="resetForm()" class="btn-link">Annuler</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="glass-card table-card">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th width="70">Img</th>
+                            <th>Produit</th>
+                            <th>Prix</th>
+                            <th>Stock</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let p of products">
+                            <td>
+                                <div class="img-wrapper"><img [src]="p.image" class="table-img"></div>
+                            </td>
+                            <td>
+                                <div><span class="fw-bold">{{ p.name }}</span><br><small class="text-muted">{{
+                                        p.category }}</small></div>
+                            </td>
+                            <td class="price-cell">{{ p.price }} UM</td>
+                            <td><span class="stock-badge" [class.low]="p.stock < 5" [class.out]="p.stock === 0">{{
+                                    p.stock }}</span></td>
+                            <td class="text-right">
+                                <button (click)="editProduct(p)" class="btn-icon edit"><i
+                                        class="fas fa-pen"></i></button>
+                                <button (click)="deleteProduct(p._id)" class="btn-icon delete"><i
+                                        class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ORDERS TAB -->
+        <div *ngIf="activeTab === 'orders'" class="tab-pane fade-in">
+            <div class="glass-card table-card">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Montant</th>
+                            <th>Statut</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let order of orders">
+                            <td>
+                                <div class="user-info">
+                                    <span class="user-name">{{ order.user?.fullName }}</span>
+                                    <small class="user-phone"><i class="fas fa-phone"></i> {{ order.user?.phoneNumber
+                                        }}</small>
+                                </div>
+                            </td>
+                            <td class="price-cell fw-bold">{{ order.totalAmount }} UM</td>
+                            <td><span class="status-badge" [ngClass]="'status-' + order.status.toLowerCase()">{{
+                                    order.status }}</span></td>
+                            <td class="text-right">
+                                <button (click)="updateOrderStatus(order._id, 'Confirmed')"
+                                    *ngIf="order.status === 'Pending'" class="btn-action confirm"><i
+                                        class="fas fa-check"></i> Valider</button>
+                                <button (click)="updateOrderStatus(order._id, 'Delivered')"
+                                    *ngIf="order.status === 'Confirmed'" class="btn-action deliver"><i
+                                        class="fas fa-truck"></i> Livrer</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>

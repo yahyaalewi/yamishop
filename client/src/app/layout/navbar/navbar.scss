@@ -1,0 +1,147 @@
+.glass-nav {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+
+    li a {
+        color: var(--text-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+
+        &:hover,
+        &.active {
+            color: var(--primary-color);
+        }
+    }
+}
+
+.btn-highlight {
+    background: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: white !important;
+
+    &:hover {
+        background: var(--primary-hover);
+    }
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:hover {
+        color: var(--error-color);
+    }
+}
+
+.mobile-toggle {
+    display: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.8rem 1rem;
+    }
+
+    .brand {
+        font-size: 1.2rem;
+    }
+
+    /* Cacher le toggle hamburger */
+    .mobile-toggle {
+        display: none !important;
+    }
+
+    /* Afficher les liens inline */
+    .nav-links {
+        display: flex;
+        flex-direction: row;
+        gap: 0.8rem;
+        position: static;
+        width: auto;
+        background: none;
+        padding: 0;
+
+        li a,
+        li button {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .btn-highlight {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    /* Cacher la navbar sur mobile si connecté (bottom nav prend le relais) */
+    .glass-nav.hide-on-mobile {
+        display: block !important;
+        /* Garder visible pour afficher Logo + Profil */
+    }
+
+    /* Cacher les liens desktop, garder seulement logo + profil */
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-profile {
+        display: flex !important;
+
+        a {
+            font-size: 1.2rem;
+            padding: 0.5rem;
+
+            i {
+                color: var(--primary-color);
+            }
+        }
+    }
+}
+
+/* Desktop - cacher mobile-profile */
+@media (min-width: 769px) {
+    .mobile-profile {
+        display: none !important;
+    }
+
+    .desktop-only {
+        display: flex !important;
+    }
+}

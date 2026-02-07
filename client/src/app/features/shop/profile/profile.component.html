@@ -1,0 +1,56 @@
+<div class="profile-container">
+    <div class="profile-card glass-card">
+        <div class="profile-header">
+            <div class="avatar-large">
+                <i class="fas fa-user"></i>
+            </div>
+            <h1>Mon Profil</h1>
+        </div>
+
+        <div class="profile-info" *ngIf="user">
+            <div class="info-item">
+                <i class="fas fa-user"></i>
+                <div class="info-content">
+                    <label>Nom complet</label>
+                    <p>{{ user.fullName }}</p>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-phone"></i>
+                <div class="info-content">
+                    <label>Téléphone</label>
+                    <p>{{ user.phoneNumber }}</p>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-venus-mars"></i>
+                <div class="info-content">
+                    <label>Genre</label>
+                    <p>{{ user.gender }}</p>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-shield-alt"></i>
+                <div class="info-content">
+                    <label>Rôle</label>
+                    <p>{{ user.role }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <button *ngIf="user?.role === 'Manager'" class="btn-dashboard" (click)="goToDashboard()">
+                <i class="fas fa-chart-line"></i>
+                Tableau de Bord
+            </button>
+
+            <button class="btn-logout" (click)="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Déconnexion
+            </button>
+        </div>
+    </div>
+</div>

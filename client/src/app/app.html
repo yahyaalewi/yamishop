@@ -1,0 +1,22 @@
+<app-navbar></app-navbar>
+<div style="padding-top: 80px; padding-bottom: 90px;">
+  <router-outlet></router-outlet>
+</div>
+
+<!-- Bottom Navigation - UNIQUEMENT si connecté et Client (PAS Admin) -->
+<nav *ngIf="isLoggedIn && role !== 'Manager'" class="mobile-bottom-nav">
+
+  <!-- Standard Menu - DEBUG MODE: Click Handlers -->
+  <div (click)="navigateTo('/shop')" class="nav-item">
+    <i class="fas fa-store"></i>
+    <span>Boutique</span>
+  </div>
+  <div (click)="navigateTo('/cart')" class="nav-item">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Panier</span>
+  </div>
+  <div (click)="navigateTo('/order-history')" class="nav-item">
+    <i class="fas fa-receipt"></i>
+    <span>Commandes</span>
+  </div>
+</nav>

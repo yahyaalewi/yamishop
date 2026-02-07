@@ -1,0 +1,71 @@
+<div class="login-container fade-in"
+    style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <div class="glass-card login-card" style="width: 100%; max-width: 450px;">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h2 style="color: var(--primary-color); font-size: 2rem; margin-bottom: 0.5rem;">Connexion</h2>
+            <p style="color: var(--text-muted);">Content de vous revoir !</p>
+        </div>
+
+        <!-- Step 1: Login Credentials -->
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" *ngIf="step === 1">
+
+            <!-- Error Alert -->
+            <div *ngIf="errorMessage" class="alert alert-error">
+                <span>⚠️</span> {{ errorMessage }}
+            </div>
+
+            <div class="form-group mb-4">
+                <label style="display: block; margin-bottom: 0.5rem;">Numéro de Téléphone</label>
+                <input type="tel" formControlName="phoneNumber" class="form-control" placeholder="Ex: 41234567">
+                <div *ngIf="submitted && f['phoneNumber'].errors" class="text-error"
+                    style="color: var(--error-color); font-size: 0.875rem; margin-top: 0.25rem;">Numéro requis</div>
+            </div>
+
+            <div class="form-group mb-4">
+                <label style="display: block; margin-bottom: 0.5rem;">Mot de passe</label>
+                <input type="password" formControlName="password" class="form-control" placeholder="******">
+                <div *ngIf="submitted && f['password'].errors" class="text-error"
+                    style="color: var(--error-color); font-size: 0.875rem; margin-top: 0.25rem;">Mot de passe requis
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary w-full" [disabled]="loading" style="width: 100%;">
+                {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
+            </button>
+
+            <div class="text-center mt-4">
+                <p>Pas encore de compte ? <a routerLink="/register"
+                        style="color: var(--primary-color); text-decoration: none;">S'inscrire</a></p>
+            </div>
+        </form>
+
+        <!-- Step 2: OTP Verification -->
+        <form [formGroup]="otpForm" (ngSubmit)="onVerifyOtp()" *ngIf="step === 2" class="fade-in">
+            <div class="text-center mb-4">
+                <h3 style="margin-bottom: 0.5rem;">Sécurité</h3>
+                <p style="color: var(--text-muted);">Entrez le code envoyé au <strong>{{ f['phoneNumber'].value
+                        }}</strong></p>
+            </div>
+
+            <!-- Error Alert -->
+            <div *ngIf="errorMessage" class="alert alert-error">
+                <span>⚠️</span> {{ errorMessage }}
+            </div>
+
+            <div class="form-group mb-4">
+                <label style="display: block; margin-bottom: 0.5rem;">Code OTP</label>
+                <input type="text" formControlName="otp" class="form-control text-center"
+                    style="font-size: 1.5rem; letter-spacing: 0.5rem;" placeholder="XXXX" maxlength="4">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <button type="button" class="btn-secondary" (click)="step = 1"
+                    style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-color); padding: 0.75rem; border-radius: 0.5rem; cursor: pointer;">Retour</button>
+                <button type="submit" class="btn-primary" [disabled]="loading">
+                    {{ loading ? 'Vérification...' : 'Confirmer' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

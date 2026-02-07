@@ -1,0 +1,54 @@
+<div class="container fade-in">
+    <button class="back-link" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i> Retour aux produits
+    </button>
+
+    <div class="product-wrapper glass-card" *ngIf="product">
+        <div class="product-gallery">
+            <div class="main-image-container">
+                <img [src]="product.image || 'assets/placeholder-product.png'" [alt]="product.name" class="main-image">
+
+            </div>
+        </div>
+
+        <div class="product-info-column">
+            <div class="product-header">
+                <h1 class="product-title">{{ product.name }}</h1>
+                <div class="product-meta">
+                    <span class="sku">SKU: {{ (product._id + '') | slice:-6 | uppercase }}</span>
+                </div>
+            </div>
+
+            <div class="price-block">
+                <span class="currency">UM</span>
+                <span class="amount">{{ product.price | number:'1.0-0' }}</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="description-block">
+                <h3>Description</h3>
+                <p>{{ product.description }}</p>
+            </div>
+
+            <div class="stock-status" [class.in-stock]="product.stock > 0" [class.out-of-stock]="product.stock <= 0">
+                <span class="status-indicator"></span>
+                {{ product.stock > 0 ? 'En Stock' : 'Rupture de stock' }}
+                <span *ngIf="product.stock > 0 && product.stock < 5" class="low-stock-warning">(Plus que {{
+                    product.stock }}!)</span>
+            </div>
+
+            <div class="action-area">
+                <button class="add-to-cart-btn btn-primary" (click)="addToCart()" [disabled]="product.stock < 1">
+                    <span>{{ product.stock > 0 ? 'Ajouter au Panier' : 'Indisponible' }}</span>
+                    <i class="fas fa-shopping-bag"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!product" class="loading-state glass-card">
+        <div class="spinner"></div>
+        <p>Chargement du produit...</p>
+    </div>
+</div>

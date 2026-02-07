@@ -1,0 +1,41 @@
+<!-- Bottom Navigation - Client -->
+<nav class="mobile-bottom-nav" *ngIf="isClient">
+    <a routerLink="/shop" class="nav-item" [class.active]="isActive('/shop')">
+        <i class="fas fa-store"></i>
+        <span>Boutique</span>
+    </a>
+    <a routerLink="/cart" class="nav-item" [class.active]="isActive('/cart')">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Panier</span>
+        <span class="badge-mini" *ngIf="cartItemsCount > 0">{{ cartItemsCount }}</span>
+    </a>
+    <a routerLink="/order-history" class="nav-item" [class.active]="isActive('/order-history')">
+        <i class="fas fa-receipt"></i>
+        <span>Commandes</span>
+    </a>
+    <a routerLink="/profile" class="nav-item" [class.active]="isActive('/profile')">
+        <i class="fas fa-user"></i>
+        <span>Profil</span>
+    </a>
+</nav>
+
+<!-- Bottom Navigation - Admin -->
+<nav class="mobile-bottom-nav" *ngIf="isAdmin">
+    <button class="nav-item" [class.active]="isActive('/dashboard')" (click)="navigateToDashboard()">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+    </button>
+    <button class="nav-item" [class.active]="isActive('/dashboard')" (click)="navigateToProducts()">
+        <i class="fas fa-box"></i>
+        <span>Produits</span>
+    </button>
+    <button class="nav-item" [class.active]="isActive('/dashboard')" (click)="navigateToOrders()">
+        <i class="fas fa-shopping-bag"></i>
+        <span>Commandes</span>
+        <span class="badge-mini" *ngIf="pendingOrdersCount > 0">{{ pendingOrdersCount }}</span>
+    </button>
+    <a routerLink="/" class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>Site</span>
+    </a>
+</nav>

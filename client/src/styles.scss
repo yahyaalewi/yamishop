@@ -1,0 +1,238 @@
+/* Ionic Core & Basics */
+@import "@ionic/angular/css/core.css";
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+
+
+/* Global Variables */
+:root {
+  --primary-color: #6366f1;
+  /* Indigo 500 */
+  --primary-hover: #4f46e5;
+  /* Indigo 600 */
+  --secondary-color: #ec4899;
+  /* Pink 500 */
+  --background-color: #0f172a;
+  /* Slate 900 */
+  --surface-color: #1e293b;
+  /* Slate 800 */
+  --text-color: #f8fafc;
+  /* Slate 50 */
+  --text-muted: #94a3b8;
+  /* Slate 400 */
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --success-color: #10b981;
+  --error-color: #ef4444;
+  --font-family: 'Inter', sans-serif;
+  --transition-speed: 0.3s;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-speed) ease-out forwards;
+}
+
+/* Alerts */
+.alert {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.3s ease-out;
+
+  &.alert-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    /* Red 500 with opacity */
+    border: 1px solid var(--error-color);
+    color: #fca5a5;
+    /* Red 300 */
+    animation: shake 0.4s ease-in-out;
+  }
+
+  &.alert-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    /* Emerald 500 with opacity */
+    border: 1px solid var(--success-color);
+    color: #6ee7b7;
+    /* Emerald 300 */
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.form-control {
+  background-color: var(--surface-color);
+  border: 1px solid var(--glass-border);
+  color: var(--text-color);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+  outline: none;
+
+  &:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+
+  &.ng-invalid.ng-touched {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+  }
+}
+
+/* Utility */
+.d-flex {
+  display: flex;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.content-center {
+  align-items: center;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+/* Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Toastr Imports */
+/* Toastr Imports - Moved to angular.json */
+
+/* Custom Toastr Styles */
+.toast-container .ngx-toastr {
+  background-color: var(--surface-color) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 12px !important;
+  font-family: var(--font-family) !important;
+}
+
+.toast-message {
+  font-size: 0.95rem;
+}
+
+.toast-title {
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.toast-success {
+  border-left: 5px solid var(--success-color) !important;
+}
+
+.toast-error {
+  border-left: 5px solid var(--error-color) !important;
+}
+
+.toast-info {
+  border-left: 5px solid var(--primary-color) !important;
+}
+
+.toast-warning {
+  border-left: 5px solid #f59e0b !important;
+}

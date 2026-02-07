@@ -1,0 +1,58 @@
+<div class="container fade-in">
+    <h1 class="page-title">Mon Panier</h1>
+
+    <div *ngIf="items.length === 0" class="empty-cart glass-card">
+        <div class="empty-icon">🛒</div>
+        <h3>Votre panier est vide</h3>
+        <p>Il semblerait que vous n'ayez rien ajouté pour le moment.</p>
+
+    </div>
+
+    <div *ngIf="items.length > 0" class="cart-layout">
+        <div class="cart-items">
+            <div *ngFor="let item of items" class="glass-card cart-item">
+                <div class="item-visual">
+                    <img [src]="item.image || 'assets/placeholder-product.png'" [alt]="item.name" class="item-img">
+                </div>
+
+                <div class="item-details">
+                    <h3 class="item-name">{{ item.name }}</h3>
+                    <p class="item-price">{{ item.price | number:'1.0-0' }} UM</p>
+                </div>
+
+                <div class="item-actions">
+                    <div class="quantity-controls">
+                        <button (click)="updateQuantity(item, item.quantity - 1)" class="qty-btn minus">-</button>
+                        <span class="qty-value">{{ item.quantity }}</span>
+                        <button (click)="updateQuantity(item, item.quantity + 1)" class="qty-btn plus">+</button>
+                    </div>
+                    <button (click)="removeItem(item)" class="delete-btn" title="Supprimer">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-summary glass-card">
+            <h2 class="summary-title">Résumé</h2>
+
+            <div class="summary-row total-row">
+                <span>Total</span>
+                <span class="total-amount">{{ total | number:'1.0-0' }} UM</span>
+            </div>
+
+            <div class="shipping-form">
+                <label>Adresse de livraison</label>
+                <textarea [(ngModel)]="shippingAddress" class="form-control"
+                    placeholder="Quartier, Rue, Numéro de maison..." rows="3"></textarea>
+            </div>
+
+            <button (click)="checkout()" class="btn-primary w-full checkout-btn" [disabled]="isSubmitting">
+                <i class="fas" [class.fa-spinner]="isSubmitting" [class.fa-spin]="isSubmitting"
+                    [class.fa-check-circle]="!isSubmitting"></i>
+                {{ isSubmitting ? 'Traitement...' : 'Confirmer la commande' }}
+            </button>
+            <p class="payment-note text-center">Paiement à la livraison</p>
+        </div>
+    </div>
+</div>

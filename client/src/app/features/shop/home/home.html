@@ -1,0 +1,28 @@
+<div class="container fade-in">
+    <h1 class="page-title">Boutique</h1>
+    <p class="page-subtitle">Découvrez nos produits</p>
+
+    <div class="products-grid">
+        <div *ngFor="let product of products" class="glass-card product-card" [routerLink]="['/product', product._id]">
+            <div class="card-image-wrapper">
+                <img [src]="product.image || 'assets/placeholder-product.png'" [alt]="product.name"
+                    class="product-image">
+                <span class="category-tag">{{ product.category }}</span>
+            </div>
+
+            <div class="card-content">
+                <h3 class="product-name">{{ product.name }}</h3>
+                <p class="product-description">{{ product.description }}</p>
+
+                <div class="card-footer">
+                    <span class="product-price">{{ product.price | number:'1.0-0' }} <small>UM</small></span>
+                    <button (click)="addToCart(product); $event.stopPropagation()" class="add-btn btn-primary"
+                        [disabled]="product.stock < 1">
+                        <i class="fas fa-shopping-bag"></i>
+                        {{ product.stock > 0 ? '' : 'Rupture' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

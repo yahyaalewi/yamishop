@@ -1,0 +1,38 @@
+<nav class="glass-nav" [class.hide-on-mobile]="isLoggedIn">
+    <div class="container">
+        <a routerLink="/" class="brand">Yamishop</a>
+
+        <button class="mobile-toggle" (click)="toggleMenu()">
+            <span></span><span></span><span></span>
+        </button>
+
+        <ul class="nav-links" [class.active]="menuOpen">
+            <!-- Common -->
+
+            <!-- Guest -->
+            <ng-container *ngIf="!isLoggedIn">
+                <li><a routerLink="/login" routerLinkActive="active">Connexion</a></li>
+                <li><a routerLink="/register" routerLinkActive="active" class="btn-highlight">S'inscrire</a></li>
+            </ng-container>
+
+            <!-- Client -->
+            <ng-container *ngIf="isLoggedIn && role !== 'Manager'">
+                <li class="desktop-only"><a routerLink="/shop" routerLinkActive="active">Boutique</a></li>
+                <li class="desktop-only"><a routerLink="/orders" routerLinkActive="active">Mes Commandes</a></li>
+                <li class="desktop-only"><a routerLink="/cart" routerLinkActive="active" class="cart-link">Panier <span
+                            *ngIf="cartCount > 0" class="cart-badge">{{ cartCount }}</span></a></li>
+                <li class="mobile-profile"><a routerLink="/profile" routerLinkActive="active"><i
+                            class="fas fa-user"></i></a></li>
+                <li class="desktop-only"><button (click)="logout()" class="btn-link">Déconnexion</button></li>
+            </ng-container>
+
+            <!-- Manager -->
+            <ng-container *ngIf="isLoggedIn && role === 'Manager'">
+                <li class="desktop-only"><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
+                <li class="mobile-profile"><a routerLink="/profile" routerLinkActive="active"><i
+                            class="fas fa-user"></i></a></li>
+                <li class="desktop-only"><button (click)="logout()" class="btn-link">Déconnexion</button></li>
+            </ng-container>
+        </ul>
+    </div>
+</nav>
