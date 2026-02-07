@@ -1,3 +1,26 @@
+/* Main Scroll Container logic */
+.main-scroll-container {
+    position: fixed;
+    /* Fix user in place */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    /* Internal scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* iOS Smooth Scroll */
+    padding-top: 80px;
+    /* Space for Navbar */
+    padding-bottom: 90px;
+    /* Space for Bottom Nav */
+    z-index: 1;
+    /* Behind navbars */
+    background-color: var(--background-color);
+}
+
 /* Bottom Navigation Styles */
 .mobile-bottom-nav {
     display: flex !important;
