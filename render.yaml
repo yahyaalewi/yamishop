@@ -5,7 +5,7 @@ services:
     runtime: docker
     plan: starter
     region: frankfurt
-    dockerContext: ./backend
+    dockerContext: .
     dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: PORT
@@ -24,7 +24,7 @@ services:
     runtime: docker
     plan: starter
     region: frankfurt
-    dockerContext: ./frontend
+    dockerContext: .
     dockerfilePath: ./frontend/Dockerfile
 
   # ── 3. WAF: ModSecurity + OWASP CRS (Public Service / Entry Point) ──────────
@@ -33,7 +33,7 @@ services:
     runtime: docker
     plan: starter
     region: frankfurt
-    dockerContext: ./waf
+    dockerContext: .
     dockerfilePath: ./waf/Dockerfile
     envVars:
       - key: BACKEND
@@ -47,4 +47,3 @@ services:
       - key: ALLOWED_METHODS
         value: "GET HEAD POST PUT DELETE PATCH OPTIONS"
     healthCheckPath: /api/health
-    # Render expose automatiquement le port de l'application
