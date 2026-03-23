@@ -1,11 +1,10 @@
 services:
   # ── 1. Backend API (Service Privé) ──────────────────────────────────────────
-  - type: web
+  - type: pserv
     name: yamishop-backend
     env: docker
     plan: starter
-    region: frankfurt # Tu peux changer la région (oregon, frankfurt, singapore...)
-    visibility: private # ✅ Sécurisé : non accessible via Internet
+    region: frankfurt
     dockerContext: ./backend
     dockerfile: Dockerfile
     envVars:
@@ -13,19 +12,18 @@ services:
         value: 5000
       - key: NODE_ENV
         value: production
-      - fromGroup: yamishop-secrets # On créera un groupe de secrets sur Render
+      - fromGroup: yamishop-secrets
     disk:
       name: uploads-storage
       mountPath: /app/uploads
-      sizeGB: 1 # 1 Go est largement suffisant pour commencer (et gratuit/pas cher)
+      sizeGB: 1
 
   # ── 2. Frontend Angular (Service Privé) ──────────────────────────────────────
-  - type: web
+  - type: pserv
     name: yamishop-frontend
     env: docker
     plan: starter
     region: frankfurt
-    visibility: private # ✅ Sécurisé : seul le WAF peut lui parler
     dockerContext: ./frontend
     dockerfile: Dockerfile
 
@@ -35,17 +33,17 @@ services:
     env: docker
     plan: starter
     region: frankfurt
-    visibility: public # 🌐 Seul point d'entrée public pour les utilisateurs
     dockerContext: ./waf
     dockerfile: Dockerfile
     envVars:
       - key: BACKEND
-        value: http://yamishop-frontend:8080 # Proxy vers le frontend interne Render
+        value: http://yamishop-frontend:8080
       - key: PARANOIA
         value: "1"
       - key: ANOMALY_INBOUND
-        value: "5"
+        value: "10"
       - key: ANOMALY_OUTBOUND
-        value: "4"
-    # IMPORTANT: Render utilise le port 80 ou le port définit par PORT
+        value: "10"
+      - key: ALLOWED_METHODS
+        value: "GET HEAD POST PUT DELETE PATCH OPTIONS"
     healthCheckPath: /api/health
