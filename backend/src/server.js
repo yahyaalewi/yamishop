@@ -3,7 +3,7 @@ const app = require('./app');
 const connectDB = require('./config/db');
 const Product = require('./models/Product');
 
-const PORT = process.env.PORT || 5000;
+const APP_PORT = process.env.APP_PORT || 5000;
 
 async function runMigrations() {
   // Add default gender to all existing products that don't have the field, or have null/empty
@@ -20,8 +20,8 @@ async function runMigrations() {
 
 connectDB().then(async () => {
   await runMigrations();
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  app.listen(APP_PORT, () => {
+    console.log(`Server running on port ${APP_PORT}`);
   });
 }).catch(err => {
   console.error("Failed to connect to DB", err);

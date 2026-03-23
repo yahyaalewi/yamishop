@@ -3,18 +3,16 @@ services:
   - type: web
     name: yamishop-api
     runtime: docker
-    plan: starter
+    plan: free
     region: frankfurt
     dockerContext: ./backend
     dockerfilePath: Dockerfile
     envVars:
       - key: PORT
         value: 80
+      - key: APP_PORT
+        value: 5000
       - key: NODE_ENV
         value: production
       - fromGroup: yamishop-secrets
-    disk:
-      name: uploads-storage
-      mountPath: /app/uploads
-      sizeGB: 1
     healthCheckPath: /api/health
