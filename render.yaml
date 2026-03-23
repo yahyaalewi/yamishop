@@ -1,12 +1,12 @@
 services:
-  # ── 1. Backend API (Service Privé) ──────────────────────────────────────────
+  # ── 1. Backend API (Private Service) ────────────────────────────────────────
   - type: pserv
     name: yamishop-backend
-    env: docker
+    runtime: docker
     plan: starter
     region: frankfurt
     dockerContext: ./backend
-    dockerfile: Dockerfile
+    dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: PORT
         value: 5000
@@ -18,23 +18,23 @@ services:
       mountPath: /app/uploads
       sizeGB: 1
 
-  # ── 2. Frontend Angular (Service Privé) ──────────────────────────────────────
+  # ── 2. Frontend Angular (Private Service) ────────────────────────────────────
   - type: pserv
     name: yamishop-frontend
-    env: docker
+    runtime: docker
     plan: starter
     region: frankfurt
     dockerContext: ./frontend
-    dockerfile: Dockerfile
+    dockerfilePath: ./frontend/Dockerfile
 
-  # ── 3. WAF: ModSecurity + OWASP CRS (Point d'Entrée Public) ─────────────────
+  # ── 3. WAF: ModSecurity + OWASP CRS (Public Service / Entry Point) ──────────
   - type: web
     name: yamishop-waf
-    env: docker
+    runtime: docker
     plan: starter
     region: frankfurt
     dockerContext: ./waf
-    dockerfile: Dockerfile
+    dockerfilePath: ./waf/Dockerfile
     envVars:
       - key: BACKEND
         value: http://yamishop-frontend:8080
@@ -47,3 +47,4 @@ services:
       - key: ALLOWED_METHODS
         value: "GET HEAD POST PUT DELETE PATCH OPTIONS"
     healthCheckPath: /api/health
+    # Render expose automatiquement le port de l'application
