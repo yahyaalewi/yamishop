@@ -17,6 +17,17 @@ services:
       - fromGroup: yamishop-secrets # Maintenant défini au début
     healthCheckPath: /api/health
 
+  # ── Yamishop Frontend (SPA) ────────────────────────────────────────────────
+  - type: static
+    name: yamishop-web
+    plan: free
+    buildCommand: "cd frontend && npm ci && npm run build"
+    publishDir: frontend/dist/frontend/browser
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
 envVarGroups:
   - name: yamishop-secrets
     envVars:
