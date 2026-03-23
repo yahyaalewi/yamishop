@@ -1,0 +1,14 @@
+# Docker artifacts
+.docker/
+*.log
+
+# Root level ignores
+.DS_Store
+Thumbs.db
+
+# Specific subfolder ignores (redundant but safe)
+backend/node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+backend/.env
