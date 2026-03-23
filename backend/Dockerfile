@@ -1,35 +1,40 @@
-# ── Stage 1: deps ──────────────────────────────────────────────────────────────
-FROM node:20-alpine AS deps
+# ── Stage 1: build API ────────────────────────────────────────────────────────
+FROM node:20-alpine AS builder
 
 WORKDIR /app
-
-# Copy only manifest files first (better layer caching)
 COPY package.json package-lock.json ./
-
 RUN npm ci --omit=dev
+COPY . .
 
-# ── Stage 2: final image ───────────────────────────────────────────────────────
-FROM node:20-alpine AS runner
+# ── Stage 2: Final Image with WAF + API ───────────────────────────────────────
+# On utilise l'image officielle OWASP ModSecurity qui contient déjà Nginx+WAF
+FROM owasp/modsecurity-crs:nginx-alpine
+
+# Installer Node.js et Supervisor (pour lancer 2 processus en même temps)
+RUN apk add --no-cache nodejs npm supervisor
 
 WORKDIR /app
 
-# Create a non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Copier le code du backend depuis le stage builder
+COPY --from=builder /app /app
 
-# Copy production node_modules from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+# Configurer Nginx (WAF)
+COPY nginx-waf.conf /etc/nginx/conf.d/default.conf
+COPY modsecurity-tuning.conf /etc/modsecurity.d/modsecurity-tuning.conf
 
-# Copy application source
-COPY src ./src
-COPY package.json ./
+# Configuration de Supervisor pour lancer Nginx et Node.js
+RUN echo "[supervisord]" > /etc/supervisord.conf && \
+    echo "nodaemon=true" >> /etc/supervisord.conf && \
+    echo "[program:node-api]" >> /etc/supervisord.conf && \
+    echo "command=node src/server.js" >> /etc/supervisord.conf && \
+    echo "directory=/app" >> /etc/supervisord.conf && \
+    echo "stdout_logfile=/dev/stdout" >> /etc/supervisord.conf && \
+    echo "stderr_logfile=/dev/stderr" >> /etc/supervisord.conf && \
+    echo "[program:nginx-waf]" >> /etc/supervisord.conf && \
+    echo "command=nginx -g 'daemon off;'" >> /etc/supervisord.conf && \
+    echo "stdout_logfile=/dev/stdout" >> /etc/supervisord.conf && \
+    echo "stderr_logfile=/dev/stderr" >> /etc/supervisord.conf
 
-# Create the uploads directory (for multer) and set permissions
-RUN mkdir -p uploads && chown -R appuser:appgroup /app
+EXPOSE 80
 
-USER appuser
-
-EXPOSE 5000
-
-ENV NODE_ENV=production
-
-CMD ["node", "src/server.js"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

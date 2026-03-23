@@ -1,7 +1,7 @@
 services:
-  # ── 1. Backend API (Private Service) ────────────────────────────────────────
-  - type: pserv
-    name: yamishop-backend
+  # ── Yamishop API Sécurisée (WAF + Backend) ──────────────────────────────────
+  - type: web
+    name: yamishop-api
     runtime: docker
     plan: starter
     region: frankfurt
@@ -9,7 +9,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     envVars:
       - key: PORT
-        value: 5000
+        value: 80
       - key: NODE_ENV
         value: production
       - fromGroup: yamishop-secrets
@@ -17,33 +17,4 @@ services:
       name: uploads-storage
       mountPath: /app/uploads
       sizeGB: 1
-
-  # ── 2. Frontend Angular (Private Service) ────────────────────────────────────
-  - type: pserv
-    name: yamishop-frontend
-    runtime: docker
-    plan: starter
-    region: frankfurt
-    dockerContext: .
-    dockerfilePath: ./frontend/Dockerfile
-
-  # ── 3. WAF: ModSecurity + OWASP CRS (Public Service / Entry Point) ──────────
-  - type: web
-    name: yamishop-waf
-    runtime: docker
-    plan: starter
-    region: frankfurt
-    dockerContext: .
-    dockerfilePath: ./waf/Dockerfile
-    envVars:
-      - key: BACKEND
-        value: http://yamishop-frontend:8080
-      - key: PARANOIA
-        value: "1"
-      - key: ANOMALY_INBOUND
-        value: "10"
-      - key: ANOMALY_OUTBOUND
-        value: "10"
-      - key: ALLOWED_METHODS
-        value: "GET HEAD POST PUT DELETE PATCH OPTIONS"
     healthCheckPath: /api/health
