@@ -13,7 +13,7 @@ import { NotificationService } from '../../services/notification.service';
   imports: [CommonModule, RouterLink],
   styles: [':host { display: block; }'],
   template: `
-    <header class="fixed top-0 left-0 right-0 z-50 w-full bg-primary text-white shadow-lg">
+    <header class="fixed top-0 left-0 right-0 z-50 w-full backdrop-blur-md bg-primary/90 text-white shadow-lg border-b border-white/10">
       <div class="container mx-auto px-4 h-16 flex items-center gap-4">
 
         <!-- Logo -->
