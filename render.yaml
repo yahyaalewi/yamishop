@@ -14,5 +14,13 @@ services:
         value: 5000
       - key: NODE_ENV
         value: production
-      - fromGroup: yamishop-secrets
+      - fromGroup: yamishop-secrets # Maintenant défini au début
     healthCheckPath: /api/health
+
+envVarGroups:
+  - name: yamishop-secrets
+    envVars:
+      - key: MONGO_URI
+      - key: JWT_SECRET
+      - key: ALLOWED_ORIGINS
+        value: "*"
