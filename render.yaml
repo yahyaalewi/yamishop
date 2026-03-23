@@ -18,9 +18,9 @@ services:
     healthCheckPath: /api/health
 
   # ── Yamishop Frontend (SPA) ────────────────────────────────────────────────
-  - type: static_site
+  - type: web
+    runtime: static
     name: yamishop-web
-    plan: free
     buildCommand: "cd frontend && npm ci && npm run build"
     publishDir: frontend/dist/frontend/browser
     routes:
