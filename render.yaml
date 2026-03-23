@@ -21,6 +21,8 @@ envVarGroups:
   - name: yamishop-secrets
     envVars:
       - key: MONGO_URI
+        value: "mongodb://replace_with_your_atlas_uri"
       - key: JWT_SECRET
+        value: "replace_with_a_secure_random_key"
       - key: ALLOWED_ORIGINS
         value: "*"
