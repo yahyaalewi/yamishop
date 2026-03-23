@@ -32,11 +32,15 @@ RUN echo "[supervisord]" > /etc/supervisord.conf && \
     echo "command=node src/server.js" >> /etc/supervisord.conf && \
     echo "directory=/app" >> /etc/supervisord.conf && \
     echo "stdout_logfile=/dev/stdout" >> /etc/supervisord.conf && \
+    echo "stdout_logfile_maxbytes=0" >> /etc/supervisord.conf && \
     echo "stderr_logfile=/dev/stderr" >> /etc/supervisord.conf && \
+    echo "stderr_logfile_maxbytes=0" >> /etc/supervisord.conf && \
     echo "[program:nginx-waf]" >> /etc/supervisord.conf && \
     echo "command=nginx -g 'daemon off;'" >> /etc/supervisord.conf && \
     echo "stdout_logfile=/dev/stdout" >> /etc/supervisord.conf && \
-    echo "stderr_logfile=/dev/stderr" >> /etc/supervisord.conf
+    echo "stdout_logfile_maxbytes=0" >> /etc/supervisord.conf && \
+    echo "stderr_logfile=/dev/stderr" >> /etc/supervisord.conf && \
+    echo "stderr_logfile_maxbytes=0" >> /etc/supervisord.conf
 
 EXPOSE 80
 
