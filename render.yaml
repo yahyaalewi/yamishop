@@ -1,0 +1,47 @@
+services:
+  # ── 1. Backend API (Service Privé) ──────────────────────────────────────────
+  - type: web
+    name: yamishop-backend
+    env: docker
+    plan: starter
+    region: frankfurt # Tu peux changer la région (oregon, frankfurt, singapore...)
+    visibility: private # ✅ Sécurisé : non accessible via Internet
+    dockerContext: ./backend
+    dockerfile: Dockerfile
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - fromGroup: yamishop-secrets # On créera un groupe de secrets sur Render
+
+  # ── 2. Frontend Angular (Service Privé) ──────────────────────────────────────
+  - type: web
+    name: yamishop-frontend
+    env: docker
+    plan: starter
+    region: frankfurt
+    visibility: private # ✅ Sécurisé : seul le WAF peut lui parler
+    dockerContext: ./frontend
+    dockerfile: Dockerfile
+
+  # ── 3. WAF: ModSecurity + OWASP CRS (Point d'Entrée Public) ─────────────────
+  - type: web
+    name: yamishop-waf
+    env: docker
+    plan: starter
+    region: frankfurt
+    visibility: public # 🌐 Seul point d'entrée public pour les utilisateurs
+    dockerContext: ./waf
+    dockerfile: Dockerfile
+    envVars:
+      - key: BACKEND
+        value: http://yamishop-frontend:8080 # Proxy vers le frontend interne Render
+      - key: PARANOIA
+        value: "1"
+      - key: ANOMALY_INBOUND
+        value: "5"
+      - key: ANOMALY_OUTBOUND
+        value: "4"
+    # IMPORTANT: Render utilise le port 80 ou le port définit par PORT
+    healthCheckPath: /api/health
