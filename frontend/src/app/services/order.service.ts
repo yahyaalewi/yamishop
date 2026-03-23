@@ -27,7 +27,7 @@ export interface Order {
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = 'http://localhost:5000/api/orders';
+  private apiUrl = 'https://yamishop-api.onrender.com/api/orders';
 
   constructor(private http: HttpClient) {}
 

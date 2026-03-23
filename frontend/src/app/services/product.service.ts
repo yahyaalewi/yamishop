@@ -23,7 +23,7 @@ export interface Product {
   providedIn: 'root'
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:5000/api/products';
+  private apiUrl = 'https://yamishop-api.onrender.com/api/products';
 
   constructor(private http: HttpClient) {}
 
@@ -46,7 +46,7 @@ export class ProductService {
     const cleanPath = url.startsWith('/') ? url : `/${url}`;
     
     // In production, we'd use environment.apiUrl. For now, matching user's backend port
-    const backendBase = 'http://localhost:5000';
+    const backendBase = 'https://yamishop-api.onrender.com';
     
     return `${backendBase}${cleanPath}`;
   }
@@ -78,6 +78,6 @@ export class ProductService {
   uploadImage(file: File): Observable<{ url: string }> {
     const formData = new FormData();
     formData.append('image', file);
-    return this.http.post<{ url: string }>('http://localhost:5000/api/uploads', formData);
+    return this.http.post<{ url: string }>('https://yamishop-api.onrender.com/api/uploads', formData);
   }
 }
