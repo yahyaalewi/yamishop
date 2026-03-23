@@ -6,7 +6,7 @@ services:
     plan: free
     region: frankfurt
     dockerContext: ./backend
-    dockerfilePath: Dockerfile
+    dockerfilePath: backend/Dockerfile
     envVars:
       - key: PORT
         value: 80
