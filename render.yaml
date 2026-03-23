@@ -22,7 +22,7 @@ services:
     runtime: static
     name: yamishop-web
     buildCommand: "cd frontend && npm ci && npm run build"
-    publishDir: frontend/dist/frontend/browser
+    staticPublishPath: frontend/dist/frontend/browser
     routes:
       - type: rewrite
         source: /*
