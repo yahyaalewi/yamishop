@@ -10,6 +10,9 @@ COPY . .
 # On utilise l'image officielle OWASP ModSecurity qui contient déjà Nginx+WAF
 FROM owasp/modsecurity-crs:nginx-alpine
 
+# Utiliser root pour installer les dépendances système
+USER root
+
 # Installer Node.js et Supervisor (pour lancer 2 processus en même temps)
 RUN apk add --no-cache nodejs npm supervisor
 
