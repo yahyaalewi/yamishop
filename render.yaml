@@ -14,6 +14,10 @@ services:
       - key: NODE_ENV
         value: production
       - fromGroup: yamishop-secrets # On créera un groupe de secrets sur Render
+    disk:
+      name: uploads-storage
+      mountPath: /app/uploads
+      sizeGB: 1 # 1 Go est largement suffisant pour commencer (et gratuit/pas cher)
 
   # ── 2. Frontend Angular (Service Privé) ──────────────────────────────────────
   - type: web
