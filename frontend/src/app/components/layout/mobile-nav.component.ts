@@ -22,7 +22,7 @@ import { LanguageService } from '../../services/language.service';
       </a>
 
       <!-- Shop -->
-      <a routerLink="/products" routerLinkActive="text-primary"
+      <a [routerLink]="['/home']" fragment="products-list" routerLinkActive="text-primary"
          class="flex flex-col items-center gap-1 text-gray-400 no-underline transition-colors py-1">
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
