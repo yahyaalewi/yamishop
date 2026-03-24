@@ -25,40 +25,40 @@ export interface Product {
 export class ProductService {
   private apiUrl = 'https://yamishop-api.onrender.com/api/products';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getImageUrl(imageSource: any): string {
     // If no source is provided at all
     if (!imageSource) return 'https://via.placeholder.com/800x800.png?text=Bient%C3%B4t+Disponible';
-    
+
     // Sometimes the whole product object is passed instead of just the URL
     const url = typeof imageSource === 'string' ? imageSource : (imageSource.imageUrl || imageSource.image);
-    
+
     if (!url) return 'https://via.placeholder.com/800x800.png?text=Bient%C3%B4t+Disponible';
 
     // If it's already an absolute URL (e.g., Unsplash), return it as is
     if (url.startsWith('http')) return url;
-    
+
     // If it's a base64 string
     if (url.startsWith('data:image')) return url;
 
     // Standardize the relative path
     const cleanPath = url.startsWith('/') ? url : `/${url}`;
-    
+
     // In production, we'd use environment.apiUrl. For now, matching user's backend port
     const backendBase = 'https://yamishop-api.onrender.com';
-    
+
     return `${backendBase}${cleanPath}`;
   }
 
   getProducts(): Observable<Product[]> {
-    return this.http.get<{data: Product[]}>(this.apiUrl).pipe(
+    return this.http.get<{ data: Product[] }>(this.apiUrl).pipe(
       map(response => response.data)
     );
   }
 
   getProductById(id: string): Observable<Product> {
-    return this.http.get<{data: Product}>(`${this.apiUrl}/${id}`).pipe(
+    return this.http.get<{ data: Product }>(`${this.apiUrl}/${id}`).pipe(
       map(response => response.data)
     );
   }
