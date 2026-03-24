@@ -15,12 +15,10 @@ import { LanguageService } from '../services/language.service';
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterLink, FormsModule],
   styles: [':host { display: block; }'],
   template: `
-    <div class="min-h-screen flex flex-col bg-gray-50 pt-16 pb-16 md:pb-0">
-      <app-header></app-header>
-
+    <div class="h-full">
       <main class="flex-grow container mx-auto px-4 py-8">
 
         <!-- Success screen -->
@@ -204,7 +202,7 @@ import { LanguageService } from '../services/language.service';
         </div>
       </main>
 
-      <app-footer></app-footer>
+      </main>
     </div>
   `
 })

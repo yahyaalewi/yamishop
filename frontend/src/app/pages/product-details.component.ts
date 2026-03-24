@@ -24,12 +24,10 @@ const PRODUCTS: any[] = [
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonComponent, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterLink, ButtonComponent],
   styles: [':host { display: block; }'],
   template: `
-    <div class="min-h-screen flex flex-col bg-white pt-16 pb-16 md:pb-0">
-      <app-header></app-header>
-
+    <div class="h-full">
       <main class="flex-grow">
         <!-- Loading State -->
         <div *ngIf="loading(); else content" class="container mx-auto px-4 py-20 flex flex-col items-center justify-center gap-4">
@@ -242,8 +240,6 @@ const PRODUCTS: any[] = [
           </ng-template>
         </ng-template>
       </main>
-
-      <app-footer></app-footer>
     </div>
   `
 })

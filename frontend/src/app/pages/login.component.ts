@@ -13,13 +13,11 @@ import { LanguageService } from '../services/language.service';
   imports: [CommonModule, RouterLink, FormsModule, ButtonComponent],
   styles: [':host { display: block; }'],
   template: `
-    <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
-
+    <div class="h-full flex flex-col items-center justify-center px-4 py-12">
       <!-- Card -->
-      <div class="bg-white rounded-3xl shadow-xl border border-gray-100 w-full max-w-md p-8">
+      <div class="bg-white rounded-3xl shadow-xl border border-gray-100 w-full max-w-md p-8 relative z-10">
         <!-- Header -->
         <div class="text-center mb-8">
-          <a routerLink="/" class="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 shadow-lg no-underline">Y</a>
           <h1 class="text-2xl font-extrabold text-gray-900">{{ lang.translate('nav.login') }}</h1>
           <p class="text-sm text-gray-500 mt-1">
             {{ lang.translate('auth.no_account') }}

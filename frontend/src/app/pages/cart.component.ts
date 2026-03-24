@@ -12,12 +12,10 @@ import { NotificationService } from '../services/notification.service';
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterLink],
   styles: [':host { display: block; }'],
   template: `
-    <div class="min-h-screen flex flex-col bg-slate-50 pt-16 pb-16 md:pb-0">
-      <app-header></app-header>
-
+    <div class="h-full">
       <main class="flex-grow container mx-auto px-4 pt-28 pb-16">
         <div class="flex items-end justify-between mb-10">
           <div>
@@ -154,8 +152,6 @@ import { NotificationService } from '../services/notification.service';
           </div>
         </div>
       </main>
-
-      <app-footer></app-footer>
     </div>
   `
 })

@@ -19,12 +19,10 @@ const CATEGORIES = [
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterLink],
   styles: [':host { display: block; }'],
   template: `
-    <div class="min-h-screen flex flex-col bg-gray-50 pt-16 pb-16 md:pb-0">
-      <app-header></app-header>
-
+    <div class="h-full">
       <main class="flex-grow">
 
         <!-- Hero -->
@@ -180,8 +178,6 @@ const CATEGORIES = [
         </section>
 
       </main>
-
-      <app-footer></app-footer>
     </div>
   `
 })

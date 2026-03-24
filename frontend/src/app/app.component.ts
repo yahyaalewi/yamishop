@@ -6,42 +6,49 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NotificationComponent } from './components/ui/notification.component';
 import { ConfirmModalComponent } from './components/ui/confirm-modal.component';
 import { MobileNavComponent } from './components/layout/mobile-nav.component';
+import { HeaderComponent } from './components/layout/header.component';
+import { FooterComponent } from './components/layout/footer.component';
 import { AuthService } from './services/auth.service';
-
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NotificationComponent, ConfirmModalComponent, MobileNavComponent, CommonModule],
+  imports: [RouterOutlet, NotificationComponent, ConfirmModalComponent, MobileNavComponent, HeaderComponent, FooterComponent, CommonModule],
   template: `
     <app-notifications></app-notifications>
     <app-confirm-modal></app-confirm-modal>
-    <router-outlet></router-outlet>
-    <app-mobile-nav *ngIf="showMobileNav()"></app-mobile-nav>
+    
+    <!-- Stable Global Header -->
+    <app-header *ngIf="showNavigation()"></app-header>
+    
+    <main [class.pt-16]="showNavigation()" [class.pb-16]="showNavigation()" class="min-h-screen flex flex-col bg-gray-50 md:pb-0">
+      <div class="flex-grow">
+        <router-outlet></router-outlet>
+      </div>
+      <app-footer *ngIf="showNavigation()"></app-footer>
+    </main>
+    
+    <!-- Stable Bottom Navigation for Mobile -->
+    <app-mobile-nav *ngIf="showNavigation()"></app-mobile-nav>
   `
 })
 export class AppComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   
-  // Track URL changes to hide/show mobile nav
   private currentUrl = toSignal(
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     )
   );
 
-  showMobileNav = computed(() => {
-    // Access currentUrl and auth user signal to make this computed signal reactive
+  showNavigation = computed(() => {
     this.currentUrl(); 
-    const user = this.authService.currentUser();
     const isAdmin = this.authService.isAdmin();
-    
-    // Hide navigation for admins (restricted to dashboard)
     if (isAdmin) return false;
     
-    // ONLY hide navigation on the very first splash screen (root path)
     const url = this.router.url;
+    // Hide ONLY on welcome and splash screen, show on login/register for stability
     return url !== '/' && url !== '/welcome';
   });
 }

@@ -14,11 +14,9 @@ import { LanguageService } from '../services/language.service';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent, HeaderComponent, FooterComponent, RouterLink],
+  imports: [CommonModule, FormsModule, ButtonComponent, RouterLink],
   template: `
-    <div class="min-h-screen flex flex-col bg-gray-50 pt-16 pb-16 md:pb-0">
-      <app-header></app-header>
-      
+    <div class="h-full">
       <main class="flex-grow container mx-auto px-4 pt-24 pb-12">
         <div class="max-w-4xl mx-auto space-y-12">
           
@@ -137,8 +135,6 @@ import { LanguageService } from '../services/language.service';
 
         </div>
       </main>
-
-      <app-footer></app-footer>
     </div>
   `,
   styles: [`
