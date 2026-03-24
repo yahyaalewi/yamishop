@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middleware/uploadMiddleware');
+const multer = require('multer');
+const { storage } = require('../config/cloudinary');
 const { protect, admin } = require('../middleware/auth');
+
+const upload = multer({ storage });
 
 router.post('/', protect, admin, (req, res) => {
   console.log('Upload request received');
   upload.single('image')(req, res, (err) => {
     if (err) {
-      console.error('Multer error:', err);
+      console.error('Cloudinary upload error:', err);
       return res.status(400).json({ message: err.message });
     }
     
@@ -16,11 +19,10 @@ router.post('/', protect, admin, (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
     
-    console.log('File uploaded:', req.file.filename);
-    const filePath = `/uploads/${req.file.filename}`;
+    console.log('File uploaded to Cloudinary:', req.file.path);
     res.json({
-      message: 'Image uploaded successfully',
-      url: filePath
+      message: 'Image uploaded to Cloudinary successfully',
+      url: req.file.path // Cloudinary full HTTPS URL
     });
   });
 });
