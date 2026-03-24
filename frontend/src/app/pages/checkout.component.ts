@@ -15,7 +15,7 @@ import { LanguageService } from '../services/language.service';
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule],
   styles: [':host { display: block; }'],
   template: `
     <div class="h-full">
