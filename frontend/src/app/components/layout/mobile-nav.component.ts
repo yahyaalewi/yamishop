@@ -10,7 +10,7 @@ import { LanguageService } from '../../services/language.service';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-100 px-6 py-2 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] flex justify-between items-center safe-area-bottom" [attr.dir]="lang.isRTL() ? 'rtl' : 'ltr'">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-100 px-6 py-2 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] grid grid-cols-4 items-center safe-area-bottom" [attr.dir]="lang.isRTL() ? 'rtl' : 'ltr'">
       
       <!-- Home -->
       <a routerLink="/home" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}" 
@@ -22,7 +22,7 @@ import { LanguageService } from '../../services/language.service';
       </a>
 
       <!-- Shop -->
-      <a [routerLink]="['/home']" fragment="products-list" routerLinkActive="text-primary"
+      <a routerLink="/products" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}"
          class="flex flex-col items-center gap-1 text-gray-400 no-underline transition-colors py-1">
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -42,7 +42,7 @@ import { LanguageService } from '../../services/language.service';
             {{cartCount()}}
           </span>
         </div>
-        <span class="text-[10px] font-bold uppercase tracking-tighter">{{ lang.translate('nav.cart') }}</span>
+        <span class="text-[10px] font-bold uppercase tracking-tighter text-center">{{ lang.translate('nav.cart') }}</span>
       </a>
 
       <!-- Profile / Register -->
@@ -51,7 +51,7 @@ import { LanguageService } from '../../services/language.service';
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
         </svg>
-        <span class="text-[10px] font-bold uppercase tracking-tighter">
+        <span class="text-[10px] font-bold uppercase tracking-tighter text-center">
           {{ authService.currentUser() ? lang.translate('profile.title') : lang.translate('nav.register') }}
         </span>
       </a>

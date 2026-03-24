@@ -221,10 +221,10 @@ export class HomeComponent implements OnInit {
       this.selectedCategory.set(params['category'] || null);
       this.selectedGender.set(params['gender'] || null);
 
-      if (params['gender'] || params['category']) {
+      if (params['gender'] || params['category'] || this.router.url.includes('/products')) {
         setTimeout(() => {
           document.getElementById('products-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+        }, 300);
       }
     });
 
