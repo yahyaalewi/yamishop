@@ -17,8 +17,10 @@ export interface User {
 })
 export class AuthService {
   currentUser = signal<User | null>(null);
-  // Default to localhost, should be an environment variable in prod
-  private apiUrl = 'http://localhost:5000/api/users';
+  // Dynamic URL based on environment
+  private apiUrl = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000/api/users' 
+    : 'https://yamishop-api.onrender.com/api/users';
   
   constructor(private http: HttpClient) {
     const storedUser = localStorage.getItem('yamishop_user');
