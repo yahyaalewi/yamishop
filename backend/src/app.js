@@ -51,7 +51,7 @@ app.use(
 );
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost').split(',');
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost,http://localhost:4200,http://localhost:4000').split(',');
 app.use(cors({
   origin: (origin, cb) => {
     // Allow requests with no origin (mobile apps, curl, Postman) or if * is allowed

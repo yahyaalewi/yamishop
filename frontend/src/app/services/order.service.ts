@@ -27,7 +27,7 @@ export interface Order {
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = 'https://yamishop-api.onrender.com/api/orders';
+  private apiUrl = 'http://localhost:5000/api/orders';
 
   constructor(private http: HttpClient) {}
 
@@ -57,5 +57,11 @@ export class OrderService {
 
   deleteOrder(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
+
+  downloadInvoice(id: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/invoice`, {
+      responseType: 'blob'
+    });
   }
 }

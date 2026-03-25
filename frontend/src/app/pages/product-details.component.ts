@@ -202,7 +202,7 @@ const PRODUCTS: any[] = [
 
                 <!-- Features Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div *ngFor="let feat of (translatedFeatures()?.length ? translatedFeatures() : product.features)" 
+                  <div *ngFor="let feat of (translatedFeatures().length ? translatedFeatures() : product.features)" 
                        class="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-primary/20 transition-all group">
                     <div class="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm text-primary group-hover:scale-110 transition-transform">✓</div>
                     <span class="text-sm font-bold text-gray-700">{{feat}}</span>

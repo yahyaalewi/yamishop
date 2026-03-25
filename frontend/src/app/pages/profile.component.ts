@@ -113,6 +113,16 @@ import { LanguageService } from '../services/language.service';
                         <p class="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-tighter" *ngIf="order.shippingPrice > 0">
                           {{ lang.isRTL() ? 'شامل التوصيل' : 'Livraison incluse' }}
                         </p>
+                        
+                        <!-- Invoice Download Button -->
+                        <button *ngIf="order.isConfirmed" 
+                                (click)="downloadInvoice(order._id); $event.stopPropagation()"
+                                class="mt-3 flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-white rounded-lg text-[10px] font-bold transition-all border border-primary/20">
+                          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                          </svg>
+                          {{ lang.translate('profile.invoice') }}
+                        </button>
                       </div>
                     </div>
 
@@ -227,5 +237,25 @@ export class ProfileComponent implements OnInit {
   getStatusClass(order: Order) {
     if (order.isConfirmed) return 'bg-sage/20 text-sage-dark';
     return 'bg-yellow-100 text-yellow-700';
+  }
+
+  downloadInvoice(orderId: string) {
+    this.notificationService.show(this.lang.translate('common.loading'));
+    this.orderService.downloadInvoice(orderId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `facture-${orderId.substring(orderId.length-6).toUpperCase()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      },
+      error: (err) => {
+        console.error('Invoice download failed', err);
+        this.notificationService.show(this.lang.translate('msg.error_occurred'), 'error');
+      }
+    });
   }
 }
