@@ -49,7 +49,7 @@ const registerUser = async (req, res) => {
       phone,
       password,
       email,
-      role: 'client' // Force role to client to prevent privilege escalation
+      role: 'user' // Force role to user to prevent privilege escalation
     });
 
     if (user) {
