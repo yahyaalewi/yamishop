@@ -28,6 +28,7 @@ COPY modsecurity-tuning.conf /etc/modsecurity.d/modsecurity-tuning.conf
 # Configuration de Supervisor pour lancer Nginx et Node.js
 RUN echo "[supervisord]" > /etc/supervisord.conf && \
     echo "nodaemon=true" >> /etc/supervisord.conf && \
+    echo "user=root" >> /etc/supervisord.conf && \
     echo "[program:node-api]" >> /etc/supervisord.conf && \
     echo "command=node src/server.js" >> /etc/supervisord.conf && \
     echo "directory=/app" >> /etc/supervisord.conf && \
