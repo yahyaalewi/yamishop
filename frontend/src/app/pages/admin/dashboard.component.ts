@@ -24,6 +24,7 @@ import { ProductService } from '../../services/product.service';
           <div>
             <p class="text-sm font-medium text-gray-500">Revenus Total</p>
             <p class="text-2xl font-bold text-gray-900">{{ revenue() | number }} MRU</p>
+            <p class="text-[10px] text-gray-400 font-medium mt-1">Dont {{ revenueShipping() | number }} MRU livraison</p>
           </div>
         </div>
 
@@ -83,7 +84,10 @@ import { ProductService } from '../../services/product.service';
                 <td class="px-4 py-3 font-medium text-gray-900 truncate max-w-[100px]">#{{order._id.substring(order._id.length-6).toUpperCase()}}</td>
                 <td class="px-4 py-3">{{order.user?.name || 'Client Supprimé'}}</td>
                 <td class="px-4 py-3">{{order.createdAt | date:'short'}}</td>
-                <td class="px-4 py-3 font-semibold text-primary">{{order.totalPrice | number}} MRU</td>
+                <td class="px-4 py-3">
+                  <span class="font-semibold text-primary">{{order.totalPrice | number}} MRU</span>
+                  <div class="text-[10px] text-gray-500 font-medium mt-0.5">Livraison: {{ order.shippingPrice || 150 }} MRU</div>
+                </td>
                 <td class="px-4 py-3">
                   <span [class]="getStatusClass(order)" class="py-1 px-3 rounded-full text-xs font-semibold">
                     {{ order.isConfirmed ? 'Confirmée' : 'En Attente' }}
@@ -126,6 +130,12 @@ export class AdminDashboardComponent implements OnInit {
     this.orders()
       .filter(o => o.isConfirmed)
       .reduce((sum, o) => sum + o.totalPrice, 0)
+  );
+  
+  revenueShipping = computed(() => 
+    this.orders()
+      .filter(o => o.isConfirmed)
+      .reduce((sum, o) => sum + (o.shippingPrice || 150), 0)
   );
   
   monthOrdersCount = computed(() => {

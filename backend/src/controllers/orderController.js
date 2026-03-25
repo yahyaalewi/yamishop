@@ -6,7 +6,8 @@ const addOrderItems = async (req, res) => {
       orderItems,
       shippingAddress,
       paymentMethod,
-      totalPrice
+      totalPrice,
+      shippingPrice // Add it here
     } = req.body;
 
     if (!orderItems || orderItems.length === 0) {
@@ -25,6 +26,7 @@ const addOrderItems = async (req, res) => {
       user: req.user._id,
       shippingAddress,
       paymentMethod,
+      shippingPrice: shippingPrice || 150,
       totalPrice,
     });
 
@@ -208,15 +210,18 @@ const getOrderInvoice = async (req, res) => {
     const subtotalY = tableTop + 30 + i * 25 + 20;
     doc.moveTo(350, subtotalY).lineTo(550, subtotalY).stroke();
 
+    const deliveryCost = order.shippingPrice || 150;
+    const productsCost = order.totalPrice - deliveryCost;
+
     // Footer summary
     doc
       .fontSize(10)
       .font('Helvetica')
       .text('Prix Produits:', 370, subtotalY + 10, { width: 90, align: 'right' })
-      .text(`${(order.totalPrice - order.shippingPrice).toLocaleString()} MRU`, 460, subtotalY + 10, { width: 90, align: 'right' })
+      .text(`${productsCost.toLocaleString()} MRU`, 460, subtotalY + 10, { width: 90, align: 'right' })
       
       .text('Livraison:', 370, subtotalY + 25, { width: 90, align: 'right' })
-      .text(`${order.shippingPrice.toLocaleString()} MRU`, 460, subtotalY + 25, { width: 90, align: 'right' })
+      .text(`${deliveryCost.toLocaleString()} MRU`, 460, subtotalY + 25, { width: 90, align: 'right' })
 
       .fontSize(12)
       .font('Helvetica-Bold')
