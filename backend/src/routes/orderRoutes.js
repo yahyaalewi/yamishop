@@ -7,7 +7,8 @@ const {
   updateOrderToConfirmed,
   deleteOrder,
   getMyOrders,
-  getOrders
+  getOrders,
+  getOrderInvoice
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/auth');
 
