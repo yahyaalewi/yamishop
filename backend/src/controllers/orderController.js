@@ -201,14 +201,22 @@ const getOrderInvoice = async (req, res) => {
     const fs = require('fs');
     const path = require('path');
 
-    // Robust factory/constructor calls
-    const bidi = (typeof bidiFactory === 'function') ? bidiFactory() : bidiFactory;
-    const reshaper = (typeof ArabicReshaper === 'function') ? new ArabicReshaper() : ArabicReshaper;
+    // Diagnostic Mode - MOVED BEFORE PROTECT CHECKS
+    const fontPath = path.join(__dirname, '../assets/fonts/Almarai-Regular.ttf');
+    if (req.query.check_font === 'true') {
+      return res.json({
+        system: 'Yamishop',
+        exists: fs.existsSync(fontPath),
+        path: fontPath,
+        dir: __dirname,
+        files: fs.existsSync(path.join(__dirname, '../assets/fonts')) ? fs.readdirSync(path.join(__dirname, '../assets/fonts')) : 'dir missing'
+      });
+    }
 
     const order = await Order.findById(req.params.id).populate('user', 'name phone email');
     if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    if (order.user._id.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+    if (order.user._id.toString() !== req.user?._id?.toString() && !req.user?.isAdmin) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
