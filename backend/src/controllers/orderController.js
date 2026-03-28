@@ -102,24 +102,35 @@ const updateOrderToConfirmed = async (req, res) => {
 
     if (order) {
       if (!order.isConfirmed) {
-        console.log(`Decreasing stock for order ${order._id}...`);
+        console.log(`[STOCK UPDATE] Starting update for order: ${order._id}`);
+        
         for (const item of order.orderItems) {
           const qty = Number(item.quantity) || 0;
           if (qty > 0 && item.product) {
-            console.log(`- Product: ${item.product}, Qty: ${qty}`);
-            const result = await Product.updateOne(
-              { _id: item.product },
-              { $inc: { stock: -qty } }
-            );
-            console.log(`  Update result:`, result);
+            console.log(`[STOCK UPDATE] Updating Product ID: ${item.product} (Decrease by ${qty})`);
+            
+            const prodBefore = await Product.findById(item.product);
+            if (prodBefore) {
+              console.log(`[STOCK UPDATE] Current stock: ${prodBefore.stock}`);
+              prodBefore.stock = Math.max(0, prodBefore.stock - qty);
+              await prodBefore.save();
+              console.log(`[STOCK UPDATE] New stock: ${prodBefore.stock}`);
+            } else {
+              console.log(`[STOCK UPDATE] ERROR: Product not found with ID: ${item.product}`);
+            }
+          } else {
+            console.log(`[STOCK UPDATE] WARNING: Invalid item or qty skip: ${item.name}`);
           }
         }
+        
         order.isConfirmed = true;
         order.confirmedAt = Date.now();
         const updatedOrder = await order.save();
+        console.log(`[STOCK UPDATE] Order marked as confirmed.`);
         return res.json(updatedOrder);
       }
       
+      console.log(`[STOCK UPDATE] Order was already marked confirmed.`);
       res.json(order);
     } else {
       res.status(404).json({ message: 'Order not found' });
