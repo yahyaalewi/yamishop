@@ -241,8 +241,8 @@ const getOrderInvoice = async (req, res) => {
       doc.font('Helvetica');
     }
 
-    const filename = `${t.invoiceFile}-${order._id}.pdf`;
-    res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
+    const downloadName = (lang === 'ar' ? 'facture' : t.invoiceFile) + `-${order._id.substring(order._id.length - 6).toUpperCase()}.pdf`;
+    res.setHeader('Content-disposition', `attachment; filename="${downloadName}"`);
     res.setHeader('Content-type', 'application/pdf');
 
     doc.pipe(res);
