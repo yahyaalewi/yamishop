@@ -177,17 +177,17 @@ const pdfTranslations = {
     priceLabel: 'MRU'
   },
   ar: {
-    invoice: 'فاتورة طلب',
-    orderNum: 'رقم الطلب:',
-    date: 'التاريخ:',
-    billTo: 'فاتورة إلى:',
+    invoice: 'فاتورة الطلب',
+    orderNum: 'رقم الطلب',
+    date: 'التاريخ',
+    billTo: 'فاتورة إلى',
     product: 'المنتج',
     quantity: 'الكمية',
     unitPrice: 'سعر الوحدة',
     total: 'المجموع',
-    subtotal: 'المجموع الفرعي:',
-    shipping: 'التوصيل:',
-    grandTotal: 'الإجمالي الكلي:',
+    subtotal: 'المجموع الفرعي',
+    shipping: 'التوصيل',
+    grandTotal: 'الإجمالي الكلي',
     thanks: 'شكراً لثقتكم في يامي شوب!',
     priceLabel: 'أوقية'
   }
