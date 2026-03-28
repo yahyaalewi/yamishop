@@ -16,8 +16,12 @@ import { guestGuard } from './guards/guest.guard';
 import { authGuard } from './guards/auth.guard';
 import { clientGuard } from './guards/client.guard';
 
+import { PolicyComponent } from './pages/policy.component';
+
 export const routes: Routes = [
   { path: '', component: WelcomeComponent, canActivate: [clientGuard] },
+  { path: 'privacy', component: PolicyComponent, canActivate: [clientGuard] },
+  { path: 'return-policy', component: PolicyComponent, canActivate: [clientGuard] },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
   { path: 'home', component: HomeComponent, canActivate: [clientGuard] },

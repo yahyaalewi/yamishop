@@ -61,9 +61,12 @@ import { LanguageService } from '../../services/language.service';
             </p>
           </div>
 
-          <div class="flex gap-8 mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
-             <span class="hover:text-terracotta transition-colors cursor-pointer">SPA MODE</span>
-             <span class="hover:text-terracotta transition-colors cursor-pointer">V-20.0</span>
+          <div class="flex flex-wrap justify-center gap-x-8 gap-y-4 mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+             <a routerLink="/privacy" class="hover:text-terracotta transition-colors cursor-pointer no-underline">{{ lang.translate('footer.privacy_policy') }}</a>
+             <a routerLink="/return-policy" class="hover:text-terracotta transition-colors cursor-pointer no-underline">{{ lang.translate('footer.return_policy') }}</a>
+             <span class="hidden md:inline">|</span>
+             <span class="hover:text-terracotta transition-colors cursor-default">SPA MODE</span>
+             <span class="hover:text-terracotta transition-colors cursor-default">V-20.0</span>
           </div>
         </div>
       </div>
