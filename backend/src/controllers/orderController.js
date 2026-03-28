@@ -205,7 +205,10 @@ const getOrderInvoice = async (req, res) => {
 
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
-    const filename = `facture-${order._id.substring(order._id.length - 6).toUpperCase()}.pdf`;
+    const orderIdStr = order._id.toString();
+    const shortId = orderIdStr.substring(orderIdStr.length - 6).toUpperCase();
+    
+    const filename = `facture-${shortId}.pdf`;
     res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-type', 'application/pdf');
 
@@ -218,7 +221,7 @@ const getOrderInvoice = async (req, res) => {
       .text('YAMISHOP', 50, 45, { align: 'left' })
       .fontSize(10)
       .text('Facture de commande', 200, 50, { align: 'right' })
-      .text(`Commande #: ${order._id.substring(order._id.length - 6).toUpperCase()}`, 200, 65, { align: 'right' })
+      .text(`Commande #: ${shortId}`, 200, 65, { align: 'right' })
       .text(`Date: ${new Date(order.confirmedAt || order.createdAt).toLocaleDateString()}`, 200, 80, { align: 'right' })
       .moveDown();
 
