@@ -100,40 +100,42 @@ const updateOrderToConfirmed = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 
-    if (order) {
-      if (!order.isConfirmed) {
-        console.log(`[STOCK UPDATE] Starting update for order: ${order._id}`);
-        
-        for (const item of order.orderItems) {
-          const qty = Number(item.quantity) || 0;
-          if (qty > 0 && item.product) {
-            console.log(`[STOCK UPDATE] Updating Product ID: ${item.product} (Decrease by ${qty})`);
-            
-            const prodBefore = await Product.findById(item.product);
-            if (prodBefore) {
-              console.log(`[STOCK UPDATE] Current stock: ${prodBefore.stock}`);
-              prodBefore.stock = Math.max(0, prodBefore.stock - qty);
-              await prodBefore.save();
-              console.log(`[STOCK UPDATE] New stock: ${prodBefore.stock}`);
-            } else {
-              console.log(`[STOCK UPDATE] ERROR: Product not found with ID: ${item.product}`);
-            }
-          } else {
-            console.log(`[STOCK UPDATE] WARNING: Invalid item or qty skip: ${item.name}`);
-          }
-        }
-        
-        order.isConfirmed = true;
-        order.confirmedAt = Date.now();
-        const updatedOrder = await order.save();
-        console.log(`[STOCK UPDATE] Order marked as confirmed.`);
-        return res.json(updatedOrder);
-      }
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    if (!order.isConfirmed) {
+      console.log(`[STOCK UPDATE] Starting confirmation for order ${order._id}`);
       
-      console.log(`[STOCK UPDATE] Order was already marked confirmed.`);
-      res.json(order);
+      for (const item of order.orderItems) {
+        const productId = item.product;
+        const quantityToReduce = Number(item.quantity) || 0;
+
+        if (productId && quantityToReduce > 0) {
+          console.log(`[STOCK UPDATE] Processing product ID: ${productId}, Quantity: ${quantityToReduce}`);
+          
+          const product = await Product.findById(productId);
+          if (product) {
+            const oldStock = product.stock || 0;
+            product.stock = Math.max(0, oldStock - quantityToReduce);
+            await product.save();
+            console.log(`[STOCK UPDATE] Product "${product.name}" stock: ${oldStock} -> ${product.stock}`);
+          } else {
+            console.log(`[STOCK UPDATE] ERROR: Product not found for ID: ${productId}`);
+          }
+        } else {
+          console.log(`[STOCK UPDATE] Missing productId or quantity: prodId=${productId}, qty=${quantityToReduce}`);
+        }
+      }
+
+      order.isConfirmed = true;
+      order.confirmedAt = Date.now();
+      const updatedOrder = await order.save();
+      console.log(`[STOCK UPDATE] Order ${order._id} confirmed and saved.`);
+      res.json(updatedOrder);
     } else {
-      res.status(404).json({ message: 'Order not found' });
+      console.log(`[STOCK UPDATE] Order ${order._id} was already confirmed. Skipping stock update.`);
+      res.json(order);
     }
   } catch (error) {
     console.error('Confirm order error:', error);
