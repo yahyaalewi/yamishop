@@ -254,7 +254,8 @@ export class ProfileComponent implements OnInit {
       },
       error: (err) => {
         console.error('Invoice download failed', err);
-        this.notificationService.show(this.lang.translate('msg.error_occurred'), 'error');
+        const errorMsg = err.error?.error || err.error?.message || this.lang.translate('msg.error_occurred');
+        this.notificationService.show(errorMsg, 'error');
       }
     });
   }

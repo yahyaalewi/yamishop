@@ -353,9 +353,13 @@ const getOrderInvoice = async (req, res) => {
 
     doc.end();
   } catch (error) {
-    console.error('Invoice error:', error);
+    console.error('Invoice error details:', error);
     if (!res.headersSent) {
-      res.status(500).json({ message: 'Server error', error: error.message });
+      res.status(500).json({ 
+        message: 'Invoice generation failed', 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'production' ? null : error.stack 
+      });
     }
   }
 };
