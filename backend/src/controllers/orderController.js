@@ -198,6 +198,7 @@ const getOrderInvoice = async (req, res) => {
     const PDFDocument = require('pdfkit');
     const reshaper = require('arabic-reshaper');
     const bidiFactory = require('bidi-js');
+    const bidi = bidiFactory();
     const fs = require('fs');
 
     // Diagnostic Mode - MOVED BEFORE PROTECT CHECKS
@@ -230,8 +231,9 @@ const getOrderInvoice = async (req, res) => {
     const reshapeText = (text, l) => {
       if (l !== 'ar' || !text) return text;
       try {
-        const r = reshaper.reshape(text);
-        return r.split('').reverse().join('');
+        const reshaped = reshaper.reshape(text);
+        const levels = bidi.getEmbeddingLevels(reshaped, 1);
+        return bidi.getReorderedString(reshaped, levels);
       } catch (err) {
         return text;
       }
