@@ -158,11 +158,6 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-const PDFDocument = require('pdfkit');
-const ArabicReshaper = require('arabic-reshaper');
-const bidiFactory = require('bidi-js');
-const bidi = bidiFactory();
-const reshaper = new ArabicReshaper();
 const path = require('path');
 
 const pdfTranslations = {
@@ -200,19 +195,27 @@ const pdfTranslations = {
   }
 };
 
-const reshapeText = (text, lang) => {
-  if (lang !== 'ar' || !text) return text;
-  try {
-    const reshaped = reshaper.reshape(text);
-    return bidi.getVisual(reshaped);
-  } catch (err) {
-    console.error('Arabic reshaping error:', err);
-    return text;
-  }
-};
+
 
 const getOrderInvoice = async (req, res) => {
   try {
+    const PDFDocument = require('pdfkit');
+    const ArabicReshaper = require('arabic-reshaper');
+    const bidiFactory = require('bidi-js');
+    
+    const bidi = bidiFactory();
+    const reshaper = new ArabicReshaper();
+    
+    const reshapeText = (text, l) => {
+      if (l !== 'ar' || !text) return text;
+      try {
+        const r = reshaper.reshape(text);
+        return bidi.getVisual(r);
+      } catch (err) {
+        console.error('Reshaping error:', err); return text;
+      }
+    };
+
     const lang = req.query.lang === 'ar' ? 'ar' : 'fr';
     const t = pdfTranslations[lang];
     const isRtl = lang === 'ar';
