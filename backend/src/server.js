@@ -3,7 +3,7 @@ const app = require('./app');
 const connectDB = require('./config/db');
 const Product = require('./models/Product');
 
-const APP_PORT = process.env.PORT || process.env.APP_PORT || 5000;
+const APP_PORT = process.env.APP_PORT || process.env.PORT || 5000;
 
 async function runMigrations() {
   // Add default gender to all existing products that don't have the field, or have null/empty
