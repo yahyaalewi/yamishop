@@ -199,9 +199,11 @@ const getOrderInvoice = async (req, res) => {
     const ArabicReshaper = require('arabic-reshaper');
     const bidiFactory = require('bidi-js');
     const fs = require('fs');
+    const path = require('path');
 
-    const bidi = bidiFactory();
-    const reshaper = new ArabicReshaper();
+    // Robust factory/constructor calls
+    const bidi = (typeof bidiFactory === 'function') ? bidiFactory() : bidiFactory;
+    const reshaper = (typeof ArabicReshaper === 'function') ? new ArabicReshaper() : ArabicReshaper;
 
     const order = await Order.findById(req.params.id).populate('user', 'name phone email');
     if (!order) return res.status(404).json({ message: 'Order not found' });
