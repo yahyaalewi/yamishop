@@ -333,8 +333,8 @@ const getOrderInvoice = async (req, res) => {
       doc
         .text(reshapeText(itemName, lang), col1, y, { align: alignMain, width: 250 })
         .text(item.quantity.toString(), col2, y, { width: cellWidth, align: 'center' })
-        .text(`${item.price} ${reshapeText(t.priceLabel, lang)}`, col3, y, { width: cellWidth, align: 'center' })
-        .text(`${(item.quantity * item.price)} ${reshapeText(t.priceLabel, lang)}`, col4, y, { width: cellWidth, align: alignMeta });
+        .text(reshapeText(`${item.price} ${t.priceLabel}`, lang), col3, y, { width: cellWidth, align: 'center' })
+        .text(reshapeText(`${(item.quantity * item.price)} ${t.priceLabel}`, lang), col4, y, { width: cellWidth, align: alignMeta });
       i++;
     });
 
@@ -353,15 +353,15 @@ const getOrderInvoice = async (req, res) => {
       .fontSize(10)
       .font(isRtl ? 'Almarai' : 'Helvetica')
       .text(reshapeText(t.subtotal, lang), pageStart, summaryY + 10, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(`${productsCost} ${reshapeText(t.priceLabel, lang)}`, pageStart, summaryY + 10, { width: 500, align: isRtl ? 'left' : 'right' })
+      .text(reshapeText(`${productsCost} ${t.priceLabel}`, lang), pageStart, summaryY + 10, { width: 500, align: isRtl ? 'left' : 'right' })
       
       .text(reshapeText(t.shipping, lang), pageStart, summaryY + 25, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(`${deliveryCost} ${reshapeText(t.priceLabel, lang)}`, pageStart, summaryY + 25, { width: 500, align: isRtl ? 'left' : 'right' })
+      .text(reshapeText(`${deliveryCost} ${t.priceLabel}`, lang), pageStart, summaryY + 25, { width: 500, align: isRtl ? 'left' : 'right' })
 
       .fontSize(12)
       .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
       .text(reshapeText(t.grandTotal, lang), pageStart, summaryY + 45, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(`${order.totalPrice} ${reshapeText(t.priceLabel, lang)}`, pageStart, summaryY + 45, { width: 500, align: isRtl ? 'left' : 'right' });
+      .text(reshapeText(`${order.totalPrice} ${t.priceLabel}`, lang), pageStart, summaryY + 45, { width: 500, align: isRtl ? 'left' : 'right' });
 
     doc
       .fontSize(10)
