@@ -81,7 +81,7 @@ import { NotificationService } from '../services/notification.service';
                     <div class="flex items-center bg-gray-50/50 p-1 rounded-2xl border border-gray-100">
                       <button (click)="updateQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all disabled:opacity-30 disabled:grayscale cursor-pointer border-none" [disabled]="item.qty <= 1">−</button>
                       <span class="px-4 text-xs font-black text-gray-900">{{item.qty}}</span>
-                      <button (click)="incQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all cursor-pointer border-none">+</button>
+                      <button (click)="incQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all cursor-pointer border-none disabled:opacity-30 disabled:grayscale" [disabled]="item.qty >= (item.stock || 0)">+</button>
                     </div>
                     
                     <div class="text-right">
@@ -171,7 +171,9 @@ export class CartComponent {
   }
 
   incQty(item: any) {
-    this.cartService.updateQty(item.id, item.qty + 1, item.color, item.size);
+    if (item.qty < (item.stock || 0)) {
+      this.cartService.updateQty(item.id, item.qty + 1, item.color, item.size);
+    }
   }
 
   async removeItem(item: any) {

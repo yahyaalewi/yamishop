@@ -172,9 +172,9 @@ const PRODUCTS: any[] = [
               <!-- Quantity + Cart -->
               <div class="flex flex-col sm:flex-row items-stretch gap-4 pt-4">
                 <div class="flex items-center border-2 border-gray-100 rounded-2xl overflow-hidden bg-gray-50/50 shadow-inner">
-                  <button (click)="dec()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100">−</button>
+                  <button (click)="dec()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() <= 1">−</button>
                   <span class="px-6 py-4 font-black text-gray-900 min-w-[4rem] text-center border-x-2 border-gray-100/50 text-lg tabular-nums">{{qty()}}</span>
-                  <button (click)="inc()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100">+</button>
+                  <button (click)="inc()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() >= (product?.stock || 0)">+</button>
                 </div>
                 <button (click)="addToCart()" 
                    [disabled]="(product.stock || 0) === 0"
@@ -319,7 +319,12 @@ export class ProductDetailsComponent implements OnInit {
   discount = () => this.product?.oldPrice ? Math.round((1 - this.product.price / this.product.oldPrice) * 100) : 0;
 
   selectImage(i: number) { this.selectedIndex.set(i); }
-  inc() { this.qty.update(n => n + 1); }
+  inc() { 
+    const maxStock = this.product?.stock || 0;
+    if (this.qty() < maxStock) {
+      this.qty.update(n => n + 1);
+    }
+  }
   dec() { this.qty.update(n => Math.max(1, n - 1)); }
 
   addToCart() {
