@@ -162,6 +162,7 @@ const PDFDocument = require('pdfkit');
 const ArabicReshaper = require('arabic-reshaper');
 const bidiFactory = require('bidi-js');
 const bidi = bidiFactory();
+const reshaper = new ArabicReshaper();
 const path = require('path');
 
 const pdfTranslations = {
@@ -202,7 +203,7 @@ const pdfTranslations = {
 const reshapeText = (text, lang) => {
   if (lang !== 'ar' || !text) return text;
   try {
-    const reshaped = ArabicReshaper.reshape(text);
+    const reshaped = reshaper.reshape(text);
     return bidi.getVisual(reshaped);
   } catch (err) {
     console.error('Arabic reshaping error:', err);
