@@ -158,6 +158,7 @@ const deleteOrder = async (req, res) => {
   }
 };
 
+const PDFDocument = require('pdfkit');
 const ArabicReshaper = require('arabic-reshaper');
 const bidiFactory = require('bidi-js');
 const bidi = bidiFactory();
@@ -202,7 +203,7 @@ const reshapeText = (text, lang) => {
   if (lang !== 'ar' || !text) return text;
   try {
     const reshaped = ArabicReshaper.reshape(text);
-    return bidi.process(reshaped, 'rtl').bidiText;
+    return bidi.getVisual(reshaped);
   } catch (err) {
     console.error('Arabic reshaping error:', err);
     return text;
