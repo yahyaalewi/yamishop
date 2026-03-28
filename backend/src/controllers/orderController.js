@@ -168,23 +168,6 @@ const pdfTranslations = {
     billTo: 'Facturer à:',
     product: 'Produit',
     quantity: 'Qté',
-    unitPrice: 'Prix Unitaire',
-    total: 'Total',
-    subtotal: 'Sous-total:',
-    shipping: 'Livraison:',
-    grandTotal: 'Total:',
-    thanks: 'Merci pour votre confiance chez Yamishop!',
-    priceLabel: 'MRU',
-    invoiceFile: 'facture'
-  },
-const pdfTranslations = {
-  fr: {
-    invoice: 'Facture de commande',
-    orderNum: 'Commande #:',
-    date: 'Date:',
-    billTo: 'Facturer à:',
-    product: 'Produit',
-    quantity: 'Qté',
     unitPrice: 'Prix Unit.',
     total: 'Total',
     subtotal: 'Sous-total:',
