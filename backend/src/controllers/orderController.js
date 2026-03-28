@@ -233,22 +233,33 @@ const getOrderInvoice = async (req, res) => {
 
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
-    // Font setup
+    // Font setup with debugging
     if (isRtl) {
       const fontPath = path.join(__dirname, '../assets/fonts/Almarai-Regular.ttf');
-      doc.registerFont('Almarai', fontPath);
-      doc.font('Almarai');
+      console.log(`[INVOICE] Verifying font existence at: ${fontPath}`);
+      const fs = require('fs');
+      if (fs.existsSync(fontPath)) {
+        doc.registerFont('Almarai', fontPath);
+        doc.font('Almarai');
+        console.log(`[INVOICE] Font loaded successfully`);
+      } else {
+        console.log(`[INVOICE] ERROR: Font NOT found, falling back to Helvetica`);
+        doc.font('Helvetica');
+      }
     } else {
       doc.font('Helvetica');
     }
 
-    const downloadName = (lang === 'ar' ? 'facture' : t.invoiceFile) + `-${order._id.substring(order._id.length - 6).toUpperCase()}.pdf`;
+    const downloadName = (lang === 'ar' ? 'facture' : 'invoice') + `-${order._id.substring(order._id.length - 6).toUpperCase()}.pdf`;
     res.setHeader('Content-disposition', `attachment; filename="${downloadName}"`);
     res.setHeader('Content-type', 'application/pdf');
 
     doc.pipe(res);
 
-    // Header
+    // Date fallback
+    const displayDate = order.confirmedAt || order.createdAt;
+    const formattedDate = new Date(displayDate).toLocaleDateString(lang === 'ar' ? 'ar-MA' : 'fr-FR');
+
     const titleX = isRtl ? 400 : 50;
     const metaX = isRtl ? 50 : 200;
     const alignMain = isRtl ? 'right' : 'left';
@@ -261,7 +272,7 @@ const getOrderInvoice = async (req, res) => {
       .fontSize(10)
       .text(reshapeText(t.invoice, lang), metaX, 50, { align: alignMeta })
       .text(`${reshapeText(t.orderNum, lang)} ${order._id.substring(order._id.length-6).toUpperCase()}`, metaX, 65, { align: alignMeta })
-      .text(`${reshapeText(t.date, lang)} ${new Date(order.confirmedAt).toLocaleDateString(lang === 'ar' ? 'ar-MA' : 'fr-FR')}`, metaX, 80, { align: alignMeta })
+      .text(`${reshapeText(t.date, lang)} ${formattedDate}`, metaX, 80, { align: alignMeta })
       .moveDown();
 
     doc.moveTo(50, 100).lineTo(550, 100).stroke();
