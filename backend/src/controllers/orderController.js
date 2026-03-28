@@ -196,10 +196,9 @@ const pdfTranslations = {
 const getOrderInvoice = async (req, res) => {
   try {
     const PDFDocument = require('pdfkit');
-    const ArabicReshaper = require('arabic-reshaper');
+    const reshaper = require('arabic-reshaper');
     const bidiFactory = require('bidi-js');
     const fs = require('fs');
-    const path = require('path');
 
     // Diagnostic Mode - MOVED BEFORE PROTECT CHECKS
     const fontPath = path.join(__dirname, '../assets/fonts/Almarai-Regular.ttf');
@@ -239,17 +238,6 @@ const getOrderInvoice = async (req, res) => {
     };
 
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
-
-    // Diagnostic Mode
-    const fontPath = path.join(__dirname, '../assets/fonts/Almarai-Regular.ttf');
-    if (req.query.check_font === 'true') {
-      return res.json({
-        exists: fs.existsSync(fontPath),
-        path: fontPath,
-        dir: __dirname,
-        files: fs.existsSync(path.join(__dirname, '../assets/fonts')) ? fs.readdirSync(path.join(__dirname, '../assets/fonts')) : 'dir missing'
-      });
-    }
 
     // Font Handling
     if (isRtl) {
