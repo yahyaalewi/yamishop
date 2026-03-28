@@ -110,9 +110,14 @@ const PRODUCTS: any[] = [
                   </svg>
                 </div>
 
-                <div [class]="product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-gray-100 italic">
-                  <span class="w-2 h-2 rounded-full animate-pulse" [class]="product.stock > 0 ? 'bg-green-500' : 'bg-red-500'"></span>
-                  {{product.stock > 0 ? lang.translate('product.stock_in') : lang.translate('product.stock_out')}}
+                <div [class]="(product.stock || 0) > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-gray-100 italic transition-colors">
+                  <span class="w-2 h-2 rounded-full animate-pulse" [class]="(product.stock || 0) > 0 ? 'bg-green-500' : 'bg-red-500'"></span>
+                  <ng-container *ngIf="(product.stock || 0) > 0; else outOfStock">
+                    {{ lang.translate('product.stock_left') }} {{ product.stock }}
+                  </ng-container>
+                  <ng-template #outOfStock>
+                    {{ lang.translate('product.stock_finished') }}
+                  </ng-template>
                 </div>
                 <div class="bg-blue-50 text-blue-700 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold">
                   <span class="text-base">📍</span>
@@ -172,7 +177,8 @@ const PRODUCTS: any[] = [
                   <button (click)="inc()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100">+</button>
                 </div>
                 <button (click)="addToCart()" 
-                   class="flex-1 inline-flex items-center justify-center bg-terracotta text-white px-8 py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl hover:bg-terracotta-dark transition-all duration-300 border-2 border-white/20 active:scale-95 premium-button-shine animate-button-hover cursor-pointer group">
+                   [disabled]="(product.stock || 0) === 0"
+                   class="flex-1 inline-flex items-center justify-center bg-terracotta text-white px-8 py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl hover:bg-terracotta-dark transition-all duration-300 border-2 border-white/20 active:scale-95 premium-button-shine animate-button-hover cursor-pointer group disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
                   <svg class="h-5 w-5 mr-3 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
@@ -183,12 +189,13 @@ const PRODUCTS: any[] = [
 
               <!-- Direct Buy -->
               <button (click)="buyNow()" 
-                 class="w-full inline-flex items-center justify-center bg-primary text-white px-8 py-6 rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-primary-dark transition-all duration-300 border-2 border-white/10 active:scale-95 premium-button-shine animate-button-hover cursor-pointer relative overflow-hidden">
+                 [disabled]="(product.stock || 0) === 0"
+                 class="w-full inline-flex items-center justify-center bg-primary text-white px-8 py-6 rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-primary-dark transition-all duration-300 border-2 border-white/10 active:scale-95 premium-button-shine animate-button-hover cursor-pointer relative overflow-hidden disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
                 <span class="relative z-10 flex items-center gap-3">
                   <span class="text-xl">⚡</span>
                   {{ lang.translate('product.buy_now') }}
                 </span>
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-20deg] animate-shine"></div>
+                <div *ngIf="(product.stock || 0) > 0" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-20deg] animate-shine"></div>
               </button>
               <!-- Description & Features -->
               <div class="mt-12 space-y-12">

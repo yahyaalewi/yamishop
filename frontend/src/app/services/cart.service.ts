@@ -6,6 +6,7 @@ export interface CartItem {
   price: number;
   image: string;
   qty: number;
+  stock: number;
   color?: string;
   size?: string;
 }
@@ -19,18 +20,25 @@ export const cartItems = signal<CartItem[]>([]);
 export class CartService {
   addItem(product: any, qty: number, color?: string | null, size?: string | null) {
     const items = cartItems();
-    // Unique check should now include color and size if they exist
     const existing = items.find(i => i.id === product._id && i.color === (color || undefined) && i.size === (size || undefined));
+    const maxStock = product.stock || 0;
     
     if (existing) {
-      cartItems.update(prev => prev.map(i => (i.id === product._id && i.color === (color || undefined) && i.size === (size || undefined)) ? { ...i, qty: i.qty + qty } : i));
+      cartItems.update(prev => prev.map(i => {
+        if (i.id === product._id && i.color === (color || undefined) && i.size === (size || undefined)) {
+          const newQty = Math.min(i.qty + qty, maxStock);
+          return { ...i, qty: newQty };
+        }
+        return i;
+      }));
     } else {
       const newItem: CartItem = {
         id: product._id,
         name: product.name,
         price: product.price,
         image: product.imageUrl,
-        qty: qty,
+        qty: Math.min(qty, maxStock),
+        stock: maxStock,
         color: color || undefined,
         size: size || undefined
       };
@@ -41,11 +49,17 @@ export class CartService {
   }
 
   updateQty(id: string, qty: number, color?: string, size?: string) {
+    const items = cartItems();
+    const item = items.find(i => i.id === id && i.color === color && i.size === size);
+    if (!item) return;
+
     if (qty <= 0) {
       this.removeItem(id, color, size);
       return;
     }
-    cartItems.update(prev => prev.map(i => (i.id === id && i.color === color && i.size === size) ? { ...i, qty } : i));
+
+    const newQty = Math.min(qty, item.stock || 999);
+    cartItems.update(prev => prev.map(i => (i.id === id && i.color === color && i.size === size) ? { ...i, qty: newQty } : i));
     this.syncCount();
   }
 

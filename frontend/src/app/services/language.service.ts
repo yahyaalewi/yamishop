@@ -137,7 +137,9 @@ export class LanguageService {
       'shop.no_products_msg': 'Nous n\'avons aucun article correspondant à ces critères pour le moment.',
       'shop.reset_filters': 'Réinitialiser les filtres',
       'footer.return_policy': 'Politique de retour',
-      'footer.privacy_policy': 'Confidentialité'
+      'footer.privacy_policy': 'Confidentialité',
+      'product.stock_left': 'Stock : ',
+      'product.stock_finished': 'Stock épuisé'
     },
     ar: {
       'nav.home': 'الرئيسية',
@@ -265,7 +267,9 @@ export class LanguageService {
       'shop.no_products_msg': 'ليس لدينا أي عناصر تطابق هذه المعايير في الوقت الحالي.',
       'shop.reset_filters': 'إعادة ضبط الفلاتر',
       'footer.return_policy': 'سياسة الاسترجاع',
-      'footer.privacy_policy': 'سياسة الخصوصية'
+      'footer.privacy_policy': 'سياسة الخصوصية',
+      'product.stock_left': 'متوفر: ',
+      'product.stock_finished': 'انتهت الكمية'
     }
   };
 

@@ -156,17 +156,33 @@ const CATEGORIES = [
                <!-- Image -->
                <a [routerLink]="['/product', product._id]" class="block relative overflow-hidden h-44 no-underline group/img">
                  <img [src]="productService.getImageUrl(product.imageUrl)" [alt]="product.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                 
+                 <!-- Out of stock overlay -->
+                 <div *ngIf="(product.stock || 0) === 0" class="absolute inset-0 bg-gray-900/60 backdrop-blur-[2px] flex items-center justify-center">
+                    <span class="bg-white/90 text-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+                      {{ lang.translate('product.stock_finished') }}
+                    </span>
+                 </div>
                </a>
 
                <!-- Info -->
                <div class="p-5">
                  <div class="flex items-center justify-between mb-2">
                     <p class="text-[10px] uppercase font-black tracking-[0.2em] text-gray-300">{{ lang.translateCategory(product.category) }}</p>
+                    
+                    <!-- Stock badge -->
+                    <span *ngIf="(product.stock || 0) > 0" 
+                          [class]="(product.stock || 0) < 5 ? 'text-terracotta' : 'text-green-500'" 
+                          class="text-[9px] font-bold uppercase tracking-tighter">
+                      {{ lang.translate('product.stock_left') }} {{ product.stock }}
+                    </span>
                  </div>
                  <a [routerLink]="['/product', product._id]" class="text-sm font-bold text-gray-900 hover:text-primary line-clamp-2 block mb-4 no-underline h-10">{{product.name}}</a>
                  <div class="flex items-center justify-between gap-2">
                    <span class="text-lg font-black text-primary whitespace-nowrap">{{product.price | number}} MRU</span>
-                   <button (click)="addToCart($event, product)" class="w-10 h-10 bg-terracotta text-white rounded-xl flex items-center justify-center hover:bg-terracotta-dark transition-all shadow-lg shadow-terracotta/30 border-none cursor-pointer active:scale-95 group/btn">
+                   <button (click)="addToCart($event, product)" 
+                           [disabled]="(product.stock || 0) === 0"
+                           class="w-10 h-10 bg-terracotta text-white rounded-xl flex items-center justify-center hover:bg-terracotta-dark transition-all shadow-lg shadow-terracotta/30 border-none cursor-pointer active:scale-95 group/btn disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed">
                      <svg class="h-5 w-5 transition-transform group-hover/btn:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/>
                      </svg>
