@@ -61,8 +61,8 @@ export class OrderService {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 
-  downloadInvoice(id: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/${id}/invoice`, {
+  downloadInvoice(id: string, lang: string = 'fr'): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/invoice?lang=${lang}`, {
       responseType: 'blob'
     });
   }

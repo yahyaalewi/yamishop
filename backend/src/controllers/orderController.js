@@ -158,17 +158,69 @@ const deleteOrder = async (req, res) => {
   }
 };
 
-const PDFDocument = require('pdfkit');
+const ArabicReshaper = require('arabic-reshaper');
+const bidiFactory = require('bidi-js');
+const bidi = bidiFactory();
+const path = require('path');
+
+const pdfTranslations = {
+  fr: {
+    invoice: 'Facture de commande',
+    orderNum: 'Commande #:',
+    date: 'Date:',
+    billTo: 'Facturer à:',
+    product: 'Produit',
+    quantity: 'Qté',
+    unitPrice: 'Prix Unitaire',
+    total: 'Total',
+    subtotal: 'Sous-total:',
+    shipping: 'Livraison:',
+    grandTotal: 'Total:',
+    thanks: 'Merci pour votre confiance chez Yamishop!',
+    priceLabel: 'MRU',
+    invoiceFile: 'facture'
+  },
+  ar: {
+    invoice: 'فاتورة طلب',
+    orderNum: 'رقم الطلب:',
+    date: 'التاريخ:',
+    billTo: 'فاتورة إلى:',
+    product: 'المنتج',
+    quantity: 'الكمية',
+    unitPrice: 'سعر الوحدة',
+    total: 'المجموع',
+    subtotal: 'المجموع الفرعي:',
+    shipping: 'التوصيل:',
+    grandTotal: 'الإجمالي الكلي:',
+    thanks: 'شكراً لثقتكم في يامي شوب!',
+    priceLabel: 'أوقية',
+    invoiceFile: 'فاتورة'
+  }
+};
+
+const reshapeText = (text, lang) => {
+  if (lang !== 'ar' || !text) return text;
+  try {
+    const reshaped = ArabicReshaper.reshape(text);
+    return bidi.process(reshaped, 'rtl').bidiText;
+  } catch (err) {
+    console.error('Arabic reshaping error:', err);
+    return text;
+  }
+};
 
 const getOrderInvoice = async (req, res) => {
   try {
+    const lang = req.query.lang === 'ar' ? 'ar' : 'fr';
+    const t = pdfTranslations[lang];
+    const isRtl = lang === 'ar';
+
     const order = await Order.findById(req.params.id).populate('user', 'name phone email');
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Check if user is authorized (owner or admin)
     if (order.user._id.toString() !== req.user._id.toString() && !req.user.isAdmin) {
       return res.status(401).json({ message: 'Not authorized' });
     }
@@ -179,90 +231,109 @@ const getOrderInvoice = async (req, res) => {
 
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
-    // Set response headers
-    const filename = `invoice-${order._id}.pdf`;
+    // Font setup
+    if (isRtl) {
+      const fontPath = path.join(__dirname, '../assets/fonts/Almarai-Regular.ttf');
+      doc.registerFont('Almarai', fontPath);
+      doc.font('Almarai');
+    } else {
+      doc.font('Helvetica');
+    }
+
+    const filename = `${t.invoiceFile}-${order._id}.pdf`;
     res.setHeader('Content-disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-type', 'application/pdf');
 
     doc.pipe(res);
 
     // Header
+    const titleX = isRtl ? 400 : 50;
+    const metaX = isRtl ? 50 : 200;
+    const alignMain = isRtl ? 'right' : 'left';
+    const alignMeta = isRtl ? 'left' : 'right';
+
     doc
       .fillColor('#444444')
       .fontSize(25)
-      .text('YAMISHOP', 50, 45, { align: 'left' })
+      .text('YAMISHOP', titleX, 45, { align: alignMain })
       .fontSize(10)
-      .text('Facture de commande', 200, 50, { align: 'right' })
-      .text(`Commande #: ${order._id}`, 200, 65, { align: 'right' })
-      .text(`Date: ${new Date(order.confirmedAt).toLocaleDateString()}`, 200, 80, { align: 'right' })
+      .text(reshapeText(t.invoice, lang), metaX, 50, { align: alignMeta })
+      .text(`${reshapeText(t.orderNum, lang)} ${order._id.substring(order._id.length-6).toUpperCase()}`, metaX, 65, { align: alignMeta })
+      .text(`${reshapeText(t.date, lang)} ${new Date(order.confirmedAt).toLocaleDateString(lang === 'ar' ? 'ar-MA' : 'fr-FR')}`, metaX, 80, { align: alignMeta })
       .moveDown();
 
-    // Horizontal Line
     doc.moveTo(50, 100).lineTo(550, 100).stroke();
 
     // Customer Info
+    const customerY = 115;
     doc
       .fontSize(12)
-      .text('Facturer à:', 50, 115)
+      .text(reshapeText(t.billTo, lang), titleX, customerY, { align: alignMain })
       .fontSize(10)
-      .font('Helvetica-Bold')
-      .text(order.user.name || '', 50, 130)
-      .font('Helvetica')
-      .text(order.user.phone || '', 50, 145)
-      .text(order.shippingAddress?.street || '', 50, 160)
-      .text(`${order.shippingAddress?.city || ''}, ${order.shippingAddress?.country || ''}`, 50, 175);
+      .text(reshapeText(order.user.name || '', lang), titleX, customerY + 15, { align: alignMain })
+      .text(order.user.phone || '', titleX, customerY + 30, { align: alignMain })
+      .text(reshapeText(order.shippingAddress?.city || '', lang), titleX, customerY + 45, { align: alignMain })
+      .text(reshapeText(order.shippingAddress?.street || '', lang), titleX, customerY + 60, { align: alignMain });
 
-    // Table Header
+    // Table
     const tableTop = 210;
+    const col1 = isRtl ? 350 : 50;
+    const col2 = isRtl ? 260 : 300;
+    const col3 = isRtl ? 150 : 390;
+    const col4 = isRtl ? 50 : 480;
+    const colWidth = 90;
+
     doc
+      .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
       .fontSize(10)
-      .font('Helvetica-Bold')
-      .text('Produit', 50, tableTop)
-      .text('Quantité', 280, tableTop, { width: 90, align: 'right' })
-      .text('Prix Unitaire', 370, tableTop, { width: 90, align: 'right' })
-      .text('Total', 460, tableTop, { width: 90, align: 'right' });
+      .text(reshapeText(t.product, lang), col1, tableTop, { align: alignMain })
+      .text(reshapeText(t.quantity, lang), col2, tableTop, { width: colWidth, align: 'center' })
+      .text(reshapeText(t.unitPrice, lang), col3, tableTop, { width: colWidth, align: 'center' })
+      .text(reshapeText(t.total, lang), col4, tableTop, { width: colWidth, align: alignMeta });
 
     doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
 
-    // Table Body
+    doc.font(isRtl ? 'Almarai' : 'Helvetica');
     let i = 0;
     order.orderItems.forEach((item) => {
       const y = tableTop + 30 + i * 25;
+      const itemName = `${item.name}${item.size ? ' (' + item.size + ')' : ''}${item.color ? ' - ' + item.color : ''}`;
+      
       doc
-        .font('Helvetica')
-        .text(`${item.name}${item.size ? ' (' + item.size + ')' : ''}${item.color ? ' - ' + item.color : ''}`, 50, y)
-        .text(item.quantity.toString(), 280, y, { width: 90, align: 'right' })
-        .text(`${item.price.toLocaleString()} MRU`, 370, y, { width: 90, align: 'right' })
-        .text(`${(item.quantity * item.price).toLocaleString()} MRU`, 460, y, { width: 90, align: 'right' });
+        .text(reshapeText(itemName, lang), col1, y, { align: alignMain, width: 250 })
+        .text(item.quantity.toString(), col2, y, { width: colWidth, align: 'center' })
+        .text(`${item.price} ${reshapeText(t.priceLabel, lang)}`, col3, y, { width: colWidth, align: 'center' })
+        .text(`${(item.quantity * item.price)} ${reshapeText(t.priceLabel, lang)}`, col4, y, { width: colWidth, align: alignMeta });
       i++;
     });
 
-    const subtotalY = tableTop + 30 + i * 25 + 20;
-    doc.moveTo(350, subtotalY).lineTo(550, subtotalY).stroke();
+    const summaryY = tableTop + 40 + i * 25;
+    doc.moveTo(50, summaryY).lineTo(550, summaryY).stroke();
 
     const deliveryCost = order.shippingPrice || 150;
     const productsCost = order.totalPrice - deliveryCost;
 
-    // Footer summary
+    const labelX = isRtl ? 150 : 350;
+    const valX = isRtl ? 50 : 450;
+    const labelAlign = isRtl ? 'right' : 'right';
+
     doc
       .fontSize(10)
-      .font('Helvetica')
-      .text('Prix Produits:', 370, subtotalY + 10, { width: 90, align: 'right' })
-      .text(`${productsCost.toLocaleString()} MRU`, 460, subtotalY + 10, { width: 90, align: 'right' })
+      .text(reshapeText(t.subtotal, lang), labelX, summaryY + 10, { width: 100, align: labelAlign })
+      .text(`${productsCost} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 10, { width: 100, align: alignMeta })
       
-      .text('Livraison:', 370, subtotalY + 25, { width: 90, align: 'right' })
-      .text(`${deliveryCost.toLocaleString()} MRU`, 460, subtotalY + 25, { width: 90, align: 'right' })
+      .text(reshapeText(t.shipping, lang), labelX, summaryY + 25, { width: 100, align: labelAlign })
+      .text(`${deliveryCost} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 25, { width: 100, align: alignMeta })
 
       .fontSize(12)
-      .font('Helvetica-Bold')
-      .text('Total:', 370, subtotalY + 45, { width: 90, align: 'right' })
-      .text(`${order.totalPrice.toLocaleString()} MRU`, 460, subtotalY + 45, { width: 90, align: 'right' });
+      .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
+      .text(reshapeText(t.grandTotal, lang), labelX, summaryY + 45, { width: 100, align: labelAlign })
+      .text(`${order.totalPrice} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 45, { width: 100, align: alignMeta });
 
-    // Note
     doc
       .fontSize(10)
-      .font('Helvetica-Oblique')
-      .text('Merci pour votre confiance chez Yamishop!', 50, 700, { align: 'center', width: 500 });
+      .font(isRtl ? 'Almarai' : 'Helvetica-Oblique')
+      .text(reshapeText(t.thanks, lang), 50, 750, { align: 'center', width: 500 });
 
     doc.end();
   } catch (error) {

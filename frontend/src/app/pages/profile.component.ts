@@ -241,7 +241,7 @@ export class ProfileComponent implements OnInit {
 
   downloadInvoice(orderId: string) {
     this.notificationService.show(this.lang.translate('common.loading'));
-    this.orderService.downloadInvoice(orderId).subscribe({
+    this.orderService.downloadInvoice(orderId, this.lang.currentLocale()).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
