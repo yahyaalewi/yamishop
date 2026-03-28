@@ -322,19 +322,26 @@ const getOrderInvoice = async (req, res) => {
 
     const deliveryCost = order.shippingPrice || 150;
     const productsCost = order.totalPrice - deliveryCost;
-    const labelX = isRtl ? 150 : 350;
+    
+    // Summary Layout - RTL adjustments
+    const labelX = isRtl ? 400 : 350;
     const valX = isRtl ? 50 : 450;
+    const labelAlign = isRtl ? 'right' : 'right';
+    const valAlign = isRtl ? 'left' : 'right';
 
     doc
       .fontSize(10)
-      .text(reshapeText(t.subtotal, lang), labelX, summaryY + 10, { width: 100, align: isRtl ? 'right' : 'right' })
-      .text(`${productsCost} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 10, { width: 100, align: alignMeta })
-      .text(reshapeText(t.shipping, lang), labelX, summaryY + 25, { width: 100, align: isRtl ? 'right' : 'right' })
-      .text(`${deliveryCost} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 25, { width: 100, align: alignMeta })
+      .font(isRtl ? 'Almarai' : 'Helvetica')
+      .text(reshapeText(t.subtotal, lang), labelX, summaryY + 10, { width: 150, align: labelAlign })
+      .text(`${productsCost} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 10, { width: 100, align: valAlign })
+      
+      .text(reshapeText(t.shipping, lang), labelX, summaryY + 25, { width: 150, align: labelAlign })
+      .text(`${deliveryCost} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 25, { width: 100, align: valAlign })
+
       .fontSize(12)
       .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
-      .text(reshapeText(t.grandTotal, lang), labelX, summaryY + 45, { width: 100, align: isRtl ? 'right' : 'right' })
-      .text(`${order.totalPrice} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 45, { width: 100, align: alignMeta });
+      .text(reshapeText(t.grandTotal, lang), labelX, summaryY + 45, { width: 150, align: labelAlign })
+      .text(`${order.totalPrice} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 45, { width: 100, align: valAlign });
 
     doc
       .fontSize(10)
