@@ -232,9 +232,19 @@ const getOrderInvoice = async (req, res) => {
 
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
+    // Diagnostic Mode
+    const fontPath = path.join(__dirname, '../assets/fonts/Almarai-Regular.ttf');
+    if (req.query.check_font === 'true') {
+      return res.json({
+        exists: fs.existsSync(fontPath),
+        path: fontPath,
+        dir: __dirname,
+        files: fs.existsSync(path.join(__dirname, '../assets/fonts')) ? fs.readdirSync(path.join(__dirname, '../assets/fonts')) : 'dir missing'
+      });
+    }
+
     // Font Handling
     if (isRtl) {
-      const fontPath = path.join(__dirname, '../assets/fonts/Almarai-Regular.ttf');
       if (fs.existsSync(fontPath)) {
         doc.registerFont('Almarai', fontPath);
         doc.font('Almarai');
