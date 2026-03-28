@@ -254,54 +254,67 @@ const getOrderInvoice = async (req, res) => {
 
     doc.pipe(res);
 
-    // Layout
-    const titleX = isRtl ? 400 : 50;
-    const metaX = isRtl ? 50 : 200;
+    // Layout Constants
+    const pageStart = 50;
+    const pageEnd = 550;
+    const pageWidth = 500;
     const alignMain = isRtl ? 'right' : 'left';
     const alignMeta = isRtl ? 'left' : 'right';
     const displayDate = order.confirmedAt || order.createdAt;
     const formattedDate = new Date(displayDate).toLocaleDateString(lang === 'ar' ? 'ar-MA' : 'fr-FR');
 
+    // Header
     doc
       .fillColor('#444444')
       .fontSize(25)
-      .text('YAMISHOP', titleX, 45, { align: alignMain }) // ALWAYS LATIN AS REQUESTED
+      .text('YAMISHOP', pageStart, 45, { align: alignMain, width: pageWidth }) 
       .fontSize(10)
-      .text(reshapeText(t.invoice, lang), metaX, 50, { align: alignMeta })
-      .text(`${reshapeText(t.orderNum, lang)} ${shortId}`, metaX, 65, { align: alignMeta })
-      .text(`${reshapeText(t.date, lang)} ${formattedDate}`, metaX, 80, { align: alignMeta })
+      .text(reshapeText(t.invoice, lang), pageStart, 50, { align: alignMeta, width: pageWidth })
+      .text(`${reshapeText(t.orderNum, lang)}: ${shortId}`, pageStart, 65, { align: alignMeta, width: pageWidth })
+      .text(`${reshapeText(t.date, lang)}: ${formattedDate}`, pageStart, 80, { align: alignMeta, width: pageWidth })
       .moveDown();
 
-    doc.moveTo(50, 100).lineTo(550, 100).stroke();
+    doc.moveTo(pageStart, 100).lineTo(pageEnd, 100).stroke();
 
-    // Customer
+    // Customer Info
     const customerY = 115;
     doc
       .fontSize(12)
-      .text(reshapeText(t.billTo, lang), titleX, customerY, { align: alignMain })
+      .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
+      .text(reshapeText(t.billTo, lang), pageStart, customerY, { align: alignMain, width: pageWidth })
       .fontSize(10)
-      .text(reshapeText(order.user.name || '', lang), titleX, customerY + 15, { align: alignMain })
-      .text(order.user.phone || '', titleX, customerY + 30, { align: alignMain })
-      .text(reshapeText(order.shippingAddress?.city || '', lang), titleX, customerY + 45, { align: alignMain })
-      .text(reshapeText(order.shippingAddress?.street || '', lang), titleX, customerY + 60, { align: alignMain });
+      .font(isRtl ? 'Almarai' : 'Helvetica')
+      .text(reshapeText(order.user.name || '', lang), pageStart, customerY + 15, { align: alignMain, width: pageWidth })
+      .text(order.user.phone || '', pageStart, customerY + 30, { align: alignMain, width: pageWidth })
+      .text(reshapeText((order.shippingAddress?.district || '') + ' ' + (order.shippingAddress?.city || ''), lang), pageStart, customerY + 45, { align: alignMain, width: pageWidth })
+      .text(reshapeText(order.shippingAddress?.street || '', lang), pageStart, customerY + 60, { align: alignMain, width: pageWidth });
 
-    // Table
+    // Table Setup
     const tableTop = 210;
-    const col1 = isRtl ? 350 : 50;
-    const col2 = isRtl ? 260 : 300;
-    const col3 = isRtl ? 150 : 390;
-    const col4 = isRtl ? 50 : 480;
-    const colWidth = 90;
+    let col1, col2, col3, col4, colWidths;
+    
+    if (isRtl) {
+      col1 = 300; // Product (Right)
+      col2 = 210; // Qty (Middle right)
+      col3 = 110; // Price (Middle left)
+      col4 = 50;  // Total (Left)
+    } else {
+      col1 = 50;  // Product (Left)
+      col2 = 300; // Qty
+      col3 = 390; // Price
+      col4 = 480; // Total
+    }
+    const cellWidth = 90;
 
     doc
       .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
       .fontSize(10)
-      .text(reshapeText(t.product, lang), col1, tableTop, { align: alignMain })
-      .text(reshapeText(t.quantity, lang), col2, tableTop, { width: colWidth, align: 'center' })
-      .text(reshapeText(t.unitPrice, lang), col3, tableTop, { width: colWidth, align: 'center' })
-      .text(reshapeText(t.total, lang), col4, tableTop, { width: colWidth, align: alignMeta });
+      .text(reshapeText(t.product, lang), col1, tableTop, { align: alignMain, width: 250 })
+      .text(reshapeText(t.quantity, lang), col2, tableTop, { width: cellWidth, align: 'center' })
+      .text(reshapeText(t.unitPrice, lang), col3, tableTop, { width: cellWidth, align: 'center' })
+      .text(reshapeText(t.total, lang), col4, tableTop, { width: cellWidth, align: alignMeta });
 
-    doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+    doc.moveTo(pageStart, tableTop + 15).lineTo(pageEnd, tableTop + 15).stroke();
 
     doc.font(isRtl ? 'Almarai' : 'Helvetica');
     let i = 0;
@@ -311,42 +324,41 @@ const getOrderInvoice = async (req, res) => {
       
       doc
         .text(reshapeText(itemName, lang), col1, y, { align: alignMain, width: 250 })
-        .text(item.quantity.toString(), col2, y, { width: colWidth, align: 'center' })
-        .text(`${item.price} ${reshapeText(t.priceLabel, lang)}`, col3, y, { width: colWidth, align: 'center' })
-        .text(`${(item.quantity * item.price)} ${reshapeText(t.priceLabel, lang)}`, col4, y, { width: colWidth, align: alignMeta });
+        .text(item.quantity.toString(), col2, y, { width: cellWidth, align: 'center' })
+        .text(`${item.price} ${reshapeText(t.priceLabel, lang)}`, col3, y, { width: cellWidth, align: 'center' })
+        .text(`${(item.quantity * item.price)} ${reshapeText(t.priceLabel, lang)}`, col4, y, { width: cellWidth, align: alignMeta });
       i++;
     });
 
     const summaryY = tableTop + 40 + i * 25;
-    doc.moveTo(50, summaryY).lineTo(550, summaryY).stroke();
+    doc.moveTo(pageStart, summaryY).lineTo(pageEnd, summaryY).stroke();
 
     const deliveryCost = order.shippingPrice || 150;
     const productsCost = order.totalPrice - deliveryCost;
     
-    // Summary Layout - RTL adjustments
-    const labelX = isRtl ? 400 : 350;
-    const valX = isRtl ? 50 : 450;
-    const labelAlign = isRtl ? 'right' : 'right';
-    const valAlign = isRtl ? 'left' : 'right';
+    // Final Summary (Subtotal, Tax, Shipping, Grand Total)
+    const labelX = pageStart;
+    const labelAlignArr = isRtl ? 'right' : 'right';
+    const valAlignArr = isRtl ? 'left' : 'right';
 
     doc
       .fontSize(10)
       .font(isRtl ? 'Almarai' : 'Helvetica')
-      .text(reshapeText(t.subtotal, lang), labelX, summaryY + 10, { width: 150, align: labelAlign })
-      .text(`${productsCost} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 10, { width: 100, align: valAlign })
+      .text(reshapeText(t.subtotal, lang), pageStart, summaryY + 10, { width: 400, align: isRtl ? 'right' : 'right' })
+      .text(`${productsCost} ${reshapeText(t.priceLabel, lang)}`, pageStart, summaryY + 10, { width: 500, align: isRtl ? 'left' : 'right' })
       
-      .text(reshapeText(t.shipping, lang), labelX, summaryY + 25, { width: 150, align: labelAlign })
-      .text(`${deliveryCost} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 25, { width: 100, align: valAlign })
+      .text(reshapeText(t.shipping, lang), pageStart, summaryY + 25, { width: 400, align: isRtl ? 'right' : 'right' })
+      .text(`${deliveryCost} ${reshapeText(t.priceLabel, lang)}`, pageStart, summaryY + 25, { width: 500, align: isRtl ? 'left' : 'right' })
 
       .fontSize(12)
       .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
-      .text(reshapeText(t.grandTotal, lang), labelX, summaryY + 45, { width: 150, align: labelAlign })
-      .text(`${order.totalPrice} ${reshapeText(t.priceLabel, lang)}`, valX, summaryY + 45, { width: 100, align: valAlign });
+      .text(reshapeText(t.grandTotal, lang), pageStart, summaryY + 45, { width: 400, align: isRtl ? 'right' : 'right' })
+      .text(`${order.totalPrice} ${reshapeText(t.priceLabel, lang)}`, pageStart, summaryY + 45, { width: 500, align: isRtl ? 'left' : 'right' });
 
     doc
       .fontSize(10)
       .font(isRtl ? 'Almarai' : 'Helvetica-Oblique')
-      .text(reshapeText(t.thanks, lang), 50, 750, { align: 'center', width: 500 });
+      .text(reshapeText(t.thanks, lang), pageStart, 750, { align: 'center', width: pageWidth });
 
     doc.end();
   } catch (error) {
