@@ -224,15 +224,18 @@ const getOrderInvoice = async (req, res) => {
       return res.status(400).json({ message: 'Order must be confirmed to generate invoice' });
     }
 
-    const lang = req.query.lang === 'ar' ? 'ar' : 'fr';
+    const lang = 'fr';
     const t = pdfTranslations[lang];
-    const isRtl = lang === 'ar';
+    const isRtl = false;
 
-    const reshapeText = (text, l) => {
-      if (l !== 'ar' || !text) return text;
+    // Function to handle bilingual text (shaping/reordering Arabic if present)
+    const reshapeText = (text) => {
+      if (!text) return text;
+      const hasArabic = /[\u0600-\u06FF]/.test(text);
+      if (!hasArabic) return text;
       try {
         const reshaped = reshaper.reshape(text);
-        const levels = bidi.getEmbeddingLevels(reshaped, 1);
+        const levels = bidi.getEmbeddingLevels(reshaped, 0); // LTR paragraph base
         return bidi.getReorderedString(reshaped, levels);
       } catch (err) {
         return text;
@@ -241,14 +244,10 @@ const getOrderInvoice = async (req, res) => {
 
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
-    // Font Handling
-    if (isRtl) {
-      if (fs.existsSync(fontPath)) {
-        doc.registerFont('Almarai', fontPath);
-        doc.font('Almarai');
-      } else {
-        doc.font('Helvetica');
-      }
+    // Use Almarai as universal font to support both French and Arabic
+    if (fs.existsSync(fontPath)) {
+      doc.registerFont('Almarai', fontPath);
+      doc.font('Almarai');
     } else {
       doc.font('Helvetica');
     }
@@ -277,9 +276,9 @@ const getOrderInvoice = async (req, res) => {
       .fontSize(25)
       .text('YAMISHOP', pageStart, 45, { align: alignMain, width: pageWidth }) 
       .fontSize(10)
-      .text(reshapeText(t.invoice, lang), pageStart, 50, { align: alignMeta, width: pageWidth })
-      .text(reshapeText(`${t.orderNum}: ${shortId}`, lang), pageStart, 65, { align: alignMeta, width: pageWidth })
-      .text(reshapeText(`${t.date}: ${formattedDate}`, lang), pageStart, 80, { align: alignMeta, width: pageWidth })
+      .text(reshapeText(t.invoice), pageStart, 50, { align: alignMeta, width: pageWidth })
+      .text(reshapeText(`${t.orderNum}: ${shortId}`), pageStart, 65, { align: alignMeta, width: pageWidth })
+      .text(reshapeText(`${t.date}: ${formattedDate}`), pageStart, 80, { align: alignMeta, width: pageWidth })
       .moveDown();
 
     doc.moveTo(pageStart, 100).lineTo(pageEnd, 100).stroke();
@@ -288,14 +287,14 @@ const getOrderInvoice = async (req, res) => {
     const customerY = 115;
     doc
       .fontSize(12)
-      .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
-      .text(reshapeText(t.billTo, lang), pageStart, customerY, { align: alignMain, width: pageWidth })
+      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Bold')
+      .text(reshapeText(t.billTo), pageStart, customerY, { align: alignMain, width: pageWidth })
       .fontSize(10)
-      .font(isRtl ? 'Almarai' : 'Helvetica')
-      .text(reshapeText(order.user.name || '', lang), pageStart, customerY + 15, { align: alignMain, width: pageWidth })
+      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica')
+      .text(reshapeText(order.user.name || ''), pageStart, customerY + 15, { align: alignMain, width: pageWidth })
       .text(order.user.phone || '', pageStart, customerY + 30, { align: alignMain, width: pageWidth })
-      .text(reshapeText((order.shippingAddress?.district || '') + ' ' + (order.shippingAddress?.city || ''), lang), pageStart, customerY + 45, { align: alignMain, width: pageWidth })
-      .text(reshapeText(order.shippingAddress?.street || '', lang), pageStart, customerY + 60, { align: alignMain, width: pageWidth });
+      .text(reshapeText((order.shippingAddress?.district || '') + ' ' + (order.shippingAddress?.city || '')), pageStart, customerY + 45, { align: alignMain, width: pageWidth })
+      .text(reshapeText(order.shippingAddress?.street || ''), pageStart, customerY + 60, { align: alignMain, width: pageWidth });
 
     // Table Setup
     const tableTop = 210;
@@ -315,26 +314,26 @@ const getOrderInvoice = async (req, res) => {
     const cellWidth = 90;
 
     doc
-      .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
+      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Bold')
       .fontSize(10)
-      .text(reshapeText(t.product, lang), col1, tableTop, { align: alignMain, width: 250 })
-      .text(reshapeText(t.quantity, lang), col2, tableTop, { width: cellWidth, align: 'center' })
-      .text(reshapeText(t.unitPrice, lang), col3, tableTop, { width: cellWidth, align: 'center' })
-      .text(reshapeText(t.total, lang), col4, tableTop, { width: cellWidth, align: alignMeta });
+      .text(reshapeText(t.product), col1, tableTop, { align: alignMain, width: 250 })
+      .text(reshapeText(t.quantity), col2, tableTop, { width: cellWidth, align: 'center' })
+      .text(reshapeText(t.unitPrice), col3, tableTop, { width: cellWidth, align: 'center' })
+      .text(reshapeText(t.total), col4, tableTop, { width: cellWidth, align: alignMeta });
 
     doc.moveTo(pageStart, tableTop + 15).lineTo(pageEnd, tableTop + 15).stroke();
 
-    doc.font(isRtl ? 'Almarai' : 'Helvetica');
+    doc.font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica');
     let i = 0;
     order.orderItems.forEach((item) => {
       const y = tableTop + 30 + i * 25;
       const itemName = `${item.name}${item.size ? ' (' + item.size + ')' : ''}${item.color ? ' - ' + item.color : ''}`;
       
       doc
-        .text(reshapeText(itemName, lang), col1, y, { align: alignMain, width: 250 })
+        .text(reshapeText(itemName), col1, y, { align: alignMain, width: 250 })
         .text(item.quantity.toString(), col2, y, { width: cellWidth, align: 'center' })
-        .text(reshapeText(`${item.price} ${t.priceLabel}`, lang), col3, y, { width: cellWidth, align: 'center' })
-        .text(reshapeText(`${(item.quantity * item.price)} ${t.priceLabel}`, lang), col4, y, { width: cellWidth, align: alignMeta });
+        .text(reshapeText(`${item.price} ${t.priceLabel}`), col3, y, { width: cellWidth, align: 'center' })
+        .text(reshapeText(`${(item.quantity * item.price)} ${t.priceLabel}`), col4, y, { width: cellWidth, align: alignMeta });
       i++;
     });
 
@@ -351,22 +350,22 @@ const getOrderInvoice = async (req, res) => {
 
     doc
       .fontSize(10)
-      .font(isRtl ? 'Almarai' : 'Helvetica')
-      .text(reshapeText(t.subtotal, lang), pageStart, summaryY + 10, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(reshapeText(`${productsCost} ${t.priceLabel}`, lang), pageStart, summaryY + 10, { width: 500, align: isRtl ? 'left' : 'right' })
+      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica')
+      .text(reshapeText(t.subtotal), pageStart, summaryY + 10, { width: 400, align: isRtl ? 'right' : 'right' })
+      .text(reshapeText(`${productsCost} ${t.priceLabel}`), pageStart, summaryY + 10, { width: 500, align: isRtl ? 'left' : 'right' })
       
-      .text(reshapeText(t.shipping, lang), pageStart, summaryY + 25, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(reshapeText(`${deliveryCost} ${t.priceLabel}`, lang), pageStart, summaryY + 25, { width: 500, align: isRtl ? 'left' : 'right' })
+      .text(reshapeText(t.shipping), pageStart, summaryY + 25, { width: 400, align: isRtl ? 'right' : 'right' })
+      .text(reshapeText(`${deliveryCost} ${t.priceLabel}`), pageStart, summaryY + 25, { width: 500, align: isRtl ? 'left' : 'right' })
 
       .fontSize(12)
-      .font(isRtl ? 'Almarai' : 'Helvetica-Bold')
-      .text(reshapeText(t.grandTotal, lang), pageStart, summaryY + 45, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(reshapeText(`${order.totalPrice} ${t.priceLabel}`, lang), pageStart, summaryY + 45, { width: 500, align: isRtl ? 'left' : 'right' });
+      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Bold')
+      .text(reshapeText(t.grandTotal), pageStart, summaryY + 45, { width: 400, align: isRtl ? 'right' : 'right' })
+      .text(reshapeText(`${order.totalPrice} ${t.priceLabel}`), pageStart, summaryY + 45, { width: 500, align: isRtl ? 'left' : 'right' });
 
     doc
       .fontSize(10)
-      .font(isRtl ? 'Almarai' : 'Helvetica-Oblique')
-      .text(reshapeText(t.thanks, lang), pageStart, 750, { align: 'center', width: pageWidth });
+      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Oblique')
+      .text(reshapeText(t.thanks), pageStart, 750, { align: 'center', width: pageWidth });
 
     doc.end();
   } catch (error) {
