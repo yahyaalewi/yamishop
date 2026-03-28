@@ -57,9 +57,6 @@ import { LanguageService } from '../../services/language.service';
           <div class="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
              <a routerLink="/privacy" class="hover:text-terracotta transition-colors cursor-pointer no-underline">{{ lang.translate('footer.privacy_policy') }}</a>
              <a routerLink="/return-policy" class="hover:text-terracotta transition-colors cursor-pointer no-underline">{{ lang.translate('footer.return_policy') }}</a>
-             <span class="hidden md:inline">|</span>
-             <span class="hover:text-terracotta transition-colors cursor-default">SPA MODE</span>
-             <span class="hover:text-terracotta transition-colors cursor-default">V-20.0</span>
           </div>
 
           <div class="space-y-2 mt-4">
@@ -67,6 +64,11 @@ import { LanguageService } from '../../services/language.service';
             <p class="text-[11px] font-medium tracking-[0.1em] text-white/60 lowercase">
               {{ lang.translate('footer.developed_by') }} <a href="https://linkedin.com/in/al-mami-yahya-7a39342b9" target="_blank" rel="noopener noreferrer" class="text-terracotta hover:text-white transition-colors cursor-pointer font-black no-underline">yahya elmami</a>
             </p>
+          </div>
+
+          <div class="flex flex-wrap justify-center gap-x-4 mt-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/10">
+             <span class="hover:text-terracotta transition-colors cursor-default">SPA MODE</span>
+             <span class="hover:text-terracotta transition-colors cursor-default">V-20.0</span>
           </div>
         </div>
       </div>
