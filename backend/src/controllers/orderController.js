@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const Product = require('../models/Product');
 
 const addOrderItems = async (req, res) => {
   try {
@@ -100,8 +101,21 @@ const updateOrderToConfirmed = async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (order) {
-      order.isConfirmed = true;
-      order.confirmedAt = Date.now();
+      // Only decrease stock if the order wasn't already confirmed
+      if (!order.isConfirmed) {
+        // Decrease stock for each item in the order
+        for (const item of order.orderItems) {
+          const product = await Product.findById(item.product);
+          if (product) {
+            // New stock cannot be less than 0
+            product.stock = Math.max(0, product.stock - item.quantity);
+            await product.save();
+          }
+        }
+        order.isConfirmed = true;
+        order.confirmedAt = Date.now();
+      }
+      
       const updatedOrder = await order.save();
       res.json(updatedOrder);
     } else {
