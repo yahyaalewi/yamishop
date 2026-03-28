@@ -224,7 +224,7 @@ const getOrderInvoice = async (req, res) => {
       if (l !== 'ar' || !text) return text;
       try {
         const r = reshaper.reshape(text);
-        return bidi.getVisual(r);
+        return r.split('').reverse().join('');
       } catch (err) {
         return text;
       }
@@ -269,9 +269,9 @@ const getOrderInvoice = async (req, res) => {
       .fontSize(25)
       .text('YAMISHOP', pageStart, 45, { align: alignMain, width: pageWidth }) 
       .fontSize(10)
-      .text(reshapeText(t.invoice, lang), pageStart, 50, { align: alignMeta, width: pageWidth })
-      .text(`${reshapeText(t.orderNum, lang)}: ${shortId}`, pageStart, 65, { align: alignMeta, width: pageWidth })
-      .text(`${reshapeText(t.date, lang)}: ${formattedDate}`, pageStart, 80, { align: alignMeta, width: pageWidth })
+      .text(isRtl ? `${shortId} :${reshapeText(t.invoice, lang)}` : `${reshapeText(t.invoice, lang)}: ${shortId}`, pageStart, 50, { align: alignMeta, width: pageWidth })
+      .text(isRtl ? `${shortId} :${reshapeText(t.orderNum, lang)}` : `${reshapeText(t.orderNum, lang)}: ${shortId}`, pageStart, 65, { align: alignMeta, width: pageWidth })
+      .text(isRtl ? `${formattedDate} :${reshapeText(t.date, lang)}` : `${reshapeText(t.date, lang)}: ${formattedDate}`, pageStart, 80, { align: alignMeta, width: pageWidth })
       .moveDown();
 
     doc.moveTo(pageStart, 100).lineTo(pageEnd, 100).stroke();
