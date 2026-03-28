@@ -101,23 +101,26 @@ const updateOrderToConfirmed = async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (order) {
-      // Only decrease stock if the order wasn't already confirmed
       if (!order.isConfirmed) {
-        // Decrease stock for each item in the order
+        console.log(`Decreasing stock for order ${order._id}...`);
         for (const item of order.orderItems) {
-          const product = await Product.findById(item.product);
-          if (product) {
-            // New stock cannot be less than 0
-            product.stock = Math.max(0, product.stock - item.quantity);
-            await product.save();
+          const qty = Number(item.quantity) || 0;
+          if (qty > 0 && item.product) {
+            console.log(`- Product: ${item.product}, Qty: ${qty}`);
+            const result = await Product.updateOne(
+              { _id: item.product },
+              { $inc: { stock: -qty } }
+            );
+            console.log(`  Update result:`, result);
           }
         }
         order.isConfirmed = true;
         order.confirmedAt = Date.now();
+        const updatedOrder = await order.save();
+        return res.json(updatedOrder);
       }
       
-      const updatedOrder = await order.save();
-      res.json(updatedOrder);
+      res.json(order);
     } else {
       res.status(404).json({ message: 'Order not found' });
     }
