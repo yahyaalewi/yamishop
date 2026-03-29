@@ -28,6 +28,10 @@ import { LanguageService } from '../services/language.service';
             <ng-container *ngIf="policyType === 'return_policy'">
               <div [innerHTML]="getReturnPolicyContent()" class="policy-content"></div>
             </ng-container>
+
+            <ng-container *ngIf="policyType === 'about'">
+              <div [innerHTML]="getAboutContent()" class="policy-content"></div>
+            </ng-container>
           </div>
         </div>
 
@@ -58,12 +62,14 @@ import { LanguageService } from '../services/language.service';
 export class PolicyComponent implements OnInit {
   lang = inject(LanguageService);
   route = inject(ActivatedRoute);
-  policyType: 'privacy_policy' | 'return_policy' = 'privacy_policy';
+  policyType: 'privacy_policy' | 'return_policy' | 'about' = 'privacy_policy';
 
   ngOnInit() {
     this.route.url.subscribe(url => {
       const path = url[0].path;
-      this.policyType = path === 'privacy' ? 'privacy_policy' : 'return_policy';
+      if (path === 'privacy') this.policyType = 'privacy_policy';
+      else if (path === 'return-policy') this.policyType = 'return_policy';
+      else if (path === 'about') this.policyType = 'about';
     });
   }
 
@@ -116,6 +122,35 @@ export class PolicyComponent implements OnInit {
       <p>Veuillez nous contacter par téléphone ou WhatsApp pour initier un retour. Notre livreur passera ensuite récupérer l'article.</p>
       <h2>3. Frais de retour</h2>
       <p>En cas de défaut de fabrication, nous prenons en charge l'intégralité des frais. Pour les autres cas, des frais de livraison symboliques peuvent s'appliquer.</p>
+    `;
+  }
+
+  getAboutContent() {
+    if (this.lang.isRTL()) {
+       return `
+        <h2>1. ${this.lang.translate('footer.about_title')}</h2>
+        <p>${this.lang.translate('footer.about_desc')}</p>
+        <h2>2. ${this.lang.translate('footer.how_to_order_title')}</h2>
+        <p>${this.lang.translate('footer.how_to_order_desc')}</p>
+        <h2>3. ${this.lang.translate('footer.symbols_title')}</h2>
+        <ul>
+          <li>${this.lang.translate('footer.symbols_desc_quality')}</li>
+          <li>${this.lang.translate('footer.symbols_desc_security')}</li>
+          <li>${this.lang.translate('footer.symbols_desc_local')}</li>
+        </ul>
+      `;
+    }
+    return `
+      <h2>1. ${this.lang.translate('footer.about_title')}</h2>
+      <p>${this.lang.translate('footer.about_desc')}</p>
+      <h2>2. ${this.lang.translate('footer.how_to_order_title')}</h2>
+      <p>${this.lang.translate('footer.how_to_order_desc')}</p>
+      <h2>3. ${this.lang.translate('footer.symbols_title')}</h2>
+      <ul>
+        <li>${this.lang.translate('footer.symbols_desc_quality')}</li>
+        <li>${this.lang.translate('footer.symbols_desc_security')}</li>
+        <li>${this.lang.translate('footer.symbols_desc_local')}</li>
+      </ul>
     `;
   }
 }
