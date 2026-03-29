@@ -56,6 +56,7 @@ const CATEGORIES = [
         </section>
 
         <!-- Categories -->
+        <section class="py-12 container mx-auto px-4">
           <div class="flex items-center justify-between mb-8">
             <div>
               <h2 class="text-3xl font-black text-gray-900 tracking-tighter">
