@@ -39,7 +39,7 @@ import { NotificationService } from '../services/notification.service';
           </div>
           <h2 class="text-2xl font-black text-gray-900 mb-2">{{ lang.translate('cart.empty') }}</h2>
           <p class="text-gray-500 mb-8 max-w-xs mx-auto">{{ lang.translate('cart.empty_msg') }}</p>
-          <a routerLink="/home" 
+          <a [routerLink]="['/home']" fragment="categories-section"
              class="inline-flex items-center bg-terracotta text-white px-10 py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-terracotta-dark transition-all duration-300 no-underline cursor-pointer border-2 border-white/20 active:scale-95 premium-button-shine animate-button-hover mx-auto">
             <span>{{ lang.translate('home.shop_now') }}</span>
           </a>
