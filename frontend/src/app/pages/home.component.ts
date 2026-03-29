@@ -20,7 +20,16 @@ const CATEGORIES = [
   selector: 'app-home',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  styles: [':host { display: block; }'],
+  styles: [`
+    :host { display: block; }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  `],
   template: `
     <div class="h-full">
       <main class="flex-grow">
@@ -51,12 +60,12 @@ const CATEGORIES = [
               {{ lang.isRTL() ? 'عرض الكل' : 'Voir tout' }}
             </a>
           </div>
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
             <div *ngFor="let cat of categories" (click)="filterByCategory(cat.name)"
               [class.ring-4]="selectedCategory() === cat.name"
               [class.ring-primary]="selectedCategory() === cat.name"
               [class.scale-95]="selectedCategory() === cat.name"
-              class="group relative rounded-2xl overflow-hidden aspect-square block cursor-pointer no-underline shadow-lg hover:shadow-2xl transition-all duration-500">
+            class="group relative rounded-2xl overflow-hidden min-w-[120px] md:min-w-[180px] aspect-square flex-shrink-0 cursor-pointer no-underline shadow-lg hover:shadow-2xl transition-all duration-500">
               <img [src]="cat.image" [alt]="cat.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
               <div class="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-transparent to-transparent"></div>
               <div class="absolute bottom-4 left-4 right-4 text-white">
