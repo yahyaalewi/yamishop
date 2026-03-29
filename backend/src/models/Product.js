@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema({
   sizes: [{ type: String }],
   stock: { type: Number, required: true, default: 0 },
   gender: { type: String, enum: ['homme', 'femme', 'unisexe'], default: 'unisexe' },
+  isFeatured: { type: Boolean, default: false },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

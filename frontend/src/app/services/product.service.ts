@@ -17,6 +17,7 @@ export interface Product {
   gender?: 'homme' | 'femme' | 'unisexe';
   rating?: number;
   numReviews?: number;
+  isFeatured?: boolean;
 }
 
 @Injectable({

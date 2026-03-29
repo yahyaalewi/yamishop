@@ -131,6 +131,14 @@ import { LanguageService } from '../../services/language.service';
               <textarea name="description" [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none resize-none"></textarea>
             </div>
 
+            <div class="flex items-center gap-3 bg-primary/5 p-4 rounded-2xl border border-primary/10">
+              <input type="checkbox" name="isFeatured" [(ngModel)]="formData.isFeatured" id="isFeatured" class="w-5 h-5 accent-primary cursor-pointer">
+              <label for="isFeatured" class="text-sm font-bold text-gray-900 cursor-pointer flex flex-col">
+                <span class="flex items-center gap-2">🌟 {{ lang.isRTL() ? 'تمييز المنتج (Pépites)' : 'Mettre en avant (Nos Pépites)' }}</span>
+                <span class="text-[10px] text-gray-500 font-medium italic">{{ lang.isRTL() ? 'سيظهر المنتج في الصفحة الرئيسية بشكل افتراضي' : 'Le produit apparaîtra sur la page d\'accueil par défaut' }}</span>
+              </label>
+            </div>
+
             <div class="flex justify-end gap-3 pt-4">
               <app-button variant="outline" type="button" (onClick)="showForm.set(false)">
                 <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,6 +172,7 @@ import { LanguageService } from '../../services/language.service';
                 <th class="px-6 py-4">Genre</th>
                 <th class="px-6 py-4">Prix</th>
                 <th class="px-6 py-4">Stock</th>
+                <th class="px-6 py-4 text-center">Pépites</th>
                 <th class="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -198,6 +207,12 @@ import { LanguageService } from '../../services/language.service';
                   <span [class]="product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'" class="py-1 px-3 rounded-full text-xs font-bold">
                     {{product.stock > 0 ? product.stock + ' en stock' : 'Rupture'}}
                   </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span *ngIf="product.isFeatured" class="bg-yellow-50 text-yellow-600 py-1.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1 shadow-sm border border-yellow-100">
+                    <span class="text-xs">✨</span> OUI
+                  </span>
+                  <span *ngIf="!product.isFeatured" class="text-[10px] font-black uppercase tracking-widest text-gray-200">NON</span>
                 </td>
                 <td class="px-6 py-4 text-right">
                   <button (click)="editProduct(product)" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all border-none bg-transparent cursor-pointer">
@@ -279,7 +294,8 @@ export class AdminProductsComponent implements OnInit {
     description: '',
     featuresText: '',
     colorsText: '',
-    sizesText: ''
+    sizesText: '',
+    isFeatured: false
   };
   uploading = signal(false);
 
@@ -343,7 +359,8 @@ export class AdminProductsComponent implements OnInit {
       description: '',
       featuresText: '',
       colorsText: '',
-      sizesText: ''
+      sizesText: '',
+      isFeatured: false
     };
   }
 

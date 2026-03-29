@@ -251,11 +251,12 @@ export class HomeComponent implements OnInit {
 
   filteredProducts = computed(() => {
     const cat = this.selectedCategory();
-    let prods = this.allProducts();
+    const prods = this.allProducts();
     if (cat) {
-      prods = prods.filter(p => p.category === cat);
+      return prods.filter(p => p.category === cat);
     }
-    return prods;
+    // Only show featured products as "Nos Pépites" if no category is selected
+    return prods.filter(p => p.isFeatured);
   });
 
   ngOnInit() {
