@@ -30,6 +30,13 @@ const CATEGORIES = [
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+    @keyframes bounce-horizontal {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(5px); }
+    }
+    .animate-bounce-horizontal {
+      animation: bounce-horizontal 2s infinite;
+    }
   `],
   template: `
     <div class="h-full">
@@ -49,18 +56,25 @@ const CATEGORIES = [
         </section>
 
         <!-- Categories -->
-        <section class="py-12 container mx-auto px-4">
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center justify-between mb-8">
             <div>
-              <h2 class="text-2xl font-bold text-gray-900">
+              <h2 class="text-3xl font-black text-gray-900 tracking-tighter">
                 {{ selectedCategory() ? lang.translate('home.category_label') + ': ' + lang.translateCategory(selectedCategory()!) : lang.translate('home.categories') }}
               </h2>
-              <div class="h-1 w-16 bg-terracotta mt-2 rounded-full"></div>
+              <div class="h-1.5 w-12 bg-terracotta mt-2 rounded-full shadow-sm shadow-terracotta/20"></div>
             </div>
-            <a *ngIf="selectedCategory()" routerLink="/products" class="text-sm font-semibold text-primary hover:underline">
-              {{ lang.isRTL() ? 'عرض الكل' : 'Voir tout' }}
-            </a>
+            
+            <!-- Scroll Indicator Symbol -->
+            <div class="flex items-center gap-2 text-primary/30 animate-in fade-in slide-in-from-right duration-700">
+               <span class="text-[9px] font-black uppercase tracking-[0.3em]">{{ lang.isRTL() ? 'اسحب' : 'Glisser' }}</span>
+               <div class="flex items-center bg-gray-50 p-2 rounded-full border border-gray-100 shadow-inner">
+                  <svg class="h-4 w-4 animate-bounce-horizontal" [class.rotate-180]="lang.isRTL()" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+               </div>
+            </div>
           </div>
+          
           <div class="flex overflow-x-auto gap-6 md:gap-10 pb-8 pt-4 scrollbar-hide px-2">
             <div *ngFor="let cat of categories" (click)="filterByCategory(cat.name)"
               class="flex-shrink-0 flex flex-col items-center gap-4 cursor-pointer group transition-all duration-300 active:scale-95">
@@ -131,10 +145,10 @@ const CATEGORIES = [
                 {{ selectedCategory() ? lang.translate('home.cat_msg') : lang.translate('home.all_msg') }}
               </p>
 
-              <!-- Full Catalog Link -->
-              <div class="pt-4">
+              <!-- Full Catalog Link - Visible only when a category IS selected -->
+              <div class="pt-4" *ngIf="selectedCategory()">
                 <a (click)="resetAndScroll()"
-                   class="group inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-dark transition-all no-underline cursor-pointer">
+                   class="group inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-dark transition-all no-underline cursor-pointer animate-in zoom-in duration-500">
                   <span>{{ lang.translate('home.full_catalog') }}</span>
                   <div class="flex items-center">
                     <span class="w-8 h-[2px] bg-primary/20 group-hover:w-12 transition-all duration-300"></span>
