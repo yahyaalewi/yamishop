@@ -173,7 +173,10 @@ const PRODUCTS: any[] = [
               <div class="flex flex-col sm:flex-row items-stretch gap-4 pt-4">
                 <div class="flex items-center border-2 border-gray-100 rounded-2xl overflow-hidden bg-gray-50/50 shadow-inner">
                   <button (click)="dec()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() <= 1">−</button>
-                  <span class="px-6 py-4 font-black text-gray-900 min-w-[4rem] text-center border-x-2 border-gray-100/50 text-lg tabular-nums">{{qty()}}</span>
+                  <input type="number" 
+                         [value]="qty()" 
+                         (input)="onQtyChange($event)"
+                         class="w-16 h-full font-black text-gray-900 text-center border-x-2 border-gray-100/50 text-lg tabular-nums bg-transparent outline-none py-4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                   <button (click)="inc()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() >= (product?.stock || 0)">+</button>
                 </div>
                 <button (click)="addToCart()" 
@@ -326,6 +329,19 @@ export class ProductDetailsComponent implements OnInit {
     }
   }
   dec() { this.qty.update(n => Math.max(1, n - 1)); }
+  onQtyChange(event: any) {
+    let value = parseInt(event.target.value);
+    const maxStock = this.product?.stock || 0;
+    
+    if (isNaN(value) || value < 1) {
+      value = 1;
+    } else if (value > maxStock) {
+      value = maxStock;
+    }
+    
+    this.qty.set(value);
+    event.target.value = value;
+  }
 
   addToCart() {
     this.cartService.addItem(this.product, this.qty(), this.selectedColor(), this.selectedSize());

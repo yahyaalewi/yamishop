@@ -80,7 +80,10 @@ import { NotificationService } from '../services/notification.service';
                   <div class="flex items-center justify-between mt-4">
                     <div class="flex items-center bg-gray-50/50 p-1 rounded-2xl border border-gray-100">
                       <button (click)="updateQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all disabled:opacity-30 disabled:grayscale cursor-pointer border-none" [disabled]="item.qty <= 1">−</button>
-                      <span class="px-4 text-xs font-black text-gray-900">{{item.qty}}</span>
+                      <input type="number" 
+                             [value]="item.qty" 
+                             (input)="onQtyInput($event, item)"
+                             class="w-10 h-full font-black text-gray-900 text-center text-xs bg-transparent outline-none py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                       <button (click)="incQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all cursor-pointer border-none disabled:opacity-30 disabled:grayscale" [disabled]="item.qty >= (item.stock || 0)">+</button>
                     </div>
                     
@@ -174,6 +177,20 @@ export class CartComponent {
     if (item.qty < (item.stock || 0)) {
       this.cartService.updateQty(item.id, item.qty + 1, item.color, item.size);
     }
+  }
+
+  onQtyInput(event: any, item: any) {
+    let value = parseInt(event.target.value);
+    const maxStock = item.stock || 0;
+    
+    if (isNaN(value) || value < 1) {
+      value = 1;
+    } else if (value > maxStock) {
+      value = maxStock;
+    }
+    
+    this.cartService.updateQty(item.id, value, item.color, item.size);
+    event.target.value = value;
   }
 
   async removeItem(item: any) {
