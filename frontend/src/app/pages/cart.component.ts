@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -86,6 +86,11 @@ import { NotificationService } from '../services/notification.service';
                              class="w-10 h-full font-black text-gray-900 text-center text-xs bg-transparent outline-none py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                       <button (click)="incQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all cursor-pointer border-none disabled:opacity-30 disabled:grayscale" [disabled]="item.qty >= (item.stock || 0)">+</button>
                     </div>
+                    <!-- Error Message -->
+                    <p *ngIf="item.qty > (item.stock || 0)" class="text-[9px] font-black uppercase text-red-500 animate-pulse mt-1">
+                      ⚠️ {{ lang.isRTL() ? 'تجاوز المخزون' : 'Stock dépassé' }}
+                    </p>
+                  </div>
                     
                     <div class="text-right">
                       <p class="font-black text-gray-900 text-lg md:text-2xl tracking-tighter">{{(item.price * item.qty) | number}} <span class="text-[10px] text-gray-400 uppercase tracking-widest ml-1">MRU</span></p>
@@ -129,12 +134,17 @@ import { NotificationService } from '../services/notification.service';
                 </div>
               </div>
 
-              <a routerLink="/checkout"
+              <a [routerLink]="hasStockError() ? null : '/checkout'"
+                [class.opacity-50]="hasStockError()"
+                [class.pointer-events-none]="hasStockError()"
                 class="block w-full text-center bg-white text-gray-900 px-8 py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-xl hover:bg-primary hover:text-white transition-all duration-300 no-underline cursor-pointer active:scale-95 group/btn">
                 <span class="flex items-center justify-center gap-3">
                   {{ lang.translate('cart.checkout') }}
                   <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" [class.rotate-180]="lang.isRTL()" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </span>
+                <p *ngIf="hasStockError()" class="text-[9px] font-black uppercase text-red-400 mt-2">
+                  {{ lang.isRTL() ? 'يرجى مراجعة الكميات (مخزون غير كافٍ)' : 'Stock insuffisant pour certains articles' }}
+                </p>
               </a>
 
               <div class="mt-8 flex justify-between items-center px-2 grayscale opacity-20">
@@ -169,6 +179,10 @@ export class CartComponent {
     return cartItems().reduce((sum, i) => sum + i.price * i.qty, 0);
   }
 
+  hasStockError = computed(() => {
+    return this.items().some(item => item.qty > (item.stock || 0));
+  });
+
   updateQty(item: any) {
     this.cartService.updateQty(item.id, item.qty - 1, item.color, item.size);
   }
@@ -180,17 +194,10 @@ export class CartComponent {
   }
 
   onQtyInput(event: any, item: any) {
-    let value = parseInt(event.target.value);
-    const maxStock = item.stock || 0;
-    
-    if (isNaN(value) || value < 1) {
-      value = 1;
-    } else if (value > maxStock) {
-      value = maxStock;
+    const value = parseInt(event.target.value);
+    if (!isNaN(value)) {
+      this.cartService.updateQty(item.id, value, item.color, item.size);
     }
-    
-    this.cartService.updateQty(item.id, value, item.color, item.size);
-    event.target.value = value;
   }
 
   async removeItem(item: any) {

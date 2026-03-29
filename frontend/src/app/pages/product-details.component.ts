@@ -165,34 +165,40 @@ const PRODUCTS: any[] = [
               <div *ngIf="product.features?.length" class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-4 rounded-2xl">
                 <div *ngFor="let feat of product.features" class="flex items-center gap-2 text-sm text-gray-700">
                   <div class="w-5 h-5 bg-primary/10 text-primary rounded-full flex items-center justify-center text-[10px] font-bold">✓</div>
-                  {{feat}}
-                </div>
-              </div>
-
-              <!-- Quantity + Cart -->
+                         <!-- Quantity + Cart -->
               <div class="flex flex-col sm:flex-row items-stretch gap-4 pt-4">
-                <div class="flex items-center border-2 border-gray-100 rounded-2xl overflow-hidden bg-gray-50/50 shadow-inner">
-                  <button (click)="dec()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() <= 1">−</button>
-                  <input type="number" 
-                         [value]="qty()" 
-                         (input)="onQtyChange($event)"
-                         class="w-16 h-full font-black text-gray-900 text-center border-x-2 border-gray-100/50 text-lg tabular-nums bg-transparent outline-none py-4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                  <button (click)="inc()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() >= (product?.stock || 0)">+</button>
+                <div class="flex flex-col gap-2 flex-1">
+                  <div class="flex items-center border-2 border-gray-100 rounded-2xl overflow-hidden bg-gray-50/50 shadow-inner h-full">
+                    <button type="button" (click)="dec()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() <= 1">−</button>
+                    <input type="number" 
+                           [value]="qty()" 
+                           (input)="onQtyChange($event)"
+                           [class.text-red-600]="qty() > (product?.stock || 0)"
+                           class="w-16 h-full font-black text-gray-900 text-center border-x-2 border-gray-100/50 text-lg tabular-nums bg-transparent outline-none py-4 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                    <button type="button" (click)="inc()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() >= (product?.stock || 0)">+</button>
+                  </div>
+                  <!-- Error Message -->
+                  <p *ngIf="qty() > (product?.stock || 0)" class="text-[10px] font-black uppercase text-red-500 animate-pulse mt-1">
+                    ⚠️ {{ lang.isRTL() ? 'الكمية تتجاوز المخزون المتوفر' : 'Quantité supérieure au stock' }}
+                  </p>
                 </div>
+
                 <button (click)="addToCart()" 
-                   [disabled]="(product.stock || 0) === 0"
+                   [disabled]="(product.stock || 0) === 0 || qty() > (product.stock || 0) || qty() < 1"
                    class="flex-1 inline-flex items-center justify-center bg-terracotta text-white px-8 py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl hover:bg-terracotta-dark transition-all duration-300 border-2 border-white/20 active:scale-95 premium-button-shine animate-button-hover cursor-pointer group disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
                   <svg class="h-5 w-5 mr-3 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
                   <span>{{ lang.translate('product.add_to_cart') }}</span>
                 </button>
+              </div>art') }}</span>
+                </button>
 
               </div>
 
               <!-- Direct Buy -->
               <button (click)="buyNow()" 
-                 [disabled]="(product.stock || 0) === 0"
+                 [disabled]="(product.stock || 0) === 0 || qty() > (product.stock || 0) || qty() < 1"
                  class="w-full inline-flex items-center justify-center bg-primary text-white px-8 py-6 rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-primary-dark transition-all duration-300 border-2 border-white/10 active:scale-95 premium-button-shine animate-button-hover cursor-pointer relative overflow-hidden disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
                 <span class="relative z-10 flex items-center gap-3">
                   <span class="text-xl">⚡</span>
@@ -330,17 +336,10 @@ export class ProductDetailsComponent implements OnInit {
   }
   dec() { this.qty.update(n => Math.max(1, n - 1)); }
   onQtyChange(event: any) {
-    let value = parseInt(event.target.value);
-    const maxStock = this.product?.stock || 0;
-    
-    if (isNaN(value) || value < 1) {
-      value = 1;
-    } else if (value > maxStock) {
-      value = maxStock;
+    const value = parseInt(event.target.value);
+    if (!isNaN(value)) {
+      this.qty.set(value);
     }
-    
-    this.qty.set(value);
-    event.target.value = value;
   }
 
   addToCart() {
