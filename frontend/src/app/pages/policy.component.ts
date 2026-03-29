@@ -52,7 +52,7 @@ import { LanguageService } from '../services/language.service';
       @apply text-2xl font-black text-primary-dark mt-8 mb-4 flex items-center gap-3;
     }
     ::ng-deep .policy-content p { 
-      @apply text-primary-dark/70 leading-relaxed mb-6 block; 
+      @apply text-primary-dark/70 leading-relaxed mb-6 block whitespace-pre-wrap; 
     }
     ::ng-deep .policy-content ul { 
       @apply list-disc list-inside space-y-2 mb-6 text-primary-dark/70 block px-4; 
