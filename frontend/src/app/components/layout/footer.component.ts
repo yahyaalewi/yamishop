@@ -53,8 +53,38 @@ import { LanguageService } from '../../services/language.service';
           </div>
         </div>
 
-        <div class="border-t border-white/10 pt-10 pb-4 flex flex-col items-center gap-4 text-center">
-          <div class="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+        <div class="border-t border-white/10 pt-10 pb-4 flex flex-col items-center gap-8">
+          <!-- About Section -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl px-4 text-center md:text-start" [style.direction]="lang.isRTL() ? 'rtl' : 'ltr'">
+            <div class="space-y-3">
+              <h4 class="text-xs font-black uppercase tracking-[0.2em] text-terracotta">{{ lang.translate('footer.about_title') }}</h4>
+              <p class="text-[11px] leading-relaxed text-white/50 font-medium">{{ lang.translate('footer.about_desc') }}</p>
+            </div>
+            <div class="space-y-3">
+              <h4 class="text-xs font-black uppercase tracking-[0.2em] text-terracotta">{{ lang.translate('footer.how_to_order_title') }}</h4>
+              <p class="text-[11px] leading-relaxed text-white/50 font-medium">{{ lang.translate('footer.how_to_order_desc') }}</p>
+            </div>
+            <div class="space-y-3">
+              <h4 class="text-xs font-black uppercase tracking-[0.2em] text-terracotta">{{ lang.translate('footer.symbols_title') }}</h4>
+              <ul class="text-[11px] leading-relaxed text-white/50 font-medium space-y-1 list-none p-0 m-0">
+                <li class="flex items-center gap-2 justify-center md:justify-start">
+                  <span class="w-1 h-1 rounded-full bg-terracotta"></span>
+                  {{ lang.translate('footer.symbols_desc_quality') }}
+                </li>
+                <li class="flex items-center gap-2 justify-center md:justify-start">
+                  <span class="w-1 h-1 rounded-full bg-terracotta"></span>
+                  {{ lang.translate('footer.symbols_desc_security') }}
+                </li>
+                <li class="flex items-center gap-2 justify-center md:justify-start">
+                  <span class="w-1 h-1 rounded-full bg-terracotta"></span>
+                  {{ lang.translate('footer.symbols_desc_local') }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Policies Links -->
+          <div class="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-t border-white/5 pt-8 w-full">
              <a routerLink="/privacy" class="hover:text-terracotta transition-colors cursor-pointer no-underline">{{ lang.translate('footer.privacy_policy') }}</a>
              <a routerLink="/return-policy" class="hover:text-terracotta transition-colors cursor-pointer no-underline">{{ lang.translate('footer.return_policy') }}</a>
           </div>
