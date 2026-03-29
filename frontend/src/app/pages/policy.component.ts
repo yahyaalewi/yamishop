@@ -112,7 +112,7 @@ export class PolicyComponent implements OnInit {
         <h2>2. إجراءات الاسترجاع</h2>
         <p>يرجى التواصل معنا عبر الهاتف أو الواتساب لبدء عملية الاسترجاع. سيقوم مندوبنا بالاتصال بك لترتيب الموعد.</p>
         <h2>3. التكاليف</h2>
-        <p>في حالة وجود عيب مصنعي، نتحمل كامل تكاليف التوصيل. في حالات أخرى، قد يتم تطبيق رسوم توصيل رمزية.</p>
+        <p>رسوم التوصيل للاستبدال أو الاسترجاع تقع على عاتق الزبون في جميع الحالات. نحن لا نتحمل تكاليف التوصيل.</p>
       `;
     }
     return `
@@ -121,7 +121,7 @@ export class PolicyComponent implements OnInit {
       <h2>2. Procédure de retour</h2>
       <p>Veuillez nous contacter par téléphone ou WhatsApp pour initier un retour. Notre livreur passera ensuite récupérer l'article.</p>
       <h2>3. Frais de retour</h2>
-      <p>En cas de défaut de fabrication, nous prenons en charge l'intégralité des frais. Pour les autres cas, des frais de livraison symboliques peuvent s'appliquer.</p>
+      <p>Les frais de livraison pour les retours ou échanges sont à la charge exclusive du client dans tous les cas. Nous ne prenons pas en charge les frais de transport.</p>
     `;
   }
 
