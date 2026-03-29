@@ -14,6 +14,7 @@ const CATEGORIES = [
   { name: 'Électronique', image: '/images/categories/electronics.png' },
   { name: 'Maison', image: '/images/categories/home.png' },
   { name: 'Beauté', image: '/images/categories/beauty.png' },
+  { name: 'Accessoires', image: '/images/categories/accessories.png' },
 ];
 
 @Component({

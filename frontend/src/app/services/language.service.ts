@@ -116,6 +116,7 @@ export class LanguageService {
       'cat.electronics': 'Électronique',
       'cat.home': 'Appareils de la Maison',
       'cat.beauty': 'Cosmétiques',
+      'cat.accessories': 'Accessoires',
       'msg.added_to_cart': 'Produit ajouté au panier',
       'msg.item_removed': 'Produit retiré',
       'msg.logged_in': 'Connexion réussie',
@@ -246,6 +247,7 @@ export class LanguageService {
       'cat.electronics': 'إلكترونيات',
       'cat.home': 'الأجهزة المنزلية',
       'cat.beauty': 'مستحضرات التجميل',
+      'cat.accessories': 'إكسسوارات',
       'msg.added_to_cart': 'تمت الإضافة إلى السلة بنجاح',
       'msg.item_removed': 'تمت إزالة المنتج من السلة',
       'msg.logged_in': 'تم تسجيل الدخول بنجاح',
@@ -294,7 +296,8 @@ export class LanguageService {
       'Maison': 'cat.home',
       'Appareils de la Maison': 'cat.home',
       'Beauté': 'cat.beauty',
-      'Cosmétiques': 'cat.beauty'
+      'Cosmétiques': 'cat.beauty',
+      'Accessoires': 'cat.accessories'
     };
     const key = map[category] || category;
     return this.translate(key, locale);
