@@ -60,7 +60,6 @@ import { NotificationService } from '../services/notification.service';
                
                <!-- Info and Controls Container -->
                <div class="flex-1 min-w-0 flex flex-col justify-between h-full py-1">
-                  <!-- Product Metadata -->
                   <div class="flex justify-between items-start gap-4">
                     <div class="min-w-0">
                       <p class="text-[10px] font-black text-terracotta uppercase tracking-tighter mb-1">{{ lang.translate('cart.quality_badge') }}</p>
@@ -68,7 +67,6 @@ import { NotificationService } from '../services/notification.service';
                       <div class="flex flex-wrap gap-2" *ngIf="item.color || item.size">
                         <span *ngIf="item.color" class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{item.color}}</span>
                         <span *ngIf="item.size" class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{ lang.isRTL() ? 'مقاس' : 'Taille' }} {{item.size}}</span>
-
                       </div>
                     </div>
                     <button (click)="removeItem(item)" class="text-gray-300 hover:text-terracotta transition-colors bg-transparent border-none cursor-pointer p-2 rounded-xl hover:bg-terracotta/5 group/del">
@@ -76,21 +74,20 @@ import { NotificationService } from '../services/notification.service';
                     </button>
                   </div>
 
-                  <!-- Bottom row: Qty and Price -->
                   <div class="flex items-center justify-between mt-4">
-                    <div class="flex items-center bg-gray-50/50 p-1 rounded-2xl border border-gray-100">
-                      <button (click)="updateQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all disabled:opacity-30 disabled:grayscale cursor-pointer border-none" [disabled]="item.qty <= 1">−</button>
-                      <input type="number" 
-                             [value]="item.qty" 
-                             (input)="onQtyInput($event, item)"
-                             class="w-10 h-full font-black text-gray-900 text-center text-xs bg-transparent outline-none py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                      <button (click)="incQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all cursor-pointer border-none disabled:opacity-30 disabled:grayscale" [disabled]="item.qty >= (item.stock || 0)">+</button>
+                    <div class="flex flex-col gap-1">
+                      <div class="flex items-center bg-gray-50/50 p-1 rounded-2xl border border-gray-100 w-fit">
+                        <button (click)="updateQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all disabled:opacity-30 disabled:grayscale cursor-pointer border-none" [disabled]="item.qty <= 1">−</button>
+                        <input type="number" 
+                               [value]="item.qty" 
+                               (input)="onQtyInput($event, item)"
+                               class="w-10 h-full font-black text-gray-900 text-center text-xs bg-transparent outline-none py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                        <button (click)="incQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all cursor-pointer border-none disabled:opacity-30 disabled:grayscale" [disabled]="item.qty >= (item.stock || 0)">+</button>
+                      </div>
+                      <p *ngIf="item.qty > (item.stock || 0)" class="text-[9px] font-black uppercase text-red-500 animate-pulse mt-1">
+                        ⚠️ {{ lang.isRTL() ? 'تجاوز المخزون' : 'Stock dépassé' }}
+                      </p>
                     </div>
-                    <!-- Error Message -->
-                    <p *ngIf="item.qty > (item.stock || 0)" class="text-[9px] font-black uppercase text-red-500 animate-pulse mt-1">
-                      ⚠️ {{ lang.isRTL() ? 'تجاوز المخزون' : 'Stock dépassé' }}
-                    </p>
-                  </div>
                     
                     <div class="text-right">
                       <p class="font-black text-gray-900 text-lg md:text-2xl tracking-tighter">{{(item.price * item.qty) | number}} <span class="text-[10px] text-gray-400 uppercase tracking-widest ml-1">MRU</span></p>
@@ -103,7 +100,6 @@ import { NotificationService } from '../services/notification.service';
           <!-- Summary -->
           <div class="lg:w-[35%] w-full sticky top-28">
             <div class="bg-gray-900 text-white rounded-[2.5rem] shadow-2xl p-8 overflow-hidden relative group/summary">
-              <!-- Glass reflection effect -->
               <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 blur-[80px] rounded-full group-hover/summary:scale-150 transition-transform duration-1000"></div>
               
               <h2 class="text-xl font-black mb-8 flex items-center gap-3">
@@ -129,7 +125,6 @@ import { NotificationService } from '../services/notification.service';
                       <p class="text-[10px] text-white/30 uppercase font-black tracking-[0.2em] mb-1">{{ lang.translate('cart.total') }}</p>
                       <p class="text-3xl font-black tracking-tighter">{{(subtotal() + 150) | number}} <span class="text-sm font-medium text-white/40">{{ lang.translate('common.price_label') }}</span></p>
                     </div>
-                    <div class="text-[10px] bg-white/5 px-3 py-1.5 rounded-full border border-white/5 text-white/40 font-bold uppercase tracking-widest italic">{{ lang.translate('cart.vat_included') }}</div>
                   </div>
                 </div>
               </div>
@@ -146,21 +141,6 @@ import { NotificationService } from '../services/notification.service';
                   {{ lang.isRTL() ? 'يرجى مراجعة الكميات (مخزون غير كافٍ)' : 'Stock insuffisant pour certains articles' }}
                 </p>
               </a>
-
-              <div class="mt-8 flex justify-between items-center px-2 grayscale opacity-20">
-                <div class="text-[10px] font-black uppercase tracking-widest">{{ lang.translate('cart.security_badge') }}</div>
-                <div class="flex gap-4">
-                  <span class="text-xl">💳</span>
-                  <span class="text-xl">💵</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Extra info -->
-            <div class="mt-4 p-6 bg-primary/5 rounded-[2rem] border border-primary/10">
-              <p class="text-[11px] font-bold text-gray-600 leading-relaxed">
-                <span class="text-primary mr-1">📍</span> {{ lang.translate('product.shipping_info') }}
-              </p>
             </div>
           </div>
         </div>
