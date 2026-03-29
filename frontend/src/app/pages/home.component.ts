@@ -60,24 +60,44 @@ const CATEGORIES = [
               {{ lang.isRTL() ? 'عرض الكل' : 'Voir tout' }}
             </a>
           </div>
-          <div class="flex overflow-x-auto gap-4 pb-4 scrollbar-hide">
+          <div class="flex overflow-x-auto gap-6 md:gap-10 pb-8 pt-4 scrollbar-hide px-2">
             <div *ngFor="let cat of categories" (click)="filterByCategory(cat.name)"
-              [class.ring-4]="selectedCategory() === cat.name"
-              [class.ring-primary]="selectedCategory() === cat.name"
-              [class.scale-95]="selectedCategory() === cat.name"
-            class="group relative rounded-2xl overflow-hidden min-w-[120px] md:min-w-[180px] aspect-square flex-shrink-0 cursor-pointer no-underline shadow-lg hover:shadow-2xl transition-all duration-500">
-              <img [src]="cat.image" [alt]="cat.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-              <div class="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-transparent to-transparent"></div>
-              <div class="absolute bottom-4 left-4 right-4 text-white">
-                <h3 class="text-xl font-bold font-inter tracking-wide">{{ lang.translateCategory(cat.name) }}</h3>
-                <span class="text-[10px] uppercase font-bold text-beige opacity-0 group-hover:opacity-100 transition-opacity">
-                  {{ lang.isRTL() ? 'عرض المزيد ←' : 'Voir plus →' }}
-                </span>
+              class="flex-shrink-0 flex flex-col items-center gap-4 cursor-pointer group transition-all duration-300 active:scale-95">
+              
+              <!-- Circular Image Container -->
+              <div class="relative">
+                <div 
+                  [class.ring-4]="selectedCategory() === cat.name"
+                  [class.ring-primary]="selectedCategory() === cat.name"
+                  [class.ring-offset-4]="selectedCategory() === cat.name"
+                  [class.scale-105]="selectedCategory() === cat.name"
+                  class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-50 shadow-md group-hover:shadow-xl group-hover:border-primary/20 transition-all duration-500 bg-gray-50 relative">
+                  <img [src]="cat.image" [alt]="cat.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                  
+                  <!-- Overlays and Badges -->
+                  <div *ngIf="selectedCategory() === cat.name" class="absolute inset-0 bg-primary/10 flex items-center justify-center backdrop-blur-[1px]">
+                     <div class="bg-primary text-white p-1.5 rounded-full shadow-lg transform scale-110">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                     </div>
+                  </div>
+                </div>
+
+                <!-- Subtle Glow effect on selected -->
+                <div *ngIf="selectedCategory() === cat.name" class="absolute -inset-1 bg-primary/20 blur-xl rounded-full -z-10 animate-pulse"></div>
               </div>
-              <div *ngIf="selectedCategory() === cat.name" class="absolute top-3 right-3 bg-primary text-white p-1.5 rounded-full shadow-lg scale-110 animate-pulse">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                </svg>
+
+              <!-- Label -->
+              <div class="flex flex-col items-center">
+                <span [class.text-primary]="selectedCategory() === cat.name"
+                      [class.font-black]="selectedCategory() === cat.name"
+                      class="text-sm font-extrabold text-gray-700 tracking-tight transition-all duration-300 group-hover:text-primary whitespace-nowrap uppercase text-[11px]">
+                  {{ lang.translateCategory(cat.name) }}
+                </span>
+                <div class="h-1 w-0 bg-primary/40 rounded-full mt-1.5 transition-all duration-500 group-hover:w-full"
+                     [class.w-full]="selectedCategory() === cat.name"
+                     [class.bg-primary]="selectedCategory() === cat.name"></div>
               </div>
             </div>
           </div>
