@@ -242,7 +242,8 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   addToCart() {
-    this.cartService.addItem(this.product, this.qty(), this.selectedColor(), this.selectedSize());
+    const currentImage = this.selectedImage(); // image currently displayed (may differ from imageUrl)
+    this.cartService.addItem(this.product, this.qty(), this.selectedColor(), this.selectedSize(), currentImage);
     this.notificationService.show(`${this.translatedName() || this.product.name}: ${this.lang.translate('msg.added_to_cart')}`);
   }
 

@@ -18,7 +18,7 @@ export const cartItems = signal<CartItem[]>([]);
   providedIn: 'root'
 })
 export class CartService {
-  addItem(product: any, qty: number, color?: string | null, size?: string | null) {
+  addItem(product: any, qty: number, color?: string | null, size?: string | null, selectedImage?: string | null) {
     const items = cartItems();
     const existing = items.find(i => i.id === product._id && i.color === (color || undefined) && i.size === (size || undefined));
     const maxStock = product.stock || 0;
@@ -36,7 +36,7 @@ export class CartService {
         id: product._id,
         name: product.name,
         price: product.price,
-        image: product.imageUrl,
+        image: selectedImage || product.imageUrl,   // ← use selected image if provided
         qty: Math.min(qty, maxStock),
         stock: maxStock,
         color: color || undefined,

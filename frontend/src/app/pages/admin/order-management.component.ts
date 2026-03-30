@@ -38,6 +38,15 @@ import { NotificationService } from '../../services/notification.service';
                 </div>
                 <div class="flex-grow min-w-0">
                   <p class="text-sm font-bold text-gray-900 truncate">{{item.name}}</p>
+                  <!-- Color & Size badges -->
+                  <div class="flex flex-wrap gap-1.5 mt-1" *ngIf="item.color || item.size">
+                    <span *ngIf="item.color" class="inline-flex items-center gap-1 bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">
+                      🎨 {{item.color}}
+                    </span>
+                    <span *ngIf="item.size" class="inline-flex items-center gap-1 bg-terracotta/10 text-terracotta text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">
+                      📐 {{item.size}}
+                    </span>
+                  </div>
                   <p class="text-[10px] font-black text-primary uppercase mt-1">Quantité: {{item.qty || item.quantity}}</p>
                 </div>
                 <p class="font-black text-gray-900 text-sm whitespace-nowrap">{{item.price | number}} MRU</p>
