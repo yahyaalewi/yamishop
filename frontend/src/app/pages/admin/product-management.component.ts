@@ -67,6 +67,8 @@ import { LanguageService } from '../../services/language.service';
                   <option value="Beauté">Beauté</option>
                   <option value="Maison">Maison</option>
                   <option value="Accessoires">Accessoires</option>
+                  <option value="Chaussures">Chaussures</option>
+                  <option value="Parfum">Parfum</option>
                 </select>
               </div>
               <div>

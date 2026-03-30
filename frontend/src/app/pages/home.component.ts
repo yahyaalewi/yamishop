@@ -15,6 +15,8 @@ const CATEGORIES = [
   { name: 'Maison', image: '/images/categories/home.png' },
   { name: 'Beauté', image: '/images/categories/beauty.png' },
   { name: 'Accessoires', image: '/images/categories/accessories.png' },
+  { name: 'Chaussures', image: '/images/categories/shoes.png' },
+  { name: 'Parfum', image: '/images/categories/perfume.png' },
 ];
 
 @Component({
