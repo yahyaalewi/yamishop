@@ -107,23 +107,45 @@ import { LanguageService } from '../../services/language.service';
               </div>
             </div>
 
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Image du produit</label>
-              <div class="flex items-center gap-4">
-                <div class="w-20 h-20 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-100">
-                  <img [src]="getImageUrl(formData.imageUrl)" class="w-full h-full object-cover" *ngIf="formData.imageUrl">
-                  <div class="w-full h-full flex items-center justify-center text-gray-300" *ngIf="!formData.imageUrl">
-                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <!-- Main Image + Gallery -->
+            <div class="space-y-3">
+              <label class="block text-sm font-semibold text-gray-700">Photos du produit</label>
+              <p class="text-[10px] text-gray-400 -mt-2">La première photo est l'image principale. Ajoutez-en plusieurs pour les différentes couleurs.</p>
+
+              <!-- Uploaded images grid -->
+              <div class="flex flex-wrap gap-3">
+                <!-- Existing images as thumbnails -->
+                <div *ngFor="let img of formData.images; let i = index"
+                     class="relative w-24 h-24 rounded-xl overflow-hidden border-2 flex-shrink-0 group"
+                     [class.border-primary]="i === 0"
+                     [class.border-gray-200]="i !== 0">
+                  <img [src]="getImageUrl(img)" class="w-full h-full object-cover">
+                  <!-- Main badge -->
+                  <div *ngIf="i === 0" class="absolute bottom-0 left-0 right-0 bg-primary text-white text-[8px] font-black uppercase tracking-widest text-center py-0.5">
+                    Principale
                   </div>
+                  <!-- Set as main button (only for non-first images) -->
+                  <button *ngIf="i !== 0" type="button" (click)="setMainImage(i)"
+                          class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-[8px] font-black py-0.5 text-center border-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                    Principale
+                  </button>
+                  <!-- Remove button -->
+                  <button type="button" (click)="removeImage(i)"
+                          class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center border-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity shadow-md text-xs font-black">
+                    ✕
+                  </button>
                 </div>
-                <div class="flex-1">
+
+                <!-- Add image button -->
+                <div class="relative w-24 h-24 flex-shrink-0">
                   <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" id="productImage" #fileInput>
-                  <label for="productImage" class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl border-2 border-primary text-primary hover:bg-gray-50 transition-all cursor-pointer" [class.opacity-50]="uploading()" [class.pointer-events-none]="uploading()">
-                    <svg *ngIf="!uploading()" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                    <svg *ngIf="uploading()" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                    {{ uploading() ? 'Téléchargement...' : 'Choisir une image' }}
+                  <label for="productImage"
+                         class="w-full h-full rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all"
+                         [class.opacity-50]="uploading()" [class.pointer-events-none]="uploading()">
+                    <svg *ngIf="!uploading()" class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <svg *ngIf="uploading()" class="animate-spin h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide text-center leading-tight px-1">{{ uploading() ? '...' : 'Ajouter' }}</span>
                   </label>
-                  <p class="text-[10px] text-gray-400 mt-1">PNG, JPG ou WebP (Max 5MB)</p>
                 </div>
               </div>
             </div>
@@ -293,6 +315,7 @@ export class AdminProductsComponent implements OnInit {
     price: 0,
     stock: 0,
     imageUrl: '',
+    images: [] as string[],
     description: '',
     featuresText: '',
     colorsText: '',
@@ -311,21 +334,36 @@ export class AdminProductsComponent implements OnInit {
       this.uploading.set(true);
       this.productService.uploadImage(file).subscribe({
         next: (res) => {
-          console.log('Upload success:', res);
-          this.formData.imageUrl = res.url;
+          // Append new URL to the gallery
+          if (!Array.isArray(this.formData.images)) this.formData.images = [];
+          this.formData.images = [...this.formData.images, res.url];
+          // Keep imageUrl always pointing to first image
+          this.formData.imageUrl = this.formData.images[0];
           this.uploading.set(false);
-          this.notificationService.show('Image téléchargée avec succès');
-          event.target.value = ''; // Reset input
+          this.notificationService.show('Photo ajoutée avec succès');
+          event.target.value = '';
         },
         error: (err) => {
-          console.error('Upload error:', err);
           this.uploading.set(false);
-          const errorMsg = err.error?.message || 'Erreur lors du téléchargement de l\'image';
+          const errorMsg = err.error?.message || 'Erreur lors du téléchargement';
           this.notificationService.show(errorMsg, 'error');
-          event.target.value = ''; // Reset input
+          event.target.value = '';
         }
       });
     }
+  }
+
+  removeImage(index: number) {
+    this.formData.images = this.formData.images.filter((_: string, i: number) => i !== index);
+    this.formData.imageUrl = this.formData.images[0] || '';
+  }
+
+  setMainImage(index: number) {
+    const imgs: string[] = [...this.formData.images];
+    const [selected] = imgs.splice(index, 1);
+    imgs.unshift(selected);
+    this.formData.images = imgs;
+    this.formData.imageUrl = imgs[0];
   }
 
   constructor() {}
@@ -358,6 +396,7 @@ export class AdminProductsComponent implements OnInit {
       price: 0,
       stock: 0,
       imageUrl: '',
+      images: [] as string[],
       description: '',
       featuresText: '',
       colorsText: '',
@@ -369,9 +408,14 @@ export class AdminProductsComponent implements OnInit {
   editProduct(product: Product) {
     this.currentProduct = product;
     const g = (product.gender || 'unisexe').toLowerCase().trim();
-    this.formGender.set(g); // Update signal so buttons light up correctly
+    this.formGender.set(g);
+    // Build images array: use existing images[] or fall back to [imageUrl]
+    const imgs: string[] = (product.images && product.images.length > 0)
+      ? [...product.images]
+      : (product.imageUrl ? [product.imageUrl] : []);
     this.formData = { 
       ...product,
+      images: imgs,
       featuresText: product.features && Array.isArray(product.features) ? product.features.join('\n') : '',
       colorsText: product.colors && Array.isArray(product.colors) ? product.colors.join(', ') : '',
       sizesText: product.sizes && Array.isArray(product.sizes) ? product.sizes.join(', ') : ''
@@ -385,15 +429,17 @@ export class AdminProductsComponent implements OnInit {
 
   saveProduct() {
     this.saving.set(true);
-    if (!this.formData.imageUrl) {
-      this.notificationService.show('Veuillez d\'abord télécharger une image', 'error');
+    if (!this.formData.images || this.formData.images.length === 0) {
+      this.notificationService.show('Veuillez ajouter au moins une photo', 'error');
       this.saving.set(false);
       return;
     }
 
     const productData = { 
       ...this.formData,
-      gender: this.formGender(), // Always read from signal — guaranteed correct value
+      imageUrl: this.formData.images[0], // Always sync imageUrl from gallery
+      images: this.formData.images,
+      gender: this.formGender(),
       features: this.formData.featuresText ? this.formData.featuresText.split('\n').filter((f: string) => f.trim().length > 0) : [],
       colors: this.formData.colorsText ? this.formData.colorsText.split(',').map((c: string) => c.trim()).filter((c: string) => c.length > 0) : [],
       sizes: this.formData.sizesText ? this.formData.sizesText.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0) : []

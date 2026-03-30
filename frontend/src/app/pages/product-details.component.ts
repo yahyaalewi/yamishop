@@ -51,8 +51,8 @@ import { LanguageService } from '../services/language.service';
                       </span>
                     </div>
                   </div>
-                  <div class="flex gap-2 overflow-x-auto pb-2">
-                    <button *ngFor="let img of product.images; let i = index" (click)="selectImage(i)"
+                  <div class="flex gap-2 overflow-x-auto pb-2" *ngIf="galleryImages.length > 1">
+                    <button *ngFor="let img of galleryImages; let i = index" (click)="selectImage(i)"
                       class="w-20 h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 bg-transparent p-0 cursor-pointer"
                       [class.border-primary]="selectedIndex() === i" [class.border-gray-200]="selectedIndex() !== i">
                       <img [src]="productService.getImageUrl(img)" [alt]="product.name" class="w-full h-full object-cover">
@@ -222,7 +222,16 @@ export class ProductDetailsComponent implements OnInit {
     }
   }
 
-  selectedImage = () => this.productService.getImageUrl(this.product?.images?.[this.selectedIndex()] ?? this.product?.imageUrl);
+  /** Unified gallery: uses images[] if populated, otherwise wraps imageUrl */
+  get galleryImages(): string[] {
+    if (!this.product) return [];
+    const imgs: string[] = this.product.images && this.product.images.length > 0
+      ? this.product.images
+      : (this.product.imageUrl ? [this.product.imageUrl] : []);
+    return imgs;
+  }
+
+  selectedImage = () => this.productService.getImageUrl(this.galleryImages[this.selectedIndex()] ?? this.product?.imageUrl);
   discount = () => this.product?.oldPrice ? Math.round((1 - this.product.price / this.product.oldPrice) * 100) : 0;
   selectImage(i: number) { this.selectedIndex.set(i); }
   inc() { if (this.qty() < (this.product?.stock || 0)) this.qty.update(n => n + 1); }
