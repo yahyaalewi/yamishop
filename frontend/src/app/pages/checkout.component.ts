@@ -183,10 +183,25 @@ import { LanguageService } from '../services/language.service';
                     {{ loading() ? lang.translate('common.loading') : lang.translate('checkout.confirm') }}
                   </span>
                 </button>
-                <div class="mt-8 pt-6 border-t border-gray-50 flex items-center justify-center gap-4 grayscale opacity-30">
-                  <img src="https://img.icons8.com/color/48/000000/visa.png" class="h-6 w-auto" alt="visa">
-                  <img src="https://img.icons8.com/color/48/000000/mastercard.png" class="h-6 w-auto" alt="mastercard">
-                  <img src="https://img.icons8.com/color/48/000000/bank-card-back.png" class="h-6 w-auto" alt="cash">
+                <div class="mt-8 pt-6 border-t border-gray-50 flex flex-wrap items-center justify-center gap-3 opacity-60 hover:opacity-100 transition-opacity duration-300">
+                  <!-- Bankily Badge -->
+                  <div class="h-8 px-3 rounded-xl flex items-center justify-center bg-[#00AEEF]/5 border border-[#00AEEF]/20 text-[#00AEEF] gap-1.5 shadow-sm" title="Bankily">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h8.5c2.5 0 4.5 2 4.5 4.5 0 1.5-.7 2.8-1.8 3.5 1.4.6 2.3 2 2.3 3.6 0 2.8-2.2 5-5 5H4V4zm3 8h4.5c1.4 0 2.5-1.1 2.5-2.5S12.9 7 11.5 7H7v5zm0 5.5h5.5c1.4 0 2.5-1.1 2.5-2.5S13.9 12.5 12.5 12.5H7v5z"/></svg>
+                    <span class="text-[11px] font-black tracking-widest uppercase mt-0.5">Bankily</span>
+                  </div>
+                  <!-- Masrivi Badge -->
+                  <div class="h-8 px-3 rounded-xl flex items-center justify-center bg-[#0C6A36]/5 border border-[#0C6A36]/20 text-[#0C6A36] gap-1.5 shadow-sm" title="Masrivi">
+                    <svg class="w-4 h-4 text-[#FFD000]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <span class="text-[11px] font-black tracking-widest uppercase mt-0.5 relative">
+                      Masrivi
+                      <span class="absolute -right-2 top-0.5 w-1 h-1 bg-[#FFD000] rounded-full"></span>
+                    </span>
+                  </div>
+                  <!-- Cash Badge -->
+                  <div class="h-8 px-3 rounded-xl flex items-center justify-center bg-gray-50 border border-gray-200 text-gray-400 gap-1.5 shadow-sm" title="Cash">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span class="text-[11px] font-bold tracking-widest uppercase mt-0.5">Cash</span>
+                  </div>
                 </div>
               </div>
 
