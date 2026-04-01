@@ -9,6 +9,7 @@ import { ProductService, Product } from '../services/product.service';
 import { NotificationService } from '../services/notification.service';
 import { AuthService } from '../services/auth.service';
 import { LanguageService } from '../services/language.service';
+import { Title, Meta } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-product-details',
@@ -173,6 +174,8 @@ export class ProductDetailsComponent implements OnInit {
   notificationService = inject(NotificationService);
   authService = inject(AuthService);
   lang = inject(LanguageService);
+  titleService = inject(Title);
+  metaService = inject(Meta);
 
   product: any = null;
   loading = signal(true);
@@ -213,6 +216,20 @@ export class ProductDetailsComponent implements OnInit {
           if (this.product.colors?.length) this.selectedColor.set(this.product.colors[0]);
           if (this.product.sizes?.length) this.selectedSize.set(this.product.sizes[0]);
           this.loading.set(false);
+
+          // SEO Tags Update for this product!
+          const productName = this.translatedName() || this.product.name;
+          const price = this.product.price + ' MRU';
+          const desc = this.product.description ? this.product.description.slice(0, 155) + '...' : 'Produit disponible sur YamiShop';
+          const img = this.productService.getImageUrl(this.product.imageUrl) || 'https://yamishop.vercel.app/banner.png';
+
+          this.titleService.setTitle(`${productName} - ${price} | YamiShop`);
+          this.metaService.updateTag({ name: 'description', content: desc });
+          this.metaService.updateTag({ property: 'og:title', content: `${productName} | YamiShop` });
+          this.metaService.updateTag({ property: 'og:description', content: desc });
+          this.metaService.updateTag({ property: 'og:image', content: img });
+          this.metaService.updateTag({ property: 'product:price:amount', content: this.product.price.toString() });
+          this.metaService.updateTag({ property: 'product:price:currency', content: 'MRU' });
         },
         error: () => {
           this.product = null;
