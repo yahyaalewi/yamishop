@@ -155,6 +155,24 @@ import { LanguageService } from '../../services/language.service';
               <textarea name="description" [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none resize-none"></textarea>
             </div>
 
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Caractéristiques techniques (une par ligne)</label>
+              <textarea name="featuresText" [(ngModel)]="formData.featuresText" rows="2" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none resize-none" placeholder="Ex: Résistant à l'eau..."></textarea>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Couleurs disponibles</label>
+                <input type="text" name="colorsText" [(ngModel)]="formData.colorsText" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: Rouge, Bleu, Noir">
+                <p class="text-[10px] text-gray-400 mt-1">Séparées par des virgules</p>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Tailles disponibles</label>
+                <input type="text" name="sizesText" [(ngModel)]="formData.sizesText" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: S, M, L, XL ou 38, 40">
+                <p class="text-[10px] text-gray-400 mt-1">Séparées par des virgules</p>
+              </div>
+            </div>
+
             <div class="flex items-center gap-3 bg-primary/5 p-4 rounded-2xl border border-primary/10">
               <input type="checkbox" name="isFeatured" [(ngModel)]="formData.isFeatured" id="isFeatured" class="w-5 h-5 accent-primary cursor-pointer">
               <label for="isFeatured" class="text-sm font-bold text-gray-900 cursor-pointer flex flex-col">
