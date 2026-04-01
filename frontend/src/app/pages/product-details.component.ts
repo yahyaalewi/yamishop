@@ -221,7 +221,7 @@ export class ProductDetailsComponent implements OnInit {
           const productName = this.translatedName() || this.product.name;
           const price = this.product.price + ' MRU';
           const desc = this.product.description ? this.product.description.slice(0, 155) + '...' : 'Produit disponible sur YamiShop';
-          const img = this.productService.getImageUrl(this.product.imageUrl) || 'https://yamishop.vercel.app/banner.png';
+          const img = this.productService.getImageUrl(this.product.imageUrl) || 'https://yamishop.store/banner.png';
 
           this.titleService.setTitle(`${productName} - ${price} | YamiShop`);
           this.metaService.updateTag({ name: 'description', content: desc });

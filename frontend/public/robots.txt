@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /profile/
 Disallow: /checkout/
 
-Sitemap: https://yamishop.vercel.app/sitemap.xml
+Sitemap: https://yamishop.store/sitemap.xml
