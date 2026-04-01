@@ -254,7 +254,7 @@ export class AdminDashboardComponent implements OnInit {
 
   // Chart Data (Last 7 Days)
   recentChartData = computed(() => {
-    const data = [];
+    const data: {date: Date, label: string, revenue: number, heightPercentage: string}[] = [];
     const today = new Date();
     today.setHours(0,0,0,0);
     
