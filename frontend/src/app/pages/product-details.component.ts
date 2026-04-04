@@ -9,7 +9,7 @@ import { ProductService, Product } from '../services/product.service';
 import { NotificationService } from '../services/notification.service';
 import { AuthService } from '../services/auth.service';
 import { LanguageService } from '../services/language.service';
-import { Title, Meta } from '@angular/platform-browser';
+import { SeoService } from '../services/seo.service';
 
 @Component({
   selector: 'app-product-details',
@@ -174,10 +174,9 @@ export class ProductDetailsComponent implements OnInit {
   notificationService = inject(NotificationService);
   authService = inject(AuthService);
   lang = inject(LanguageService);
-  titleService = inject(Title);
-  metaService = inject(Meta);
+  seo = inject(SeoService);
 
-  product: any = null;
+  product: Product | null = null;
   loading = signal(true);
   qty = signal(1);
   
@@ -218,18 +217,16 @@ export class ProductDetailsComponent implements OnInit {
           this.loading.set(false);
 
           // SEO Tags Update for this product!
-          const productName = this.translatedName() || this.product.name;
-          const price = this.product.price + ' MRU';
-          const desc = this.product.description ? this.product.description.slice(0, 155) + '...' : 'Produit disponible sur YamiShop';
-          const img = this.productService.getImageUrl(this.product.imageUrl) || 'https://yamishop.store/banner.png';
+          const productName = this.translatedName() || this.product!.name;
+          const desc = this.product!.description ? this.product!.description.slice(0, 155) + '...' : 'Produit disponible sur YamiShop';
+          const img = this.productService.getImageUrl(this.product!.imageUrl) || 'https://yamishop.store/banner.png';
 
-          this.titleService.setTitle(`${productName} - ${price} | YamiShop`);
-          this.metaService.updateTag({ name: 'description', content: desc });
-          this.metaService.updateTag({ property: 'og:title', content: `${productName} | YamiShop` });
-          this.metaService.updateTag({ property: 'og:description', content: desc });
-          this.metaService.updateTag({ property: 'og:image', content: img });
-          this.metaService.updateTag({ property: 'product:price:amount', content: this.product.price.toString() });
-          this.metaService.updateTag({ property: 'product:price:currency', content: 'MRU' });
+          this.seo.updateTags({
+            title: productName,
+            description: desc,
+            image: img,
+            type: 'product'
+          });
         },
         error: () => {
           this.product = null;
@@ -260,8 +257,8 @@ export class ProductDetailsComponent implements OnInit {
 
   addToCart() {
     const currentImage = this.selectedImage(); // image currently displayed (may differ from imageUrl)
-    this.cartService.addItem(this.product, this.qty(), this.selectedColor(), this.selectedSize(), currentImage);
-    this.notificationService.show(`${this.translatedName() || this.product.name}: ${this.lang.translate('msg.added_to_cart')}`);
+    this.cartService.addItem(this.product!, this.qty(), this.selectedColor(), this.selectedSize(), currentImage);
+    this.notificationService.show(`${this.translatedName() || this.product!.name}: ${this.lang.translate('msg.added_to_cart')}`);
   }
 
   buyNow() {

@@ -151,7 +151,10 @@ export class LanguageService {
       'footer.symbols_desc_security': 'Expérience Sûre : Vos données restent 100% confidentielles.',
       'footer.symbols_desc_local': 'Proximité : Une plateforme pensée par et pour les Mauritaniens.',
       'product.stock_left': 'Stock : ',
-      'product.stock_finished': 'Stock épuisé'
+      'product.stock_finished': 'Stock épuisé',
+      'seo.home_title': 'YamiShop - Meilleure Boutique E-Commerce en Mauritanie',
+      'seo.home_description': 'Découvrez YamiShop, la destination shopping n°1 en Mauritanie. Mode, électronique et bien plus avec paiement à la livraison.',
+      'seo.home_keywords': 'boutique mauritanie, meilleur boutique en mauritanie, shopping nouakchott, achat en ligne mauritanie, chaussures mauritanie, parfum mauritanie, électronique mauritanie, mode mauritanie'
     },
     ar: {
       'nav.home': 'الرئيسية',
@@ -293,8 +296,11 @@ export class LanguageService {
       'footer.symbols_desc_security': 'تجربة آمنة: بياناتكم في سرية تامة ومحمية 100%.',
       'footer.symbols_desc_local': 'منصة محلية: مصممة خصيصاً لتلبية احتياجات السوق الموريتاني.',
       'product.stock_left': 'متوفر: ',
-      'product.stock_finished': 'انتهت الكمية'
-    }
+      'product.stock_finished': 'انتهت الكمية',
+      'seo.home_title': 'يامي شوب - أفضل متجر إلكتروني في موريتانيا',
+      'seo.home_description': 'اكتشف يامي شوب، وجهتك الأولى للتسوق في موريتانيا. موضة، إلكترونيات، وأكثر مع خدمة الدفع عند الاستلام.',
+      'seo.home_keywords': 'متجر موريتانيا، أفضل متجر في موريتانيا، تسوق موريتانيا، بوتيك موريتانيا، ملابس، أحذية، عطور، إلكترونيات، نواكشوط'
+    },
   };
 
   setLocale(locale: Locale) {

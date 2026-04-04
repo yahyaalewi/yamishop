@@ -8,6 +8,7 @@ import { LanguageService } from '../services/language.service';
 import { CartService } from '../services/cart.service';
 import { ProductService, Product } from '../services/product.service';
 import { NotificationService } from '../services/notification.service';
+import { SeoService } from '../services/seo.service';
 
 const CATEGORIES = [
   { name: 'Mode', image: '/images/categories/fashion.png' },
@@ -257,6 +258,7 @@ export class HomeComponent implements OnInit {
   notificationService = inject(NotificationService);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  seo = inject(SeoService);
 
   filterByGender(gender: string | null) {
     this.router.navigate([], {
@@ -289,6 +291,7 @@ export class HomeComponent implements OnInit {
     });
 
     this.loadProducts();
+    this.seo.updateTags();
   }
 
   loadProducts() {

@@ -9,6 +9,9 @@ import { MobileNavComponent } from './components/layout/mobile-nav.component';
 import { HeaderComponent } from './components/layout/header.component';
 import { FooterComponent } from './components/layout/footer.component';
 import { AuthService } from './services/auth.service';
+import { SeoService } from './services/seo.service';
+import { LanguageService } from './services/language.service';
+import { effect } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -35,6 +38,16 @@ import { AuthService } from './services/auth.service';
 export class AppComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
+  private seo = inject(SeoService);
+  private lang = inject(LanguageService);
+
+  constructor() {
+    effect(() => {
+      // Trigger update when language changes
+      this.lang.currentLocale();
+      this.seo.updateTags();
+    });
+  }
   
   private currentUrl = toSignal(
     this.router.events.pipe(
