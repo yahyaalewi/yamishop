@@ -1,15 +1,6 @@
 const nodemailer = require('nodemailer');
+const path = require('path');
 
-/**
- * Creates and returns a Gmail SMTP transporter.
- * 
- * ⚠️  IMPORTANT — Gmail requires an "App Password", NOT your regular Gmail password.
- *     Steps to create one:
- *     1. Go to https://myaccount.google.com/security
- *     2. Enable 2-Step Verification (if not already done)
- *     3. Search for "App passwords" → create one for "Mail"
- *     4. Use that 16-character code as EMAIL_PASS in your .env
- */
 const createTransporter = () => {
   return nodemailer.createTransport({
     service: 'gmail',
@@ -22,16 +13,22 @@ const createTransporter = () => {
 
 /**
  * Send OTP email for password reset.
- * Falls back to console log in development if email sending fails.
  * @param {string} toEmail - Recipient email address
  * @param {string} otpCode - 6-digit OTP code
- * @param {string} userName - User's name for personalization
+ * @param {string} userName - User's name
  */
 const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
   const mailOptions = {
     from: `"YamiShop 🛍️" <${process.env.EMAIL_USER}>`,
     to: toEmail,
     subject: 'Code de réinitialisation - YamiShop / رمز إعادة تعيين كلمة المرور',
+    attachments: [
+      {
+        filename: 'logo.png',
+        path: path.join(__dirname, '../assets/logo.png'), // Relative path in the project
+        cid: 'yamishoplogo'
+      }
+    ],
     html: `
       <!DOCTYPE html>
       <html dir="ltr" lang="fr">
@@ -39,68 +36,53 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
       </head>
-      <body style="margin:0;padding:0;background:#f5f5f5;font-family:'Segoe UI',Arial,sans-serif;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 20px;">
+      <body style="margin:0;padding:0;background:#f8f9fa;font-family:'Inter', 'Segoe UI', Arial, sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f9fa;padding:30px 10px;">
           <tr>
             <td align="center">
-              <table width="580" cellpadding="0" cellspacing="0"
-                style="background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,0.10);">
+              <table width="100%" cellpadding="0" cellspacing="0" 
+                style="background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.06);border:1px solid #eee;max-width:550px;">
 
-                <!-- Header -->
+                <!-- Logo Header -->
                 <tr>
-                  <td style="background:linear-gradient(135deg,#6c3483,#a93226);padding:36px 40px;text-align:center;">
-                    <h1 style="color:#fff;margin:0;font-size:30px;font-weight:900;letter-spacing:-0.5px;">
-                      YamiShop 🛍️
-                    </h1>
-                    <p style="color:rgba(255,255,255,0.80);margin:6px 0 0;font-size:15px;">يامي شوب</p>
+                  <td style="padding:40px 40px 20px;text-align:center;">
+                    <img src="cid:yamishoplogo" alt="YamiShop Logo" style="height:50px;width:auto;display:block;margin:0 auto;">
                   </td>
                 </tr>
 
-                <!-- Body -->
+                <!-- Content -->
                 <tr>
-                  <td style="padding:40px 44px;">
-
-                    <h2 style="color:#1a1a2e;font-size:20px;margin:0 0 14px;font-weight:700;">
-                      Bonjour ${userName} 👋
+                  <td style="padding:20px 40px 40px;">
+                    <h2 style="color:#111827;font-size:22px;margin:0 0 16px;font-weight:800;text-align:center;">
+                      Bonjour, ${userName} 👋
                     </h2>
-                    <p style="color:#555;font-size:15px;line-height:1.7;margin:0 0 24px;">
-                      Vous avez demandé à réinitialiser votre mot de passe YamiShop.<br>
-                      Voici votre code valable pendant <strong>10 minutes</strong> :
+                    <p style="color:#4b5563;font-size:15px;line-height:1.6;margin:0 0 24px;text-align:center;">
+                      Vous avez demandé la réinitialisation de votre compte. 
+                      Utilisez le code de validation ci-dessous.
                     </p>
 
-                    <!-- OTP Box -->
-                    <div style="background:linear-gradient(135deg,#fdf2f8,#fce4ec);
-                                border:2px dashed #e91e8c44;border-radius:16px;
-                                padding:32px;text-align:center;margin:0 0 28px;">
-                      <p style="color:#999;font-size:11px;font-weight:700;letter-spacing:3px;
-                                 text-transform:uppercase;margin:0 0 14px;">Code de vérification</p>
-                      <span style="font-size:46px;font-weight:900;letter-spacing:14px;
-                                   color:#6c3483;font-family:'Courier New',monospace;
-                                   display:inline-block;padding:0 8px;">
-                        ${otpCode}
-                      </span>
-                      <p style="color:#bbb;font-size:12px;margin:18px 0 0;">
-                        ⏱ Ce code expire dans 10 minutes
+                    <!-- OTP Code Box -->
+                    <div style="background:#fff7f5;border:2px dashed #E2725B;border-radius:20px;padding:30px;text-align:center;margin-bottom:24px;">
+                      <p style="color:#E2725B;font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 10px;">Votre code secret</p>
+                      <span style="font-size:42px;font-weight:900;letter-spacing:12px;color:#E2725B;font-family:'Courier New', monospace;display:block;">${otpCode}</span>
+                      <p style="color:#9CA3AF;font-size:12px;margin:15px 0 0;">
+                        ⏱ Ce code est valable pendant <b>3 minutes</b> seulement.
                       </p>
                     </div>
 
-                    <!-- Arabic -->
-                    <div style="border-top:1px solid #f0f0f0;padding-top:22px;text-align:right;direction:rtl;">
-                      <p style="color:#555;font-size:14px;line-height:1.9;margin:0;">
-                        مرحباً <strong>${userName}</strong>،<br>
-                        طلبت إعادة تعيين كلمة مرورك في يامي شوب.<br>
-                        استخدم الرمز أعلاه — صلاحيته <strong>10 دقائق</strong> فقط.
+                    <!-- Arabic Area -->
+                    <div style="border-top:1px solid #f3f4f6;padding-top:20px;margin-top:20px;text-align:right;direction:rtl;">
+                      <p style="color:#374151;font-size:15px;line-height:1.7;margin:0;">
+                        مرحباً <b>${userName}</b>، لقد طلبت إعادة تعيين كلمة مرورك.<br>
+                        استخدم الرمز أعلاه لإتمام العملية. الرمز صالح لمدة <b>3 دقائق</b> فقط.
                       </p>
                     </div>
 
-                    <!-- Warning -->
-                    <div style="background:#fffbea;border-left:4px solid #f59e0b;
-                                border-radius:10px;padding:14px 16px;margin-top:24px;">
-                      <p style="color:#92400e;font-size:13px;margin:0;line-height:1.6;">
-                        ⚠️ Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
-                        <span style="display:block;direction:rtl;text-align:right;margin-top:6px;">
-                          ⚠️ إذا لم تطلب ذلك، تجاهل هذا البريد. حسابك بأمان.
-                        </span>
+                    <!-- Security Alert -->
+                    <div style="margin-top:30px;background:#FEF2F2;border-radius:12px;padding:15px;">
+                      <p style="color:#B91C1C;font-size:13px;margin:0;line-height:1.5;">
+                         Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.<br>
+                         إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذا البريد.
                       </p>
                     </div>
                   </td>
@@ -108,11 +90,10 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
 
                 <!-- Footer -->
                 <tr>
-                  <td style="background:#f9f9f9;padding:18px 40px;
-                             text-align:center;border-top:1px solid #eee;">
-                    <p style="color:#bbb;font-size:12px;margin:0;">
-                      © 2025 YamiShop · Mauritanie<br>
-                      يامي شوب · موريتانيا
+                  <td style="background:#F9FAFB;padding:24px 40px;text-align:center;border-top:1px solid #F3F4F6;">
+                    <p style="color:#9CA3AF;font-size:12px;margin:0;line-height:1.5;">
+                      <b>YamiShop</b> - Fièrement fabriqué en Mauritanie<br>
+                      صنع بكل فخر في موريتانيا
                     </p>
                   </td>
                 </tr>
@@ -129,21 +110,10 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
   try {
     const transporter = createTransporter();
     await transporter.sendMail(mailOptions);
-    console.log(`[EMAIL] OTP sent to ${toEmail}`);
+    console.log(`[EMAIL] OTP envoyée à ${toEmail} (Valide 3 min)`);
   } catch (error) {
-    // In development: log to console as fallback so you can still test
-    console.error('[EMAIL] Failed to send email:', error.message);
-    console.log(`\n========================================`);
-    console.log(`[DEV FALLBACK] OTP for ${toEmail}: ${otpCode}`);
-    console.log(`========================================\n`);
-    
-    // Re-throw so the controller knows — it will still respond with userId
-    // but we surface the Gmail auth issue clearly
-    throw new Error(
-      `Échec de l'envoi de l'email. ` +
-      `Vérifiez que EMAIL_PASS est un "App Password" Gmail (pas le mot de passe normal). ` +
-      `Créez-le sur: https://myaccount.google.com/apppasswords`
-    );
+    console.error('[EMAIL] Erreur d\'envoi :', error.message);
+    throw new Error(`Impossible d'envoyer l'email : ${error.message}`);
   }
 };
 

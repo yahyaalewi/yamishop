@@ -363,7 +363,7 @@ export class ForgotPasswordComponent {
 
   startTimer() {
     if (this.timerInterval) clearInterval(this.timerInterval);
-    this.countdown.set(120); // 2 minutes
+    this.countdown.set(180); // 3 minutes
     this.timerInterval = setInterval(() => {
       this.countdown.update(c => {
         if (c <= 1) { clearInterval(this.timerInterval); return 0; }

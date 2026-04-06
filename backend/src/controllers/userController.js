@@ -218,7 +218,7 @@ const forgotPassword = async (req, res) => {
     // Generate OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     user.otpCode = otpCode;
-    user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    user.otpExpires = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
     await user.save();
 
     // Send OTP via email
