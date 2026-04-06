@@ -215,6 +215,9 @@ const forgotPassword = async (req, res) => {
       });
     }
 
+    // Debug log
+    console.log(`[FORGOT_PWD] Phone: ${phone.trim()} | Email: ${user.email}`);
+
     // Generate OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     user.otpCode = otpCode;
@@ -224,8 +227,11 @@ const forgotPassword = async (req, res) => {
     // Send OTP via email
     await sendPasswordResetOtp(user.email, otpCode, user.name);
 
-    // Mask email for privacy: ya***@gmail.com
-    const masked = user.email.replace(/(^.{2})[^@]+(@.+)/, '$1***$2');
+    // Safer Mask email logic
+    const atIndex = user.email.indexOf("@");
+    const masked = atIndex > 2 
+      ? user.email.substring(0, 2) + "***" + user.email.substring(atIndex)
+      : user.email.substring(0, 1) + "***" + user.email.substring(atIndex);
 
     return res.status(200).json({
       message: 'OTP envoyé',
