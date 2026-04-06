@@ -1,8 +1,14 @@
+require('dotenv').config();
 const { Resend } = require('resend');
 const fs = require('fs');
 const path = require('path');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const apiKey = process.env.RESEND_API_KEY;
+if (!apiKey) {
+    console.error('[EMAIL_SERVICE] CRITICAL ERROR: RESEND_API_KEY is missing from environment variables.');
+}
+
+const resend = new Resend(apiKey || 'dummy_key_to_prevent_immediate_crash');
 
 /**
  * Send OTP email for password reset via Resend API
