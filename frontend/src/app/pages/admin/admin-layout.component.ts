@@ -56,6 +56,13 @@ import { LanguageService } from '../../services/language.service';
                   </svg>
                   {{ lang.translate('admin.orders', 'fr') }}
                 </a>
+                <a routerLink="/admin/users" routerLinkActive="bg-white/15 text-white shadow-lg"
+                  class="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-bold text-white/60 hover:text-white hover:bg-white/10 transition-all no-underline font-inter">
+                  <svg class="h-5 w-5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  Utilisateurs
+                </a>
               </div>
             </div>
             <div>

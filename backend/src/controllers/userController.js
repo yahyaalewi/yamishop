@@ -276,6 +276,34 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// ── Admin: List all users ──
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select('-password').sort({ createdAt: -1 });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ── Admin: Reset any user password ──
+const adminResetPassword = async (req, res) => {
+  try {
+    const { userId, newPassword } = req.body;
+    if (!userId || !newPassword) {
+      return res.status(400).json({ message: 'UserId et nouveau mot de passe requis' });
+    }
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
+
+    user.password = newPassword;
+    await user.save();
+    res.status(200).json({ message: 'Mot de passe mis à jour avec succès' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -283,5 +311,8 @@ module.exports = {
   getUserProfile,
   updateUserProfile,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  getAllUsers,
+  adminResetPassword
 };
+

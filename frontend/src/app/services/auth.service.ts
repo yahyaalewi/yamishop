@@ -98,4 +98,14 @@ export class AuthService {
   resetPassword(userId: string, otpCode: string, newPassword: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/reset-password`, { userId, otpCode, newPassword });
   }
+
+  // --- Admin Methods ---
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/admin/all`);
+  }
+
+  adminResetPassword(userId: string, newPassword: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/admin/reset-password`, { userId, newPassword });
+  }
 }
+
