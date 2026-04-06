@@ -12,10 +12,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
  */
 const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
   try {
-    // Note: Resend requiere un domaine vérifié.
-    // Si pas encore vérifié, utilisez 'onboarding@resend.dev' pour les tests.
-    // Mais pour la "vraie" utilisation, utilisez votre adresse enregistrée sur Resend.
-    const fromEmail = "YamiShop 🛍️ <onboarding@resend.dev>"; 
+    // Domaine vérifié sur Resend
+    const fromEmail = "YamiShop 🛍️ <noreply@yamishop.store>"; 
 
     const logoPath = path.join(__dirname, '../assets/logo.png');
     let attachments = [];
