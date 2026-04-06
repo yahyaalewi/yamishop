@@ -10,6 +10,7 @@ const createTransporter = () => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    family: 4, // Force IPv4 pour éviter Erreur Réseau ENETUNREACH sur IPv6
     // ON TENTE DE RÉDUIRE LES ERREURS RÉSEAU CLOUD
     connectionTimeout: 20000,
     greetingTimeout: 20000,
