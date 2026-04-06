@@ -3,11 +3,17 @@ const path = require('path');
 
 const createTransporter = () => {
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // On utilise STARTTLS sur le port 587
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    // On ajoute un timeout pour éviter de bloquer le serveur en cas de souci réseau
+    connectionTimeout: 10000, // 10 secondes max pour se connecter
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
   });
 };
 
@@ -25,7 +31,7 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
     attachments: [
       {
         filename: 'logo.png',
-        path: path.join(__dirname, '../assets/logo.png'), // Relative path in the project
+        path: path.join(__dirname, '../assets/logo.png'),
         cid: 'yamishoplogo'
       }
     ],
@@ -92,8 +98,8 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
                 <tr>
                   <td style="background:#F9FAFB;padding:24px 40px;text-align:center;border-top:1px solid #F3F4F6;">
                     <p style="color:#9CA3AF;font-size:12px;margin:0;line-height:1.5;">
-                      <b>YamiShop</b> - Fièrement fabriqué en Mauritanie<br>
-                      صنع بكل فخر في موريتانيا
+                      <b>YamiShop</b> - Mauritanie<br>
+                      يامي شوب - موريتانيا
                     </p>
                   </td>
                 </tr>
@@ -109,11 +115,12 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
 
   try {
     const transporter = createTransporter();
+    await transporter.verify(); // On vérifie la connexion avant d'envoyer
     await transporter.sendMail(mailOptions);
-    console.log(`[EMAIL] OTP envoyée à ${toEmail} (Valide 3 min)`);
+    console.log(`[EMAIL] OTP envoyée avec succès à ${toEmail}`);
   } catch (error) {
-    console.error('[EMAIL] Erreur d\'envoi :', error.message);
-    throw new Error(`Impossible d'envoyer l'email : ${error.message}`);
+    console.error('[EMAIL] Erreur fatale :', error.message);
+    throw new Error(`Erreur SMTP : ${error.message}`);
   }
 };
 
