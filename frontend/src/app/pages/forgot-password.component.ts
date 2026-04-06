@@ -85,7 +85,7 @@ type Step = 'phone' | 'otp' | 'newpwd' | 'done';
             </svg>
             <div>
               {{ lang.translate('auth.forgot_no_email') }}
-              <a href="https://wa.me/22246789000" target="_blank"
+              <a href="https://wa.me/22234165525" target="_blank"
                  class="block mt-1 text-primary font-semibold hover:underline">
                 📲 WhatsApp
               </a>
