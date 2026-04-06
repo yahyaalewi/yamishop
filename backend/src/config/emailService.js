@@ -5,15 +5,18 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
-    secure: false, // On utilise STARTTLS sur le port 587
+    secure: false, 
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
-    // On ajoute un timeout pour éviter de bloquer le serveur en cas de souci réseau
-    connectionTimeout: 10000, // 10 secondes max pour se connecter
-    greetingTimeout: 10000,
-    socketTimeout: 20000,
+    // ON TENTE DE RÉDUIRE LES ERREURS RÉSEAU CLOUD
+    connectionTimeout: 20000,
+    greetingTimeout: 20000,
+    socketTimeout: 30000,
+    tls: {
+       rejectUnauthorized: false 
+    }
   });
 };
 
@@ -46,7 +49,7 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
         <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f9fa;padding:30px 10px;">
           <tr>
             <td align="center">
-              <table width="100%" cellpadding="0" cellspacing="0" 
+              <table width="100%" maxWidth="550" cellpadding="0" cellspacing="0" 
                 style="background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.06);border:1px solid #eee;max-width:550px;">
 
                 <!-- Logo Header -->
@@ -98,8 +101,8 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
                 <tr>
                   <td style="background:#F9FAFB;padding:24px 40px;text-align:center;border-top:1px solid #F3F4F6;">
                     <p style="color:#9CA3AF;font-size:12px;margin:0;line-height:1.5;">
-                      <b>YamiShop</b> - Mauritanie<br>
-                      يامي شوب - موريتانيا
+                      <b>YamiShop</b> - Fièrement fabriqué en Mauritanie<br>
+                      صنع بكل فخر في موريتانيا
                     </p>
                   </td>
                 </tr>
@@ -115,12 +118,11 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
 
   try {
     const transporter = createTransporter();
-    await transporter.verify(); // On vérifie la connexion avant d'envoyer
     await transporter.sendMail(mailOptions);
-    console.log(`[EMAIL] OTP envoyée avec succès à ${toEmail}`);
+    console.log(`[EMAIL] OTP envoyée à ${toEmail} (Valide 3 min)`);
   } catch (error) {
-    console.error('[EMAIL] Erreur fatale :', error.message);
-    throw new Error(`Erreur SMTP : ${error.message}`);
+    console.error('[EMAIL] Erreur réseau SMTP détectée :', error.message);
+    throw new Error(`Erreur Réseau : ${error.message}`);
   }
 };
 
