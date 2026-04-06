@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
+const { sendPasswordResetOtp } = require('../config/emailService');
 
 const generateToken = (id) => {
   if (!process.env.JWT_SECRET) {
@@ -195,10 +196,86 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+// ── Forgot Password ─────────────────────────────────────────────────────────
+const forgotPassword = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ message: 'Numéro de téléphone requis' });
+
+    const user = await User.findOne({ phone: phone.trim() });
+    if (!user) {
+      return res.status(404).json({ message: 'Aucun compte associé à ce numéro' });
+    }
+
+    // Check if user has an email
+    if (!user.email) {
+      return res.status(400).json({
+        message: 'no_email',
+        detail: 'Aucun email enregistré sur ce compte. Contactez-nous pour récupérer votre compte.'
+      });
+    }
+
+    // Generate OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otpCode = otpCode;
+    user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await user.save();
+
+    // Send OTP via email
+    await sendPasswordResetOtp(user.email, otpCode, user.name);
+
+    // Mask email for privacy: ya***@gmail.com
+    const masked = user.email.replace(/(^.{2})[^@]+(@.+)/, '$1***$2');
+
+    return res.status(200).json({
+      message: 'OTP envoyé',
+      userId: user._id,
+      maskedEmail: masked
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ── Reset Password ────────────────────────────────────────────────────────────
+const resetPassword = async (req, res) => {
+  try {
+    const { userId, otpCode, newPassword } = req.body;
+
+    if (!userId || !otpCode || !newPassword) {
+      return res.status(400).json({ message: 'Données incomplètes' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Le mot de passe doit contenir au moins 6 caractères' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'Utilisateur introuvable' });
+
+    if (user.otpCode !== otpCode || user.otpExpires < new Date()) {
+      return res.status(400).json({ message: 'Code OTP invalide ou expiré' });
+    }
+
+    // Set new password & clear OTP
+    user.password = newPassword;
+    user.otpCode = undefined;
+    user.otpExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: 'Mot de passe réinitialisé avec succès' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   verifyOtp,
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  forgotPassword,
+  resetPassword
 };

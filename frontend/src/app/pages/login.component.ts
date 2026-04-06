@@ -92,7 +92,7 @@ import { LanguageService } from '../services/language.service';
               <input type="checkbox" class="rounded border-gray-300 text-primary">
               {{ lang.translate('auth.remember_me') }}
             </label>
-            <a href="#" class="text-terracotta font-medium hover:underline no-underline">{{ lang.translate('auth.forgot_pwd') }}</a>
+            <a routerLink="/forgot-password" class="text-terracotta font-medium hover:underline no-underline">{{ lang.translate('auth.forgot_pwd') }}</a>
           </div>
 
           <!-- Error message -->

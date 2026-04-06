@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { WelcomeComponent } from './pages/welcome.component';
 import { LoginComponent } from './pages/login.component';
 import { RegisterComponent } from './pages/register.component';
+import { ForgotPasswordComponent } from './pages/forgot-password.component';
 import { HomeComponent } from './pages/home.component';
 import { ProductDetailsComponent } from './pages/product-details.component';
 import { CartComponent } from './pages/cart.component';
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'about', component: PolicyComponent, canActivate: [clientGuard] },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [guestGuard] },
   { path: 'home', component: HomeComponent, canActivate: [clientGuard] },
   { path: 'products', component: HomeComponent, canActivate: [clientGuard] },
   { path: 'product/:id', component: ProductDetailsComponent, canActivate: [clientGuard] },

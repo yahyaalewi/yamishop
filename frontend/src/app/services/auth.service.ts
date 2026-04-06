@@ -90,4 +90,12 @@ export class AuthService {
       })
     );
   }
+
+  forgotPassword(phone: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { phone });
+  }
+
+  resetPassword(userId: string, otpCode: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/reset-password`, { userId, otpCode, newPassword });
+  }
 }

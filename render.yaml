@@ -37,3 +37,7 @@ envVarGroups:
         value: "supersecretkey_yamishop_dev_only"
       - key: ALLOWED_ORIGINS
         value: "*"
+      - key: EMAIL_USER
+        value: "yamishop.store@gmail.com"
+      - key: EMAIL_PASS
+        value: "bvrytvrbksabdoxb"
