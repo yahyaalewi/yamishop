@@ -74,6 +74,11 @@ const uploadsPath = path.join(__dirname, '../uploads');
 console.log('Uploads path:', uploadsPath);
 app.use('/uploads', express.static(uploadsPath));
 
+// Health check endpoint (unlimited to avoid 429 from platform health checks)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Rate Limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -98,11 +103,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/uploads', uploadRoutes);
-
-// Health check endpoint (used by Docker Compose)
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
 
 app.get('/', (req, res) => {
   res.send('Yamishop API is running');
