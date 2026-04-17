@@ -96,7 +96,7 @@ import { LanguageService } from '../../services/language.service';
               </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-4">
+            <div class="grid md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Prix (MRU)</label>
                 <input type="number" name="price" [(ngModel)]="formData.price" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none">
@@ -104,6 +104,11 @@ import { LanguageService } from '../../services/language.service';
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Stock</label>
                 <input type="number" name="stock" [(ngModel)]="formData.stock" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Frais de livraison (MRU)</label>
+                <input type="number" name="shippingPrice" [(ngModel)]="formData.shippingPrice" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: 150">
+                <p class="text-[10px] text-gray-400 mt-1">Le prix le plus élevé sera appliqué si plusieurs produits</p>
               </div>
             </div>
 
@@ -213,6 +218,7 @@ import { LanguageService } from '../../services/language.service';
                 <th class="px-6 py-4">Catégorie</th>
                 <th class="px-6 py-4">Genre</th>
                 <th class="px-6 py-4">Prix</th>
+                <th class="px-6 py-4">Livraison</th>
                 <th class="px-6 py-4">Stock</th>
                 <th class="px-6 py-4 text-center">Pépites</th>
                 <th class="px-6 py-4 text-right">Actions</th>
@@ -245,6 +251,11 @@ import { LanguageService } from '../../services/language.service';
                   </div>
                 </td>
                 <td class="px-6 py-4 font-bold text-primary">{{product.price | number}} MRU</td>
+                <td class="px-6 py-4">
+                  <span class="py-1 px-3 rounded-full text-xs font-bold" [class]="(product.shippingPrice || 0) > 0 ? 'bg-blue-50 text-blue-700' : 'bg-gray-50 text-gray-400'">
+                    {{(product.shippingPrice || 0) | number}} MRU
+                  </span>
+                </td>
                 <td class="px-6 py-4">
                   <span [class]="product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'" class="py-1 px-3 rounded-full text-xs font-bold">
                     {{product.stock > 0 ? product.stock + ' en stock' : 'Rupture'}}
@@ -288,6 +299,7 @@ import { LanguageService } from '../../services/language.service';
               <h4 class="font-bold text-gray-900 truncate">{{product.name}}</h4>
               <p class="text-[10px] text-gray-400 uppercase font-black mb-1">{{ lang.translateCategory(product.category, 'fr') }}</p>
               <p class="font-bold text-primary text-sm">{{product.price | number}} MRU</p>
+              <p *ngIf="(product.shippingPrice || 0) > 0" class="text-[10px] text-blue-600 font-bold">🚚 Livraison: {{product.shippingPrice | number}} MRU</p>
               <div class="flex items-center justify-between mt-3">
                 <span [class]="product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'" class="py-1 px-3 rounded-full text-[10px] font-bold">
                   {{product.stock > 0 ? product.stock + ' en stock' : 'Rupture'}}
@@ -332,6 +344,7 @@ export class AdminProductsComponent implements OnInit {
     category: 'Mode',
     price: 0,
     stock: 0,
+    shippingPrice: 0,
     imageUrl: '',
     images: [] as string[],
     description: '',
@@ -413,6 +426,7 @@ export class AdminProductsComponent implements OnInit {
       category: 'Mode',
       price: 0,
       stock: 0,
+      shippingPrice: 0,
       imageUrl: '',
       images: [] as string[],
       description: '',

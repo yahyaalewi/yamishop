@@ -81,6 +81,15 @@ import { SeoService } from '../services/seo.service';
                     <span class="text-4xl font-extrabold text-primary">{{product.price | number}} MRU</span>
                     <span *ngIf="product.oldPrice" class="text-xl text-gray-400 line-through mb-1">{{product.oldPrice | number}} MRU</span>
                   </div>
+                  <div class="flex items-center gap-2 bg-blue-50/50 px-4 py-2.5 rounded-xl border border-blue-100/50 w-fit">
+                    <svg class="h-4 w-4 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a2 2 0 104 0m-4 0a2 2 0 11-4 0"/></svg>
+                    <span *ngIf="(product.shippingPrice || 0) > 0" class="text-xs font-bold text-blue-700">
+                      {{ lang.isRTL() ? 'رسوم التوصيل' : 'Livraison' }}: {{product.shippingPrice | number}} MRU
+                    </span>
+                    <span *ngIf="(product.shippingPrice || 0) === 0" class="text-xs font-bold text-green-600">
+                      {{ lang.isRTL() ? 'توصيل مجاني' : 'Livraison gratuite' }}
+                    </span>
+                  </div>
 
                   <div class="flex flex-wrap gap-2">
                     <div *ngIf="product.gender?.toLowerCase()?.trim() === 'homme'" 

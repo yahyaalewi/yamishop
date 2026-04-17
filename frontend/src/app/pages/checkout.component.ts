@@ -165,12 +165,12 @@ import { LanguageService } from '../services/language.service';
                     <span>{{ lang.translate('checkout.subtotal') }}</span> <span class="text-gray-900">{{subtotal() | number}} {{ lang.translate('common.price_label') }}</span>
                   </div>
                   <div class="flex justify-between text-gray-500 font-medium">
-                    <span>{{ lang.translate('checkout.shipping_fee') }}</span> <span class="text-primary font-bold">150 {{ lang.translate('common.price_label') }}</span>
+                    <span>{{ lang.translate('checkout.shipping_fee') }}</span> <span class="text-primary font-bold">{{shippingFee() | number}} {{ lang.translate('common.price_label') }}</span>
                   </div>
                   <div class="flex justify-between font-extrabold text-gray-900 pt-4 border-t border-gray-100 items-baseline">
                     <span class="text-base uppercase tracking-wider">Total</span>
                     <div class="text-right">
-                       <span class="text-3xl font-black text-terracotta tracking-tight">{{(subtotal() + 150) | number}} {{ lang.translate('common.price_label') }}</span>
+                       <span class="text-3xl font-black text-terracotta tracking-tight">{{(subtotal() + shippingFee()) | number}} {{ lang.translate('common.price_label') }}</span>
                     </div>
                   </div>
                 </div>
@@ -255,6 +255,12 @@ export class CheckoutComponent {
     return cartItems().reduce((sum, i) => sum + i.price * i.qty, 0);
   }
 
+  shippingFee() {
+    const items = cartItems();
+    if (items.length === 0) return 0;
+    return Math.max(...items.map(i => i.shippingPrice || 0));
+  }
+
   placeOrder() {
     this.submitted = true;
     if (!this.form.name || !this.form.phone || !this.form.address || !this.form.city) {
@@ -283,8 +289,8 @@ export class CheckoutComponent {
         country: 'Mauritanie'
       },
       paymentMethod: 'Cash on Delivery',
-      shippingPrice: 150,
-      totalPrice: this.subtotal() + 150
+      shippingPrice: this.shippingFee(),
+      totalPrice: this.subtotal() + this.shippingFee()
     };
 
     this.orderService.createOrder(orderData).subscribe({

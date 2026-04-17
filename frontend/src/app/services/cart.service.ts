@@ -9,6 +9,7 @@ export interface CartItem {
   stock: number;
   color?: string;
   size?: string;
+  shippingPrice: number;
 }
 
 export const cartCount = signal(0);
@@ -40,7 +41,8 @@ export class CartService {
         qty: Math.min(qty, maxStock),
         stock: maxStock,
         color: color || undefined,
-        size: size || undefined
+        size: size || undefined,
+        shippingPrice: product.shippingPrice || 0
       };
       cartItems.set([...items, newItem]);
     }

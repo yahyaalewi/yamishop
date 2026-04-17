@@ -115,7 +115,7 @@ import { NotificationService } from '../services/notification.service';
                 <div class="flex justify-between items-center text-white/50 text-xs font-bold uppercase tracking-widest">
                   <span>{{ lang.translate('checkout.shipping_fee') }}</span>
                   <div class="text-right">
-                    <span class="text-primary font-black text-base">150 {{ lang.translate('common.price_label') }}</span>
+                  <span class="text-primary font-black text-base">{{shippingFee() | number}} {{ lang.translate('common.price_label') }}</span>
                   </div>
                 </div>
                 
@@ -123,7 +123,7 @@ import { NotificationService } from '../services/notification.service';
                   <div class="flex justify-between items-end">
                     <div>
                       <p class="text-[10px] text-white/30 uppercase font-black tracking-[0.2em] mb-1">{{ lang.translate('cart.total') }}</p>
-                      <p class="text-3xl font-black tracking-tighter">{{(subtotal() + 150) | number}} <span class="text-sm font-medium text-white/40">{{ lang.translate('common.price_label') }}</span></p>
+                      <p class="text-3xl font-black tracking-tighter">{{(subtotal() + shippingFee()) | number}} <span class="text-sm font-medium text-white/40">{{ lang.translate('common.price_label') }}</span></p>
                     </div>
                   </div>
                 </div>
@@ -157,6 +157,12 @@ export class CartComponent {
 
   subtotal() {
     return cartItems().reduce((sum, i) => sum + i.price * i.qty, 0);
+  }
+
+  shippingFee() {
+    const items = cartItems();
+    if (items.length === 0) return 0;
+    return Math.max(...items.map(i => i.shippingPrice || 0));
   }
 
   hasStockError = computed(() => {
