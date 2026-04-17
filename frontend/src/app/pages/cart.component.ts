@@ -69,8 +69,8 @@ import { NotificationService } from '../services/notification.service';
                         <span *ngIf="item.size" class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{ lang.isRTL() ? 'مقاس' : 'Taille' }} {{item.size}}</span>
                       </div>
                     </div>
-                    <button (click)="removeItem(item)" class="text-gray-300 hover:text-terracotta transition-colors bg-transparent border-none cursor-pointer p-2 rounded-xl hover:bg-terracotta/5 group/del">
-                      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    <button (click)="removeItem(item)" class="text-terracotta md:text-gray-300 md:hover:text-terracotta transition-colors bg-terracotta/10 md:bg-transparent md:hover:bg-terracotta/5 border-none cursor-pointer p-3 md:p-2 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <svg class="h-6 w-6 md:h-5 md:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                   </div>
 
@@ -197,3 +197,5 @@ export class CartComponent {
     }
   }
 }
+
+
