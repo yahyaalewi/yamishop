@@ -1,5 +1,5 @@
 import { Component, signal, inject, computed } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { LanguageService } from '../../services/language.service';
@@ -49,7 +49,9 @@ import { NotificationService } from '../../services/notification.service';
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            <input type="text" [placeholder]="lang.translate('nav.search')"
+            <input #searchInput type="text" [placeholder]="lang.translate('nav.search')"
+              [value]="currentSearchQuery()"
+              (keyup.enter)="onSearch(searchInput.value)"
               class="w-full bg-white/10 border border-white/20 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all font-inter">
           </div>
         </div>
@@ -116,6 +118,15 @@ export class HeaderComponent {
   cartCount = cartCount;
   notificationService = inject(NotificationService);
   router = inject(Router);
+  route = inject(ActivatedRoute);
+
+  currentSearchQuery = signal('');
+
+  constructor() {
+    this.route.queryParams.subscribe(params => {
+      this.currentSearchQuery.set(params['q'] || '');
+    });
+  }
 
   firstName = computed(() => {
     const user = this.authService.currentUser();
@@ -131,5 +142,16 @@ export class HeaderComponent {
   toggleRTL() {
     const next = this.lang.currentLocale() === 'ar' ? 'fr' : 'ar';
     this.lang.setLocale(next);
+  }
+
+  onSearch(query: string) {
+    if (query.trim()) {
+      this.router.navigate(['/products'], { queryParams: { q: query.trim() }, queryParamsHandling: 'merge' });
+    } else {
+      // If query is empty, maybe remove the q parameter
+      const currentParams = { ...this.route?.snapshot.queryParams };
+      delete currentParams['q'];
+      this.router.navigate(['/products'], { queryParams: currentParams });
+    }
   }
 }

@@ -131,7 +131,7 @@ const CATEGORIES = [
               <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/10 animate-in fade-in slide-in-from-bottom duration-700">
                 <span class="text-xs">✨</span>
                 <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
-                  {{ selectedCategory() ? lang.translate('home.category_label') : lang.translate('home.all_products') }}
+                  {{ searchQuery() ? lang.translate('nav.search') : (selectedCategory() ? lang.translate('home.category_label') : lang.translate('home.all_products')) }}
                 </span>
                 <span class="text-xs">✨</span>
               </div>
@@ -140,17 +140,17 @@ const CATEGORIES = [
               <h2 class="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-tight max-w-2xl">
                 {{ lang.isRTL() ? 'اكتشف' : 'Découvrez' }}
                 <span class="text-transparent bg-clip-text bg-gradient-to-br from-terracotta to-primary">
-                  {{ selectedCategory() ? lang.translateCategory(selectedCategory()!) : (lang.isRTL() ? 'منتجاتنا المختارة' : 'Nos Pépites') }}
+                  {{ searchQuery() ? '"' + searchQuery() + '"' : (selectedCategory() ? lang.translateCategory(selectedCategory()!) : (lang.isRTL() ? 'منتجاتنا المختارة' : 'Nos Pépites')) }}
                 </span>
               </h2>
 
               <!-- Subtitle -->
               <p class="text-gray-400 text-xs font-black uppercase tracking-[0.4em]">
-                {{ selectedCategory() ? lang.translate('home.cat_msg') : lang.translate('home.all_msg') }}
+                {{ searchQuery() ? (lang.isRTL() ? 'نتائج البحث' : 'Résultats de recherche') : (selectedCategory() ? lang.translate('home.cat_msg') : lang.translate('home.all_msg')) }}
               </p>
 
-              <!-- Full Catalog Link - Visible only when a category IS selected -->
-              <div class="pt-4" *ngIf="selectedCategory()">
+              <!-- Full Catalog Link - Visible only when a category IS selected OR search IS present -->
+              <div class="pt-4" *ngIf="selectedCategory() || searchQuery()">
                 <a (click)="resetAndScroll()"
                    class="group inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-dark transition-all no-underline cursor-pointer animate-in zoom-in duration-500">
                   <span>{{ lang.translate('home.full_catalog') }}</span>
@@ -250,6 +250,7 @@ export class HomeComponent implements OnInit {
   allProducts = signal<Product[]>([]);
   selectedCategory = signal<string | null>(null);
   selectedGender = signal<string | null>(null);
+  searchQuery = signal<string | null>(null);
   categories = CATEGORIES;
   loading = signal(true);
 
@@ -269,11 +270,28 @@ export class HomeComponent implements OnInit {
   }
 
   filteredProducts = computed(() => {
+    let prods = this.allProducts();
     const cat = this.selectedCategory();
-    const prods = this.allProducts();
+    const gender = this.selectedGender();
+    const q = this.searchQuery();
+
+    if (q) {
+      const lowerQ = q.toLowerCase();
+      prods = prods.filter(p => p.name?.toLowerCase().includes(lowerQ));
+    }
+    
+    if (gender) {
+      prods = prods.filter(p => p.gender?.toLowerCase() === gender.toLowerCase());
+    }
+
     if (cat) {
       return prods.filter(p => p.category === cat);
     }
+    
+    if (q || gender) {
+      return prods;
+    }
+    
     // Only show featured products as "Nos Pépites" if no category is selected
     return prods.filter(p => p.isFeatured);
   });
@@ -282,8 +300,9 @@ export class HomeComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.selectedCategory.set(params['category'] || null);
       this.selectedGender.set(params['gender'] || null);
+      this.searchQuery.set(params['q'] || null);
 
-      if (params['gender'] || params['category'] || this.router.url.includes('/products')) {
+      if (params['gender'] || params['category'] || params['q'] || this.router.url.includes('/products')) {
         setTimeout(() => {
           document.getElementById('products-list')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 300);
@@ -320,6 +339,7 @@ export class HomeComponent implements OnInit {
   resetAndScroll() {
     this.selectedCategory.set(null);
     this.selectedGender.set(null);
+    this.searchQuery.set(null);
     this.router.navigate(['/products'], { queryParams: {} });
     setTimeout(() => {
       document.getElementById('products-list')?.scrollIntoView({ behavior: 'smooth' });
