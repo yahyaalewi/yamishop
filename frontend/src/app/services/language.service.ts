@@ -383,20 +383,6 @@ export class LanguageService {
     }
   }
 
-  getLocalizedProductName(product: any): string {
-    if (!product) return '';
-    if (this.currentLocale() === 'ar' && product.nameAr) return product.nameAr;
-    if (this.currentLocale() === 'fr' && product.nameFr) return product.nameFr;
-    return product.name || '';
-  }
-
-  getLocalizedProductDescription(product: any): string {
-    if (!product) return '';
-    if (this.currentLocale() === 'ar' && product.descriptionAr) return product.descriptionAr;
-    if (this.currentLocale() === 'fr' && product.descriptionFr) return product.descriptionFr;
-    return product.description || '';
-  }
-
   constructor() {
     const saved = localStorage.getItem('yamishop_locale') as Locale || 'ar';
     this.setLocale(saved);

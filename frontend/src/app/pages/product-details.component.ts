@@ -65,7 +65,7 @@ import { SeoService } from '../services/seo.service';
                 <div class="lg:w-1/2 space-y-6">
                   <div>
                     <p class="text-terracotta font-semibold text-sm tracking-wide mb-1 uppercase">{{ lang.translateCategory(product.category) }}</p>
-                    <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">{{ lang.getLocalizedProductName(product) }}</h1>
+                    <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">{{ translatedName() || product.name }}</h1>
                   </div>
 
                   <div class="flex items-center gap-2">
@@ -149,7 +149,7 @@ import { SeoService } from '../services/seo.service';
                   <div class="mt-12 space-y-8 pt-8 border-t border-gray-100">
                     <div>
                       <h3 class="text-lg font-bold text-gray-900 mb-4 uppercase tracking-wider">{{ lang.translate('product.description') }}</h3>
-                      <p class="text-gray-600 leading-relaxed font-inter text-base whitespace-pre-wrap">{{ lang.getLocalizedProductDescription(product) }}</p>
+                      <p class="text-gray-600 leading-relaxed font-inter text-base whitespace-pre-wrap">{{ translatedDescription() || product.description }}</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div *ngFor="let feat of (translatedFeatures().length ? translatedFeatures() : product.features)" class="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
@@ -189,6 +189,8 @@ export class ProductDetailsComponent implements OnInit {
   loading = signal(true);
   qty = signal(1);
   
+  translatedName = signal('');
+  translatedDescription = signal('');
   translatedFeatures = signal<string[]>([]);
   
   selectedIndex = signal(0);
@@ -201,6 +203,8 @@ export class ProductDetailsComponent implements OnInit {
       const locale = this.lang.currentLocale();
       
       if (currentProduct) {
+        this.lang.translateText(currentProduct.name, locale).then(res => this.translatedName.set(res));
+        this.lang.translateText(currentProduct.description, locale).then(res => this.translatedDescription.set(res));
         if (currentProduct.features?.length) {
           Promise.all(currentProduct.features.map((f: string) => this.lang.translateText(f, locale))).then(res => this.translatedFeatures.set(res));
         } else {
@@ -222,8 +226,8 @@ export class ProductDetailsComponent implements OnInit {
           this.loading.set(false);
 
           // SEO Tags Update for this product!
-          const productName = this.lang.getLocalizedProductName(this.product) || this.product!.name;
-          const desc = this.lang.getLocalizedProductDescription(this.product) ? this.lang.getLocalizedProductDescription(this.product).slice(0, 155) + '...' : 'Produit disponible sur YamiShop';
+          const productName = this.translatedName() || this.product!.name;
+          const desc = this.product!.description ? this.product!.description.slice(0, 155) + '...' : 'Produit disponible sur YamiShop';
           const img = this.productService.getImageUrl(this.product!.imageUrl) || 'https://yamishop.store/banner.png';
 
           this.seo.updateTags({
@@ -263,7 +267,7 @@ export class ProductDetailsComponent implements OnInit {
   addToCart() {
     const currentImage = this.selectedImage(); // image currently displayed (may differ from imageUrl)
     this.cartService.addItem(this.product!, this.qty(), this.selectedColor(), this.selectedSize(), currentImage);
-    this.notificationService.show(`${this.lang.getLocalizedProductName(this.product)}: ${this.lang.translate('msg.added_to_cart')}`);
+    this.notificationService.show(`${this.translatedName() || this.product!.name}: ${this.lang.translate('msg.added_to_cart')}`);
   }
 
   buyNow() {

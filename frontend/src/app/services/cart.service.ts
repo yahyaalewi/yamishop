@@ -3,8 +3,6 @@ import { Injectable, signal } from '@angular/core';
 export interface CartItem {
   id: string;
   name: string;
-  nameFr?: string;
-  nameAr?: string;
   price: number;
   image: string;
   qty: number;
@@ -38,8 +36,6 @@ export class CartService {
       const newItem: CartItem = {
         id: product._id,
         name: product.name,
-        nameFr: product.nameFr,
-        nameAr: product.nameAr,
         price: product.price,
         image: selectedImage || product.imageUrl,   // ← use selected image if provided
         qty: Math.min(qty, maxStock),
