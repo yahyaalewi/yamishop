@@ -8,6 +8,7 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+    "@vitalets/google-translate-api": "^9.2.1",
     "arabic-reshaper": "^1.1.0",
     "bcryptjs": "^2.4.3",
     "bidi-js": "^1.0.3",
@@ -17,6 +18,7 @@
     "express": "^4.19.2",
     "express-rate-limit": "^7.2.0",
     "helmet": "^7.1.0",
+    "http-proxy-agent": "^9.0.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.3.4",

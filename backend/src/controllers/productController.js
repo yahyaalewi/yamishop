@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const { prepareProductTranslations } = require('../services/translateService');
 
 const getProducts = async (req, res) => {
   try {
@@ -29,7 +30,8 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const product = new Product(req.body);
+    const translatedBody = await prepareProductTranslations(req.body);
+    const product = new Product(translatedBody);
     const createdProduct = await product.save();
     res.status(201).json({ message: "Product created", data: createdProduct });
   } catch (error) {
@@ -39,9 +41,10 @@ const createProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
+    const translatedBody = await prepareProductTranslations(req.body);
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: translatedBody },
       { new: true, runValidators: true }
     );
     if (!updatedProduct) {

@@ -63,7 +63,7 @@ import { NotificationService } from '../services/notification.service';
                   <div class="flex justify-between items-start gap-4">
                     <div class="min-w-0">
                       <p class="text-[10px] font-black text-terracotta uppercase tracking-tighter mb-1">{{ lang.translate('cart.quality_badge') }}</p>
-                      <h3 class="font-black text-gray-900 text-base md:text-xl truncate tracking-tight mb-2">{{item.name}}</h3>
+                      <h3 class="font-black text-gray-900 text-base md:text-xl truncate tracking-tight mb-2">{{ lang.getLocalizedProductName(item) }}</h3>
                       <div class="flex flex-wrap gap-2" *ngIf="item.color || item.size">
                         <span *ngIf="item.color" class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{item.color}}</span>
                         <span *ngIf="item.size" class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{ lang.isRTL() ? 'مقاس' : 'Taille' }} {{item.size}}</span>

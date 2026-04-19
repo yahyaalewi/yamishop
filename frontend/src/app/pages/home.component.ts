@@ -203,7 +203,7 @@ const CATEGORIES = [
 
                <!-- Image -->
                <a [routerLink]="['/product', product._id]" class="block relative overflow-hidden h-44 no-underline group/img">
-                 <img [src]="productService.getImageUrl(product.imageUrl)" [alt]="product.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                 <img [src]="productService.getImageUrl(product.imageUrl)" [alt]="lang.getLocalizedProductName(product)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                  
                  <!-- Out of stock overlay -->
                  <div *ngIf="(product.stock || 0) === 0" class="absolute inset-0 bg-gray-900/60 backdrop-blur-[2px] flex items-center justify-center">
@@ -225,7 +225,7 @@ const CATEGORIES = [
                       {{ lang.translate('product.stock_left') }} {{ product.stock }}
                     </span>
                  </div>
-                 <a [routerLink]="['/product', product._id]" class="text-sm font-bold text-gray-900 hover:text-primary line-clamp-2 block mb-4 no-underline h-10">{{product.name}}</a>
+                 <a [routerLink]="['/product', product._id]" class="text-sm font-bold text-gray-900 hover:text-primary line-clamp-2 block mb-4 no-underline h-10">{{lang.getLocalizedProductName(product)}}</a>
                  <div class="flex items-center justify-between gap-2">
                    <span class="text-lg font-black text-primary whitespace-nowrap">{{product.price | number}} MRU</span>
                    <button (click)="addToCart($event, product)" 
@@ -277,7 +277,13 @@ export class HomeComponent implements OnInit {
 
     if (q) {
       const lowerQ = q.toLowerCase();
-      prods = prods.filter(p => p.name?.toLowerCase().includes(lowerQ));
+      prods = prods.filter(p => {
+        const lowerQName = lowerQ.trim();
+        const enName = p.name?.toLowerCase() || '';
+        const frName = p.nameFr?.toLowerCase() || '';
+        const arName = p.nameAr?.toLowerCase() || '';
+        return enName.includes(lowerQName) || frName.includes(lowerQName) || arName.includes(lowerQName);
+      });
     }
     
     if (gender) {
@@ -333,7 +339,7 @@ export class HomeComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     this.cartService.addItem(product, 1);
-    this.notificationService.show(`${product.name}: ${this.lang.translate('msg.added_to_cart')}`);
+    this.notificationService.show(`${this.lang.getLocalizedProductName(product)}: ${this.lang.translate('msg.added_to_cart')}`);
   }
 
   resetAndScroll() {

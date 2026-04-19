@@ -5,7 +5,11 @@ import { Observable, map } from 'rxjs';
 export interface Product {
   _id: string;
   name: string;
+  nameFr?: string;
+  nameAr?: string;
   description: string;
+  descriptionFr?: string;
+  descriptionAr?: string;
   price: number;
   oldPrice?: number;
   category: string;

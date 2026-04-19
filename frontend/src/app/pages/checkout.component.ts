@@ -149,7 +149,7 @@ import { LanguageService } from '../services/language.service';
                       </span>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">{{item.name}}</p>
+                      <p class="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">{{ lang.getLocalizedProductName(item) }}</p>
                       <div class="flex gap-1.5 text-[8px] font-bold uppercase text-gray-400 mt-0.5" *ngIf="item.color || item.size">
                         <span *ngIf="item.color" class="bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 italic">{{item.color}}</span>
                         <span *ngIf="item.size" class="bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 italic">{{item.size}}</span>
