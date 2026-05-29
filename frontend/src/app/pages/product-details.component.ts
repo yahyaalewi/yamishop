@@ -14,7 +14,7 @@ import { SeoService } from '../services/seo.service';
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, ButtonComponent],
+  imports: [CommonModule, RouterLink],
   styles: [':host { display: block; }'],
   template: `
     <div class="h-full">
@@ -131,10 +131,10 @@ import { SeoService } from '../services/seo.service';
                     <div class="flex flex-col gap-2 flex-1">
                       <div class="flex items-center border-2 border-gray-100 rounded-2xl overflow-hidden bg-gray-50/50 shadow-inner h-full">
                         <button type="button" (click)="dec()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() <= 1">−</button>
-                        <input type="number" [value]="qty()" (input)="onQtyChange($event)" [class.text-red-600]="qty() > (product?.stock || 0)" class="w-16 h-full font-black text-gray-900 text-center border-x-2 border-gray-100/50 text-lg tabular-nums bg-transparent outline-none py-4 appearance-none">
-                        <button type="button" (click)="inc()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() >= (product?.stock || 0)">+</button>
+                        <input type="number" [value]="qty()" (input)="onQtyChange($event)" [class.text-red-600]="qty() > (product.stock || 0)" class="w-16 h-full font-black text-gray-900 text-center border-x-2 border-gray-100/50 text-lg tabular-nums bg-transparent outline-none py-4 appearance-none">
+                        <button type="button" (click)="inc()" class="flex-1 px-5 py-4 text-gray-400 hover:text-primary hover:bg-white transition-all text-xl font-black border-none bg-transparent cursor-pointer active:bg-gray-100" [disabled]="qty() >= (product.stock || 0)">+</button>
                       </div>
-                      <p *ngIf="qty() > (product?.stock || 0)" class="text-[10px] font-black uppercase text-red-500 animate-pulse mt-1">⚠️ {{ lang.isRTL() ? 'الكمية تتجاوز المخزون المتوفر' : 'Quantité supérieure au stock' }}</p>
+                      <p *ngIf="qty() > (product.stock || 0)" class="text-[10px] font-black uppercase text-red-500 animate-pulse mt-1">⚠️ {{ lang.isRTL() ? 'الكمية تتجاوز المخزون المتوفر' : 'Quantité supérieure au stock' }}</p>
                     </div>
 
                     <button (click)="addToCart()" [disabled]="(product.stock || 0) === 0 || qty() > (product.stock || 0) || qty() < 1" class="flex-1 inline-flex items-center justify-center bg-terracotta text-white px-8 py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl hover:bg-terracotta-dark transition-all border-none cursor-pointer disabled:opacity-50">

@@ -44,12 +44,12 @@ import { LanguageService } from '../../services/language.service';
       </div>
 
       <!-- Add/Edit Form Overlay -->
-      <div *ngIf="showForm()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 border border-gray-100 animate-in fade-in zoom-in duration-300">
+      <div *ngIf="showForm()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 border border-gray-100 animate-in fade-in zoom-in duration-300">
           <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">{{ currentProduct ? 'Modifier le produit' : 'Nouveau Produit' }}</h2>
-            <button (click)="showForm.set(false)" class="text-gray-400 hover:text-gray-600 bg-transparent border-none cursor-pointer">
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <h2 class="text-2xl font-black text-gray-900 tracking-tight">{{ currentProduct ? 'Modifier le produit' : 'Nouveau Produit' }}</h2>
+            <button (click)="showForm.set(false)" class="w-8 h-8 rounded-full bg-gray-100/50 text-gray-500 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all border-none cursor-pointer">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </div>
 
@@ -268,12 +268,14 @@ import { LanguageService } from '../../services/language.service';
                   <span *ngIf="!product.isFeatured" class="text-[10px] font-black uppercase tracking-widest text-gray-200">NON</span>
                 </td>
                 <td class="px-6 py-4 text-right">
-                  <button (click)="editProduct(product)" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all border-none bg-transparent cursor-pointer">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                  </button>
-                  <button (click)="deleteProduct(product._id)" class="p-2 text-gray-400 hover:text-terracotta hover:bg-terracotta/5 rounded-lg transition-all border-none bg-transparent cursor-pointer ml-1">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  </button>
+                  <div class="flex items-center justify-end gap-1">
+                    <button (click)="editProduct(product)" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all border-none bg-transparent cursor-pointer">
+                      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                    </button>
+                    <button (click)="deleteProduct(product._id)" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all border-none bg-transparent cursor-pointer">
+                      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>

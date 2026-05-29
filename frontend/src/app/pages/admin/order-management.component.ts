@@ -12,16 +12,11 @@ import { NotificationService } from '../../services/notification.service';
   imports: [CommonModule, CardComponent, FormsModule],
   template: `
     <div class="p-6 max-w-7xl mx-auto relative">
-      <!-- DEBUG ALERT INDICATOR (Will be removed after fix confirmed) -->
-      <div *ngIf="selectedOrder()" class="fixed top-4 right-4 bg-terracotta text-white px-4 py-2 rounded-full z-[100000] shadow-2xl font-black text-[10px] animate-pulse">
-        DEBUG: MODAL SIGNAL ACTIVE
-      </div>
-
       <!-- Details Modal Overlay (Moved to top of template) -->
-      <div *ngIf="selectedOrder()" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black bg-opacity-80 transition-opacity">
-        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-8 relative border-4 border-primary shadow-primary/20">
-          <button (click)="selectedOrder.set(null)" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center transition-all border-none cursor-pointer z-[10000]">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      <div *ngIf="selectedOrder()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm transition-all">
+        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-lg max-h-[90vh] overflow-y-auto p-8 relative border border-gray-100">
+          <button (click)="selectedOrder.set(null)" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-gray-100/50 text-gray-500 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all border-none cursor-pointer z-10">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
 
           <div class="mb-6">
@@ -138,9 +133,9 @@ import { NotificationService } from '../../services/notification.service';
                 </td>
                 <td class="px-4 py-3 max-w-[150px] truncate text-xs font-bold text-gray-500">{{order.shippingAddress?.street}}</td>
                 <td class="px-4 py-3 text-center text-xs font-medium">{{formatDate(order.createdAt)}}</td>
-                <td class="px-4 py-3 text-center font-black text-primary">{{order.totalPrice | number}} MRU</td>
-                <td class="px-4 py-3 text-center">
-                  <button (click)="openDetails(order)" class="bg-primary text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border-none cursor-pointer hover:bg-primary-dark transition-colors shadow-lg shadow-primary/20">Détails</button>
+                <td class="px-4 py-4 text-center font-black text-primary">{{order.totalPrice | number}} MRU</td>
+                <td class="px-4 py-4 text-center">
+                  <button (click)="openDetails(order)" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer hover:border-primary hover:text-primary transition-all shadow-sm active:scale-95">Détails</button>
                 </td>
               </tr>
               <tr *ngIf="filteredOrders().length === 0 && !loading()">

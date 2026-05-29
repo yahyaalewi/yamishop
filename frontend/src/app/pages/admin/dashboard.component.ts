@@ -22,7 +22,7 @@ import { ProductService } from '../../services/product.service';
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- Revenus -->
-        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-primary/5 transition-transform hover:scale-105 group relative overflow-hidden">
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden">
           <div class="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
           <div class="flex flex-col gap-4">
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary flex items-center justify-center shadow-inner">
@@ -38,7 +38,7 @@ import { ProductService } from '../../services/product.service';
         </div>
 
         <!-- Commandes -->
-        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-terracotta/5 transition-transform hover:scale-105 group relative overflow-hidden">
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden">
           <div class="absolute -right-6 -top-6 w-24 h-24 bg-terracotta/5 rounded-full blur-2xl group-hover:bg-terracotta/10 transition-colors"></div>
           <div class="flex flex-col gap-4">
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-terracotta/20 to-terracotta/5 text-terracotta flex items-center justify-center shadow-inner">
@@ -54,7 +54,7 @@ import { ProductService } from '../../services/product.service';
         </div>
 
         <!-- Ce Mois -->
-        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-sage/10 transition-transform hover:scale-105 group relative overflow-hidden">
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden">
           <div class="absolute -right-6 -top-6 w-24 h-24 bg-sage/10 rounded-full blur-2xl group-hover:bg-sage/20 transition-colors"></div>
           <div class="flex flex-col gap-4">
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sage/30 to-sage/10 text-sage-dark flex items-center justify-center shadow-inner">
@@ -70,7 +70,7 @@ import { ProductService } from '../../services/product.service';
         </div>
 
         <!-- Clients -->
-        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl shadow-yellow-500/5 transition-transform hover:scale-105 group relative overflow-hidden">
+        <div class="bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden">
           <div class="absolute -right-6 -top-6 w-24 h-24 bg-yellow-400/10 rounded-full blur-2xl group-hover:bg-yellow-400/20 transition-colors"></div>
           <div class="flex flex-col gap-4">
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-300/30 to-yellow-300/10 text-yellow-600 flex items-center justify-center shadow-inner">
@@ -111,10 +111,10 @@ import { ProductService } from '../../services/product.service';
                 {{ col.revenue | number }} MRU
               </div>
               
-              <div class="w-full max-w-[4rem] relative flex items-end h-full rounded-md overflow-hidden bg-gray-50/50">
-                 <div class="w-full bg-gradient-to-t from-primary/80 to-terracotta/80 rounded-t-md hover:from-primary hover:to-primary-light transition-all duration-500 relative"
+              <div class="w-full max-w-[4rem] relative flex items-end h-full rounded-xl overflow-hidden bg-gray-50">
+                 <div class="w-full bg-gradient-to-t from-primary to-primary-light rounded-xl hover:opacity-90 transition-all duration-500 relative shadow-[0_4px_15px_rgba(0,0,0,0.1)]"
                       [style.height]="col.heightPercentage">
-                    <div class="absolute inset-x-0 top-0 h-1 bg-white/30 rounded-t-md"></div>
+                    <div class="absolute inset-x-0 top-0 h-1.5 bg-white/30 rounded-t-xl"></div>
                  </div>
               </div>
             </div>

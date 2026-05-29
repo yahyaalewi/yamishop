@@ -13,9 +13,9 @@ import { NotificationService } from '../../services/notification.service';
     <div class="p-6 max-w-7xl mx-auto">
       
       <!-- Reset Password Modal -->
-      <div *ngIf="selectedUser()" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all">
-        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 relative animate-in fade-in zoom-in duration-300">
-          <button (click)="selectedUser.set(null)" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors border-none cursor-pointer">
+      <div *ngIf="selectedUser()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm transition-all">
+        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-md p-8 relative animate-in fade-in zoom-in duration-300 border border-gray-100">
+          <button (click)="selectedUser.set(null)" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-gray-100/50 flex items-center justify-center hover:bg-gray-100 transition-colors border-none cursor-pointer">
             <svg class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
 
@@ -105,7 +105,7 @@ import { NotificationService } from '../../services/notification.service';
                 </td>
                 <td class="px-6 py-4 text-right">
                   <button (click)="openResetModal(user)" 
-                    class="bg-white border-2 border-primary text-primary px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all cursor-pointer shadow-sm group-hover:shadow-md">
+                    class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary hover:text-primary transition-all cursor-pointer shadow-sm active:scale-95">
                     Changer Password
                   </button>
                 </td>
