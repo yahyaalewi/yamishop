@@ -48,23 +48,23 @@ import { ProductService } from '../../services/product.service';
 
         <!-- Panier Moyen -->
         <div class="xl:col-span-2 bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden flex flex-col justify-between min-h-[160px]">
-          <div class="absolute -right-6 -top-6 w-32 h-32 bg-sage/10 rounded-full blur-2xl group-hover:bg-sage/20 transition-colors"></div>
+          <div class="absolute -right-6 -top-6 w-32 h-32 bg-gray-900/5 rounded-full blur-2xl group-hover:bg-gray-900/10 transition-colors"></div>
           <div class="flex items-start justify-between relative z-10">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sage/30 to-sage/10 text-sage-dark flex items-center justify-center shadow-inner">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-900/20 to-gray-900/5 text-gray-900 flex items-center justify-center shadow-inner">
                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             </div>
           </div>
           <div class="relative z-10 mt-4">
             <p class="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-1">Panier Moyen</p>
-            <p class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ averageOrderValue() | number:'1.0-0' }} <span class="text-base text-sage-dark font-bold">MRU</span></p>
+            <p class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ averageOrderValue() | number:'1.0-0' }} <span class="text-base text-gray-900 font-bold">MRU</span></p>
           </div>
         </div>
 
         <!-- En Attente -->
         <div class="xl:col-span-1 bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden flex flex-col justify-between min-h-[160px]">
-          <div class="absolute -right-6 -top-6 w-24 h-24 bg-yellow-400/10 rounded-full blur-2xl group-hover:bg-yellow-400/20 transition-colors"></div>
+          <div class="absolute -right-6 -top-6 w-24 h-24 bg-terracotta/10 rounded-full blur-2xl group-hover:bg-terracotta/20 transition-colors"></div>
           <div class="relative z-10">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-300/30 to-yellow-300/10 text-yellow-600 flex items-center justify-center shadow-inner mb-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-terracotta/30 to-terracotta/10 text-terracotta flex items-center justify-center shadow-inner mb-4">
                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
             <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">En Attente</p>
@@ -74,9 +74,9 @@ import { ProductService } from '../../services/product.service';
 
         <!-- Confirmées -->
         <div class="xl:col-span-1 bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden flex flex-col justify-between min-h-[160px]">
-          <div class="absolute -right-6 -top-6 w-24 h-24 bg-terracotta/5 rounded-full blur-2xl group-hover:bg-terracotta/10 transition-colors"></div>
+          <div class="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
           <div class="relative z-10">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-terracotta/20 to-terracotta/5 text-terracotta flex items-center justify-center shadow-inner mb-4">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary flex items-center justify-center shadow-inner mb-4">
                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
             <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Confirmées</p>
@@ -250,7 +250,7 @@ import { ProductService } from '../../services/product.service';
                 </td>
                 <td class="px-6 py-5 text-center">
                   <span [class]="getStatusClass(order)" class="py-1.5 px-3 rounded-full text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1.5">
-                    <div class="w-1.5 h-1.5 rounded-full" [class.bg-sage]="order.isConfirmed" [class.bg-yellow-500]="!order.isConfirmed" [class.animate-pulse]="!order.isConfirmed"></div>
+                    <div class="w-1.5 h-1.5 rounded-full" [class.bg-primary]="order.isConfirmed" [class.bg-terracotta]="!order.isConfirmed" [class.animate-pulse]="!order.isConfirmed"></div>
                     {{ order.isConfirmed ? 'Confirmée' : 'En Attente' }}
                   </span>
                 </td>
@@ -259,7 +259,7 @@ import { ProductService } from '../../services/product.service';
                     <button *ngIf="!order.isConfirmed" 
                       (click)="confirmOrder(order._id)"
                       title="Confirmer"
-                      class="text-sage-dark hover:text-white hover:bg-sage font-bold bg-sage/10 p-2 rounded-xl cursor-pointer transition-all active:scale-95">
+                      class="text-primary hover:text-white hover:bg-primary font-bold bg-primary/10 p-2 rounded-xl cursor-pointer transition-all active:scale-95">
                       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
                     </button>
                     <button (click)="deleteOrder(order._id)"
@@ -422,7 +422,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   getStatusClass(order: Order) {
-    if (order.isConfirmed) return 'bg-sage/10 text-sage-dark border border-sage/20';
-    return 'bg-yellow-50 text-yellow-600 border border-yellow-200';
+    if (order.isConfirmed) return 'bg-primary/10 text-primary border border-primary/20';
+    return 'bg-terracotta/10 text-terracotta border border-terracotta/20';
   }
 }
