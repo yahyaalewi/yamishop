@@ -74,7 +74,7 @@ import { LanguageService } from '../../services/language.service';
           <div class="space-y-2 mt-4">
             <p class="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">&copy; 2026 YamiShop — {{ lang.translate('footer.made_in') }} 🇲🇷</p>
             <p class="text-[11px] font-medium tracking-[0.1em] text-white/60 lowercase">
-              {{ lang.translate('footer.developed_by') }} <a href="https://www.linkedin.com/in/el-mamy-yahya-7a39342b9" target="_blank" rel="noopener noreferrer" class="text-terracotta hover:text-white transition-colors cursor-pointer font-black no-underline">yahya elmami</a>
+              {{ lang.translate('footer.developed_by') }} <a href="https://www.linkedin.com/in/yahya-el-mamy-7a39342b9" target="_blank" rel="noopener noreferrer" class="text-terracotta hover:text-white transition-colors cursor-pointer font-black no-underline">yahya elmami</a>
             </p>
           </div>
 
