@@ -87,6 +87,7 @@ export class CartService {
   clearCart() {
     cartItems.set([]);
     cartCount.set(0);
+    this.syncCount();
   }
 
   syncCount() {
