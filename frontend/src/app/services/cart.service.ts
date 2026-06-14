@@ -12,8 +12,22 @@ export interface CartItem {
   shippingPrice: number;
 }
 
-export const cartCount = signal(0);
-export const cartItems = signal<CartItem[]>([]);
+function getInitialCart(): CartItem[] {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const saved = localStorage.getItem('yamishop_cart');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return [];
+      }
+    }
+  }
+  return [];
+}
+
+export const cartItems = signal<CartItem[]>(getInitialCart());
+export const cartCount = signal(getInitialCart().reduce((n, i) => n + i.qty, 0));
 
 @Injectable({
   providedIn: 'root'
@@ -77,5 +91,8 @@ export class CartService {
 
   syncCount() {
     cartCount.set(cartItems().reduce((n, i) => n + i.qty, 0));
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('yamishop_cart', JSON.stringify(cartItems()));
+    }
   }
 }
