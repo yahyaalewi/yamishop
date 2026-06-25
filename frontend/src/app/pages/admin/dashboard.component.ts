@@ -7,7 +7,7 @@ import { ProductService } from '../../services/product.service';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, CardComponent],
+  imports: [CommonModule],
   template: `
     <div class="space-y-8 animate-fade-in pb-12 font-inter">
       <!-- Header -->

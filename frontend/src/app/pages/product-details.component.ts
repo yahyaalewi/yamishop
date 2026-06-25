@@ -164,10 +164,6 @@ import { SeoService } from '../services/seo.service';
                   </div>
                 </div>
               </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <ng-template #notFound>
             <div class="flex-grow flex flex-col items-center justify-center gap-4 text-gray-500 py-20 px-4">
