@@ -21,6 +21,7 @@ export interface Product {
   isFeatured?: boolean;
   shippingPrice?: number;
   views?: number;
+  reviews?: any[];
 }
 
 @Injectable({
@@ -81,6 +82,10 @@ export class ProductService {
 
   deleteProduct(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  createReview(id: string, review: { rating: number; comment: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/reviews`, review);
   }
 
   uploadImage(file: File): Observable<{ url: string }> {

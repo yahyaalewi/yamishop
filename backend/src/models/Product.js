@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
 
+const reviewSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  name: { type: String, required: true },
+  rating: { type: Number, required: true },
+  comment: { type: String, required: true },
+}, { timestamps: true });
+
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
@@ -18,6 +29,7 @@ const productSchema = new mongoose.Schema({
   rating: { type: Number, default: 0 },
   numReviews: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
+  reviews: [reviewSchema],
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

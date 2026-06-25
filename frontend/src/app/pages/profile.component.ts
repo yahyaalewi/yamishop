@@ -127,14 +127,19 @@ import { LanguageService } from '../services/language.service';
                     </div>
 
                     <!-- Items Preview -->
-                    <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-                      <div *ngFor="let item of order.orderItems" class="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden relative group/item">
-                         <img [src]="productService.getImageUrl(item.image)" class="w-full h-full object-cover transition-transform group-hover/item:scale-110">
-                         <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-[8px] text-white font-bold opacity-0 group-hover/item:opacity-100 transition-opacity whitespace-nowrap overflow-hidden px-1">
-                           <span *ngIf="item.color">{{item.color}}</span>
-                           <span *ngIf="item.size">{{item.size}}</span>
-                           <span>x{{item.qty || item.quantity}}</span>
-                         </div>
+                    <div class="flex flex-col gap-2 mt-4">
+                      <div *ngFor="let item of order.orderItems" class="flex items-center justify-between p-2 rounded-xl border border-gray-50 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                          <img [src]="productService.getImageUrl(item.image)" class="w-12 h-12 rounded-lg object-cover">
+                          <div>
+                            <p class="text-xs font-bold text-gray-900 line-clamp-1 max-w-[150px] sm:max-w-[200px]">{{item.name}}</p>
+                            <p class="text-[10px] text-gray-500 font-medium">x{{item.qty || item.quantity}} <span *ngIf="item.color">· {{item.color}}</span> <span *ngIf="item.size">· {{item.size}}</span></p>
+                          </div>
+                        </div>
+                        <button *ngIf="order.isConfirmed" (click)="openReviewModal(item)" class="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors border border-yellow-200/50 cursor-pointer flex items-center gap-1 shrink-0">
+                          <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                          {{ lang.isRTL() ? 'تقييم' : 'Évaluer' }}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -145,6 +150,45 @@ import { LanguageService } from '../services/language.service';
 
         </div>
       </main>
+
+      <!-- Review Modal -->
+      <div *ngIf="showReviewModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 animate-in zoom-in duration-300">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-gray-900">{{ lang.isRTL() ? 'تقييم المنتج' : 'Évaluer le produit' }}</h3>
+            <button (click)="closeReviewModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition-colors border-none cursor-pointer">✕</button>
+          </div>
+          
+          <div class="flex flex-col items-center mb-6">
+            <img *ngIf="currentReviewItem()" [src]="productService.getImageUrl(currentReviewItem().image)" class="w-16 h-16 rounded-xl object-cover mb-3">
+            <p class="font-bold text-center text-sm">{{ currentReviewItem()?.name }}</p>
+          </div>
+
+          <div class="flex justify-center gap-2 mb-6">
+            <button *ngFor="let star of [1,2,3,4,5]" 
+                    type="button" 
+                    (click)="reviewData.rating = star"
+                    (mouseenter)="hoverRating = star"
+                    (mouseleave)="hoverRating = 0"
+                    class="bg-transparent border-none p-0 cursor-pointer transition-transform hover:scale-110">
+              <svg class="w-10 h-10 transition-colors" 
+                   [class.text-yellow-400]="star <= (hoverRating || reviewData.rating)" 
+                   [class.text-gray-200]="star > (hoverRating || reviewData.rating)"
+                   viewBox="0 0 20 20" fill="currentColor">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+            </button>
+          </div>
+
+          <textarea [(ngModel)]="reviewData.comment" rows="3" 
+            [placeholder]="lang.isRTL() ? 'اكتب رأيك هنا...' : 'Votre avis sur ce produit...'"
+            class="w-full p-4 border border-gray-200 rounded-xl mb-6 focus:ring-2 focus:ring-primary outline-none resize-none"></textarea>
+
+          <app-button variant="primary" [fullWidth]="true" [disabled]="submittingReview()" (onClick)="submitReview()">
+            {{ submittingReview() ? lang.translate('common.loading') : (lang.isRTL() ? 'إرسال التقييم' : 'Envoyer l\\'avis') }}
+          </app-button>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -256,6 +300,46 @@ export class ProfileComponent implements OnInit {
         console.error('Invoice download failed', err);
         const errorMsg = err.error?.error || err.error?.message || this.lang.translate('msg.error_occurred');
         this.notificationService.show(errorMsg, 'error');
+      }
+    });
+  }
+
+  // Review logic
+  showReviewModal = signal(false);
+  submittingReview = signal(false);
+  currentReviewItem = signal<any>(null);
+  hoverRating = 0;
+  reviewData = { rating: 5, comment: '' };
+
+  openReviewModal(item: any) {
+    this.currentReviewItem.set(item);
+    this.reviewData = { rating: 5, comment: '' };
+    this.showReviewModal.set(true);
+  }
+
+  closeReviewModal() {
+    this.showReviewModal.set(false);
+    this.currentReviewItem.set(null);
+  }
+
+  submitReview() {
+    if (!this.reviewData.comment.trim()) {
+      this.notificationService.show(this.lang.isRTL() ? 'الرجاء كتابة تعليق' : 'Veuillez écrire un commentaire', 'error');
+      return;
+    }
+    const productId = this.currentReviewItem()?.product;
+    if (!productId) return;
+
+    this.submittingReview.set(true);
+    this.productService.createReview(productId, this.reviewData).subscribe({
+      next: () => {
+        this.submittingReview.set(false);
+        this.closeReviewModal();
+        this.notificationService.show(this.lang.isRTL() ? 'تم إرسال التقييم بنجاح' : 'Avis envoyé avec succès');
+      },
+      error: (err) => {
+        this.submittingReview.set(false);
+        this.notificationService.show(err.error?.message || 'Erreur', 'error');
       }
     });
   }
