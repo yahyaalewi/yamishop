@@ -15,6 +15,9 @@ const productSchema = new mongoose.Schema({
   gender: { type: String, enum: ['homme', 'femme', 'unisexe'], default: 'unisexe' },
   isFeatured: { type: Boolean, default: false },
   shippingPrice: { type: Number, default: 0 },
+  rating: { type: Number, default: 0 },
+  numReviews: { type: Number, default: 0 },
+  views: { type: Number, default: 0 },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

@@ -20,6 +20,7 @@ export interface Product {
   numReviews?: number;
   isFeatured?: boolean;
   shippingPrice?: number;
+  views?: number;
 }
 
 @Injectable({
