@@ -380,6 +380,42 @@ const getOrderInvoice = async (req, res) => {
   }
 };
 
+const addOrderReview = async (req, res) => {
+  try {
+    const { productId, rating } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    if (order.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    if (!order.isConfirmed) {
+      return res.status(400).json({ message: 'Order must be confirmed to leave a review' });
+    }
+
+    // Find the item
+    const item = order.orderItems.find(x => x.product.toString() === productId);
+    if (!item) {
+      return res.status(404).json({ message: 'Product not found in this order' });
+    }
+
+    if (item.rating) {
+      return res.status(400).json({ message: 'Product already reviewed in this order' });
+    }
+
+    item.rating = Number(rating);
+    await order.save();
+
+    res.status(200).json({ message: 'Review added successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 module.exports = {
   addOrderItems,
   getOrderById,
@@ -388,5 +424,6 @@ module.exports = {
   deleteOrder,
   getMyOrders,
   getOrders,
-  getOrderInvoice
+  getOrderInvoice,
+  addOrderReview
 };

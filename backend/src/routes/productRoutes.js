@@ -5,8 +5,7 @@ const {
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct,
-  createProductReview
+  deleteProduct
 } = require('../controllers/productController');
 const { protect, admin } = require('../middleware/auth');
 
@@ -14,8 +13,6 @@ const { protect, admin } = require('../middleware/auth');
 router.get('/', getProducts);
 router.get('/:id', getProductById);
 
-// Protected user routes
-router.post('/:id/reviews', protect, createProductReview);
 
 // Admin routes
 router.post('/', protect, admin, createProduct);

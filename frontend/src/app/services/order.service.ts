@@ -66,4 +66,8 @@ export class OrderService {
       responseType: 'blob'
     });
   }
+
+  addReview(orderId: string, productId: string, rating: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${orderId}/review`, { productId, rating });
+  }
 }

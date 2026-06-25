@@ -136,10 +136,17 @@ import { LanguageService } from '../services/language.service';
                             <p class="text-[10px] text-gray-500 font-medium">x{{item.qty || item.quantity}} <span *ngIf="item.color">· {{item.color}}</span> <span *ngIf="item.size">· {{item.size}}</span></p>
                           </div>
                         </div>
-                        <button *ngIf="order.isConfirmed" (click)="openReviewModal(item)" class="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors border border-yellow-200/50 cursor-pointer flex items-center gap-1 shrink-0">
+                        <button *ngIf="order.isConfirmed && !item.rating" (click)="openReviewModal(order, item)" class="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors border border-yellow-200/50 cursor-pointer flex items-center gap-1 shrink-0">
                           <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                           {{ lang.isRTL() ? 'تقييم' : 'Évaluer' }}
                         </button>
+                        <div *ngIf="item.rating" class="flex text-yellow-400">
+                          <svg *ngFor="let s of [1,2,3,4,5]" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"
+                               [class.text-yellow-400]="s <= item.rating"
+                               [class.text-gray-200]="s > item.rating">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -160,8 +167,8 @@ import { LanguageService } from '../services/language.service';
           </div>
           
           <div class="flex flex-col items-center mb-6">
-            <img *ngIf="currentReviewItem()" [src]="productService.getImageUrl(currentReviewItem().image)" class="w-16 h-16 rounded-xl object-cover mb-3">
-            <p class="font-bold text-center text-sm">{{ currentReviewItem()?.name }}</p>
+            <img *ngIf="currentReviewContext()?.item" [src]="productService.getImageUrl(currentReviewContext()?.item.image)" class="w-16 h-16 rounded-xl object-cover mb-3">
+            <p class="font-bold text-center text-sm">{{ currentReviewContext()?.item?.name }}</p>
           </div>
 
           <div class="flex justify-center gap-2 mb-6">
@@ -180,12 +187,8 @@ import { LanguageService } from '../services/language.service';
             </button>
           </div>
 
-          <textarea [(ngModel)]="reviewData.comment" rows="3" 
-            [placeholder]="lang.isRTL() ? 'اكتب رأيك هنا...' : 'Votre avis sur ce produit...'"
-            class="w-full p-4 border border-gray-200 rounded-xl mb-6 focus:ring-2 focus:ring-primary outline-none resize-none"></textarea>
-
           <app-button variant="primary" [fullWidth]="true" [disabled]="submittingReview()" (onClick)="submitReview()">
-            {{ submittingReview() ? lang.translate('common.loading') : (lang.isRTL() ? 'إرسال التقييم' : 'Envoyer l\\'avis') }}
+            {{ submittingReview() ? lang.translate('common.loading') : (lang.isRTL() ? 'إرسال التقييم' : 'Envoyer l\\'évaluation') }}
           </app-button>
         </div>
       </div>
@@ -307,35 +310,32 @@ export class ProfileComponent implements OnInit {
   // Review logic
   showReviewModal = signal(false);
   submittingReview = signal(false);
-  currentReviewItem = signal<any>(null);
+  currentReviewContext = signal<{orderId: string, item: any} | null>(null);
   hoverRating = 0;
-  reviewData = { rating: 5, comment: '' };
+  reviewData = { rating: 5 };
 
-  openReviewModal(item: any) {
-    this.currentReviewItem.set(item);
-    this.reviewData = { rating: 5, comment: '' };
+  openReviewModal(order: any, item: any) {
+    this.currentReviewContext.set({ orderId: order._id, item });
+    this.reviewData = { rating: 5 };
     this.showReviewModal.set(true);
   }
 
   closeReviewModal() {
     this.showReviewModal.set(false);
-    this.currentReviewItem.set(null);
+    this.currentReviewContext.set(null);
   }
 
   submitReview() {
-    if (!this.reviewData.comment.trim()) {
-      this.notificationService.show(this.lang.isRTL() ? 'الرجاء كتابة تعليق' : 'Veuillez écrire un commentaire', 'error');
-      return;
-    }
-    const productId = this.currentReviewItem()?.product;
-    if (!productId) return;
+    const ctx = this.currentReviewContext();
+    if (!ctx || !ctx.orderId || !ctx.item?.product) return;
 
     this.submittingReview.set(true);
-    this.productService.createReview(productId, this.reviewData).subscribe({
+    this.orderService.addReview(ctx.orderId, ctx.item.product, this.reviewData.rating).subscribe({
       next: () => {
         this.submittingReview.set(false);
         this.closeReviewModal();
-        this.notificationService.show(this.lang.isRTL() ? 'تم إرسال التقييم بنجاح' : 'Avis envoyé avec succès');
+        this.notificationService.show(this.lang.isRTL() ? 'تم إرسال التقييم بنجاح' : 'Évaluation envoyée avec succès');
+        this.loadOrders(); // Reload orders to show stars
       },
       error: (err) => {
         this.submittingReview.set(false);

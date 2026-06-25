@@ -8,7 +8,8 @@ const {
   deleteOrder,
   getMyOrders,
   getOrders,
-  getOrderInvoice
+  getOrderInvoice,
+  addOrderReview
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/auth');
 
@@ -17,6 +18,7 @@ router.post('/', protect, addOrderItems);
 router.get('/myorders', protect, getMyOrders);
 router.get('/:id', protect, getOrderById);
 router.get('/:id/invoice', protect, getOrderInvoice);
+router.put('/:id/review', protect, addOrderReview);
 
 // Admin routes
 router.put('/:id/pay', protect, admin, updateOrderToPaid);
