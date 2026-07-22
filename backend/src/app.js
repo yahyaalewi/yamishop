@@ -50,6 +50,13 @@ app.use(
   })
 );
 
+// ── Custom Security Headers (for pentest satisfaction) ─────────────
+app.use((req, res, next) => {
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
 // ── CORS ──────────────────────────────────────────────────────────────────────
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost,http://localhost:4200,http://localhost:4000').split(',');
 app.use(cors({
