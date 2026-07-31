@@ -49,6 +49,29 @@ exports.createCategory = async (req, res) => {
   }
 };
 
+// Update a category
+exports.updateCategory = async (req, res) => {
+  try {
+    const { name, image } = req.body;
+    const category = await Category.findById(req.params.id);
+    if (!category) {
+      return res.status(404).json({ message: 'Catégorie non trouvée.' });
+    }
+
+    if (name && name.trim()) {
+      category.name = name.trim();
+    }
+    if (image !== undefined) {
+      category.image = image;
+    }
+
+    const updatedCategory = await category.save();
+    res.json(updatedCategory);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Delete a category
 exports.deleteCategory = async (req, res) => {
   try {
@@ -63,3 +86,4 @@ exports.deleteCategory = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+

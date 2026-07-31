@@ -62,15 +62,35 @@ import { LanguageService } from '../../services/language.service';
             </button>
           </div>
 
-          <!-- Add Category Form -->
+          <!-- Add / Edit Category Form -->
           <div class="mb-6 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-            <h3 class="text-sm font-bold text-gray-900 mb-3">Ajouter une nouvelle catégorie</h3>
+            <h3 class="text-sm font-bold text-gray-900 mb-3">{{ editingCategoryId() ? 'Modifier la catégorie' : 'Ajouter une nouvelle catégorie' }}</h3>
             <div class="flex flex-col gap-3">
-              <input type="text" [(ngModel)]="newCategoryName" placeholder="Nom de la catégorie (ex: Électronique)" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm">
-              <div class="flex gap-2">
-                <input type="text" [(ngModel)]="newCategoryImage" placeholder="URL de l'image (optionnel)" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm">
-                <button (click)="addCategory()" [disabled]="addingCategory()" class="px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all border-none cursor-pointer disabled:opacity-50">
-                  {{ addingCategory() ? 'Ajout...' : 'Ajouter' }}
+              <input type="text" [(ngModel)]="newCategoryName" placeholder="Nom de la catégorie (ex: Électronique)" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm bg-white">
+              
+              <div class="flex gap-2 items-center">
+                <input type="text" [(ngModel)]="newCategoryImage" placeholder="URL de l'image ou téléversez une photo" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm bg-white">
+                
+                <label class="px-3 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  <span>{{ uploadingCategoryImage() ? 'Envoi...' : 'Image' }}</span>
+                  <input type="file" (change)="onCategoryImageSelected($event)" accept="image/*" class="hidden">
+                </label>
+              </div>
+
+              <!-- Image Preview if available -->
+              <div *ngIf="newCategoryImage" class="flex items-center gap-3 p-2 bg-white rounded-xl border border-gray-200">
+                <img [src]="getImageUrl(newCategoryImage)" class="w-12 h-12 rounded-lg object-cover border border-gray-100">
+                <span class="text-xs text-gray-500 truncate flex-1">{{ newCategoryImage }}</span>
+                <button (click)="newCategoryImage = ''" class="text-red-500 text-xs font-bold px-2 py-1 hover:bg-red-50 rounded-lg border-none cursor-pointer">Supprimer</button>
+              </div>
+
+              <div class="flex gap-2 justify-end mt-1">
+                <button *ngIf="editingCategoryId()" (click)="cancelEditCategory()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-300 transition-all border-none cursor-pointer">
+                  Annuler
+                </button>
+                <button (click)="saveCategory()" [disabled]="addingCategory()" class="px-5 py-2 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all border-none cursor-pointer disabled:opacity-50">
+                  {{ addingCategory() ? 'Enregistrement...' : (editingCategoryId() ? 'Mettre à jour' : 'Ajouter') }}
                 </button>
               </div>
             </div>
@@ -87,9 +107,14 @@ import { LanguageService } from '../../services/language.service';
                 </div>
                 <span class="font-bold text-gray-800 text-sm">{{ cat.name }}</span>
               </div>
-              <button (click)="removeCategory(cat._id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all border-none cursor-pointer" title="Supprimer">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              </button>
+              <div class="flex items-center gap-1">
+                <button (click)="startEditCategory(cat)" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all border-none cursor-pointer" title="Modifier">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button (click)="removeCategory(cat._id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all border-none cursor-pointer" title="Supprimer">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -392,6 +417,8 @@ export class AdminProductsComponent implements OnInit {
   newCategoryName = '';
   newCategoryImage = '';
   addingCategory = signal(false);
+  editingCategoryId = signal<string | null>(null);
+  uploadingCategoryImage = signal(false);
 
   selectedGenderFilter = signal<string | null>(null);
   filteredAdminProducts = computed(() => {
@@ -484,29 +511,84 @@ export class AdminProductsComponent implements OnInit {
     });
   }
 
-  addCategory() {
+  onCategoryImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploadingCategoryImage.set(true);
+      this.productService.uploadImage(file).subscribe({
+        next: (res) => {
+          this.newCategoryImage = res.url;
+          this.uploadingCategoryImage.set(false);
+          this.notificationService.show('Image téléversée avec succès');
+          event.target.value = '';
+        },
+        error: (err) => {
+          this.uploadingCategoryImage.set(false);
+          const errorMsg = err.error?.message || 'Erreur lors du téléchargement de l\'image';
+          this.notificationService.show(errorMsg, 'error');
+          event.target.value = '';
+        }
+      });
+    }
+  }
+
+  startEditCategory(category: Category) {
+    if (category._id) {
+      this.editingCategoryId.set(category._id);
+      this.newCategoryName = category.name;
+      this.newCategoryImage = category.image || '';
+    }
+  }
+
+  cancelEditCategory() {
+    this.editingCategoryId.set(null);
+    this.newCategoryName = '';
+    this.newCategoryImage = '';
+  }
+
+  saveCategory() {
     if (!this.newCategoryName || !this.newCategoryName.trim()) {
       this.notificationService.show('Veuillez entrer un nom de catégorie', 'error');
       return;
     }
     this.addingCategory.set(true);
-    this.categoryService.createCategory({
-      name: this.newCategoryName.trim(),
-      image: this.newCategoryImage.trim()
-    }).subscribe({
-      next: (cat) => {
-        this.addingCategory.set(false);
-        this.newCategoryName = '';
-        this.newCategoryImage = '';
-        this.loadCategories();
-        this.notificationService.show('Catégorie ajoutée avec succès');
-      },
-      error: (err) => {
-        this.addingCategory.set(false);
-        const msg = err.error?.message || 'Erreur lors de la création de la catégorie';
-        this.notificationService.show(msg, 'error');
-      }
-    });
+
+    const editId = this.editingCategoryId();
+    if (editId) {
+      this.categoryService.updateCategory(editId, {
+        name: this.newCategoryName.trim(),
+        image: this.newCategoryImage.trim()
+      }).subscribe({
+        next: () => {
+          this.addingCategory.set(false);
+          this.cancelEditCategory();
+          this.loadCategories();
+          this.notificationService.show('Catégorie mise à jour avec succès');
+        },
+        error: (err) => {
+          this.addingCategory.set(false);
+          const msg = err.error?.message || 'Erreur lors de la mise à jour';
+          this.notificationService.show(msg, 'error');
+        }
+      });
+    } else {
+      this.categoryService.createCategory({
+        name: this.newCategoryName.trim(),
+        image: this.newCategoryImage.trim()
+      }).subscribe({
+        next: () => {
+          this.addingCategory.set(false);
+          this.cancelEditCategory();
+          this.loadCategories();
+          this.notificationService.show('Catégorie ajoutée avec succès');
+        },
+        error: (err) => {
+          this.addingCategory.set(false);
+          const msg = err.error?.message || 'Erreur lors de la création de la catégorie';
+          this.notificationService.show(msg, 'error');
+        }
+      });
+    }
   }
 
   async removeCategory(id?: string) {

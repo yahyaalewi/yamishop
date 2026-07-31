@@ -35,6 +35,10 @@ export class CategoryService {
     return this.http.post<Category>(this.apiUrl, category, this.getAuthHeaders());
   }
 
+  updateCategory(id: string, category: { name?: string; image?: string }): Observable<Category> {
+    return this.http.put<Category>(`${this.apiUrl}/${id}`, category, this.getAuthHeaders());
+  }
+
   deleteCategory(id: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`, this.getAuthHeaders());
   }
