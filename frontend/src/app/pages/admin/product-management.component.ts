@@ -71,11 +71,11 @@ import { LanguageService } from '../../services/language.service';
               <div class="flex gap-2 items-center">
                 <input type="text" [(ngModel)]="newCategoryImage" placeholder="URL de l'image ou téléversez une photo" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm bg-white">
                 
-                <label class="px-3 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shrink-0">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                  <span>{{ uploadingCategoryImage() ? 'Envoi...' : 'Image' }}</span>
-                  <input type="file" (change)="onCategoryImageSelected($event)" accept="image/*" class="hidden">
-                </label>
+                <input type="file" #catFileInput (change)="onCategoryImageSelected($event)" accept="image/*" class="hidden">
+                <button type="button" (click)="catFileInput.click()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border border-gray-200">
+                  <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                  <span>{{ uploadingCategoryImage() ? 'Envoi...' : 'Choisir une photo' }}</span>
+                </button>
               </div>
 
               <!-- Image Preview if available -->
