@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../../components/ui/card.component';
 import { ButtonComponent } from '../../components/ui/button.component';
 import { ProductService, Product } from '../../services/product.service';
+import { CategoryService, Category } from '../../services/category.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { LanguageService } from '../../services/language.service';
@@ -35,12 +36,63 @@ import { LanguageService } from '../../services/language.service';
             </button>
           </div>
         </div>
-        <app-button variant="primary" size="md" (onClick)="showForm.set(true); currentProduct = null; resetForm()">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Nouveau Produit
-        </app-button>
+        <div class="flex items-center gap-3">
+          <button (click)="showCategoryModal.set(true)" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 border-none cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            Catégories
+          </button>
+          <app-button variant="primary" size="md" (onClick)="showForm.set(true); currentProduct = null; resetForm()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Nouveau Produit
+          </app-button>
+        </div>
+      </div>
+
+      <!-- Categories Management Modal -->
+      <div *ngIf="showCategoryModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-lg max-h-[85vh] overflow-y-auto p-6 border border-gray-100 animate-in fade-in zoom-in duration-300">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-black text-gray-900 tracking-tight">Gestion des Catégories</h2>
+            <button (click)="showCategoryModal.set(false)" class="w-8 h-8 rounded-full bg-gray-100/50 text-gray-500 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all border-none cursor-pointer">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Add Category Form -->
+          <div class="mb-6 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+            <h3 class="text-sm font-bold text-gray-900 mb-3">Ajouter une nouvelle catégorie</h3>
+            <div class="flex flex-col gap-3">
+              <input type="text" [(ngModel)]="newCategoryName" placeholder="Nom de la catégorie (ex: Électronique)" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm">
+              <div class="flex gap-2">
+                <input type="text" [(ngModel)]="newCategoryImage" placeholder="URL de l'image (optionnel)" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm">
+                <button (click)="addCategory()" [disabled]="addingCategory()" class="px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all border-none cursor-pointer disabled:opacity-50">
+                  {{ addingCategory() ? 'Ajout...' : 'Ajouter' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category List -->
+          <div class="space-y-2">
+            <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider mb-2">Catégories existantes ({{ categories().length }})</h3>
+            <div *ngFor="let cat of categories()" class="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow transition-all">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200">
+                  <img *ngIf="cat.image" [src]="getImageUrl(cat.image)" [alt]="cat.name" class="w-full h-full object-cover">
+                  <span *ngIf="!cat.image" class="text-gray-400 text-xs font-bold">{{ cat.name.charAt(0) }}</span>
+                </div>
+                <span class="font-bold text-gray-800 text-sm">{{ cat.name }}</span>
+              </div>
+              <button (click)="removeCategory(cat._id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all border-none cursor-pointer" title="Supprimer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Add/Edit Form Overlay -->
@@ -62,13 +114,7 @@ import { LanguageService } from '../../services/language.service';
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Catégorie</label>
                 <select name="category" [(ngModel)]="formData.category" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none h-[42px]">
-                  <option value="Mode">Mode</option>
-                  <option value="Électronique">Électronique</option>
-                  <option value="Beauté">Beauté</option>
-                  <option value="Maison">Maison</option>
-                  <option value="Accessoires">Accessoires</option>
-                  <option value="Chaussures">Chaussures</option>
-                  <option value="Parfum">Parfum</option>
+                  <option *ngFor="let cat of categories()" [value]="cat.name">{{ lang.translateCategory(cat.name, 'fr') }}</option>
                 </select>
               </div>
               <div>
@@ -334,12 +380,19 @@ import { LanguageService } from '../../services/language.service';
   `
 })
 export class AdminProductsComponent implements OnInit {
-  authService = inject(AuthService);
   productService = inject(ProductService);
+  categoryService = inject(CategoryService);
   notificationService = inject(NotificationService);
+  authService = inject(AuthService);
   lang = inject(LanguageService);
   
   products = signal<Product[]>([]);
+  categories = signal<Category[]>([]);
+  showCategoryModal = signal(false);
+  newCategoryName = '';
+  newCategoryImage = '';
+  addingCategory = signal(false);
+
   selectedGenderFilter = signal<string | null>(null);
   filteredAdminProducts = computed(() => {
     const prods = this.products();
@@ -416,6 +469,61 @@ export class AdminProductsComponent implements OnInit {
 
   ngOnInit() {
     this.loadProducts();
+    this.loadCategories();
+  }
+
+  loadCategories() {
+    this.categoryService.getCategories().subscribe({
+      next: (cats) => {
+        this.categories.set(cats);
+        if (cats.length > 0 && !this.formData.category) {
+          this.formData.category = cats[0].name;
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  addCategory() {
+    if (!this.newCategoryName || !this.newCategoryName.trim()) {
+      this.notificationService.show('Veuillez entrer un nom de catégorie', 'error');
+      return;
+    }
+    this.addingCategory.set(true);
+    this.categoryService.createCategory({
+      name: this.newCategoryName.trim(),
+      image: this.newCategoryImage.trim()
+    }).subscribe({
+      next: (cat) => {
+        this.addingCategory.set(false);
+        this.newCategoryName = '';
+        this.newCategoryImage = '';
+        this.loadCategories();
+        this.notificationService.show('Catégorie ajoutée avec succès');
+      },
+      error: (err) => {
+        this.addingCategory.set(false);
+        const msg = err.error?.message || 'Erreur lors de la création de la catégorie';
+        this.notificationService.show(msg, 'error');
+      }
+    });
+  }
+
+  async removeCategory(id?: string) {
+    if (!id) return;
+    const confirmed = await this.notificationService.confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');
+    if (confirmed) {
+      this.categoryService.deleteCategory(id).subscribe({
+        next: () => {
+          this.loadCategories();
+          this.notificationService.show('Catégorie supprimée');
+        },
+        error: (err) => {
+          const msg = err.error?.message || 'Erreur lors de la suppression';
+          this.notificationService.show(msg, 'error');
+        }
+      });
+    }
   }
 
   loadProducts() {

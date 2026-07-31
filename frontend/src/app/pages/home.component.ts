@@ -10,7 +10,9 @@ import { ProductService, Product } from '../services/product.service';
 import { NotificationService } from '../services/notification.service';
 import { SeoService } from '../services/seo.service';
 
-const CATEGORIES = [
+import { CategoryService, Category } from '../services/category.service';
+
+const DEFAULT_CATEGORIES = [
   { name: 'Mode', image: '/images/categories/fashion.png' },
   { name: 'Électronique', image: '/images/categories/electronics.png' },
   { name: 'Maison', image: '/images/categories/home.png' },
@@ -80,7 +82,7 @@ const CATEGORIES = [
           </div>
           
           <div class="flex overflow-x-auto gap-6 md:gap-10 pb-8 pt-4 scrollbar-hide px-2">
-            <div *ngFor="let cat of categories" (click)="filterByCategory(cat.name)"
+            <div *ngFor="let cat of categories()" (click)="filterByCategory(cat.name)"
               class="flex-shrink-0 flex flex-col items-center gap-4 cursor-pointer group transition-all duration-300 active:scale-95">
               
               <!-- Circular Image Container -->
@@ -90,8 +92,8 @@ const CATEGORIES = [
                   [class.ring-primary]="selectedCategory() === cat.name"
                   [class.ring-offset-4]="selectedCategory() === cat.name"
                   [class.scale-105]="selectedCategory() === cat.name"
-                  class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-50 shadow-md group-hover:shadow-xl group-hover:border-primary/20 transition-all duration-500 bg-gray-50 relative">
-                  <img [src]="cat.image" [alt]="cat.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                  class="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-50 shadow-md group-hover:shadow-xl group-hover:border-primary/20 transition-all duration-500 bg-gray-50 relative flex items-center justify-center">
+                  <img [src]="getCategoryImage(cat)" [alt]="cat.name" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                   
                   <!-- Overlays and Badges -->
                   <div *ngIf="selectedCategory() === cat.name" class="absolute inset-0 bg-primary/10 flex items-center justify-center backdrop-blur-[1px]">
@@ -251,15 +253,21 @@ export class HomeComponent implements OnInit {
   selectedCategory = signal<string | null>(null);
   selectedGender = signal<string | null>(null);
   searchQuery = signal<string | null>(null);
-  categories = CATEGORIES;
+  categories = signal<Category[]>(DEFAULT_CATEGORIES);
   loading = signal(true);
 
   productService = inject(ProductService);
+  categoryService = inject(CategoryService);
   cartService = inject(CartService);
   notificationService = inject(NotificationService);
   route = inject(ActivatedRoute);
   router = inject(Router);
   seo = inject(SeoService);
+
+  getCategoryImage(cat: Category): string {
+    if (cat.image) return this.productService.getImageUrl(cat.image);
+    return 'https://via.placeholder.com/300x300.png?text=' + encodeURIComponent(cat.name);
+  }
 
   filterByGender(gender: string | null) {
     this.router.navigate([], {
@@ -288,11 +296,15 @@ export class HomeComponent implements OnInit {
       return prods.filter(p => p.category === cat);
     }
     
-    if (q || gender) {
-      return prods;
+    return prods;
+  });
+
+  featuredProducts = computed(() => {
+    let prods = this.allProducts();
+    const cat = this.selectedCategory();
+    if (cat) {
+      return prods.filter(p => p.category === cat);
     }
-    
-    // Only show featured products as "Nos Pépites" if no category is selected
     return prods.filter(p => p.isFeatured);
   });
 
@@ -310,7 +322,19 @@ export class HomeComponent implements OnInit {
     });
 
     this.loadProducts();
+    this.loadCategories();
     this.seo.updateTags();
+  }
+
+  loadCategories() {
+    this.categoryService.getCategories().subscribe({
+      next: (cats) => {
+        if (cats && cats.length > 0) {
+          this.categories.set(cats);
+        }
+      },
+      error: () => {}
+    });
   }
 
   loadProducts() {
