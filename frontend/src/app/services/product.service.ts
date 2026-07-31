@@ -86,9 +86,11 @@ export class ProductService {
   uploadImage(file: File): Observable<{ url: string }> {
     const formData = new FormData();
     formData.append('image', file);
+    const token = localStorage.getItem('token');
+    const headers = token ? { headers: { 'Authorization': `Bearer ${token}` } } : {};
     const uploadUrl = window.location.hostname === 'localhost' 
       ? 'http://localhost:5000/api/uploads' 
       : 'https://yamishop-api.onrender.com/api/uploads';
-    return this.http.post<{ url: string }>(uploadUrl, formData);
+    return this.http.post<{ url: string }>(uploadUrl, formData, headers);
   }
 }
