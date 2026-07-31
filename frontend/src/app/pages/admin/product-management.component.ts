@@ -516,15 +516,23 @@ export class AdminProductsComponent implements OnInit {
     if (file) {
       this.uploadingCategoryImage.set(true);
       this.productService.uploadImage(file).subscribe({
-        next: (res) => {
-          this.newCategoryImage = res.url;
+        next: (res: any) => {
+          console.log('Upload response:', res);
+          // Handle both { url: '...' } and { data: '...' } or string responses
+          const imageUrl = typeof res === 'string' ? res : (res.url || res.data || res.imageUrl);
+          if (imageUrl) {
+            this.newCategoryImage = imageUrl;
+            this.notificationService.show('Image téléversée avec succès');
+          } else {
+            this.notificationService.show('Réponse d\'envoi invalide', 'error');
+          }
           this.uploadingCategoryImage.set(false);
-          this.notificationService.show('Image téléversée avec succès');
           event.target.value = '';
         },
         error: (err) => {
+          console.error('Upload error:', err);
           this.uploadingCategoryImage.set(false);
-          const errorMsg = err.error?.message || 'Erreur lors du téléchargement de l\'image';
+          const errorMsg = err.error?.message || err.message || 'Erreur lors du téléchargement de l\'image';
           this.notificationService.show(errorMsg, 'error');
           event.target.value = '';
         }
