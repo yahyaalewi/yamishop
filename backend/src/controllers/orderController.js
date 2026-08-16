@@ -515,13 +515,6 @@ const getOrderInvoice = async (req, res) => {
       .fontSize(9)
       .text('Merci pour votre confiance chez YamiShop !', pageStart, footerY + 12, { align: 'center', width: pageWidth });
 
-    doc
-      .fillColor(grayText)
-      .font(mainFont)
-      .fontSize(8)
-      .text('Pour toute question concernant votre commande, contactez notre service client en Mauritanie.', pageStart, footerY + 26, { align: 'center', width: pageWidth })
-      .text('www.yamishop.com — Support & Livraison Express', pageStart, footerY + 38, { align: 'center', width: pageWidth });
-
     doc.end();
   } catch (error) {
     console.error('Invoice error details:', error);
