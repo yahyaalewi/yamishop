@@ -133,7 +133,7 @@ const DEFAULT_CATEGORIES = [
               <div class="inline-flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/10 animate-in fade-in slide-in-from-bottom duration-700">
                 <span class="text-xs">✨</span>
                 <span class="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60">
-                  {{ searchQuery() ? lang.translate('nav.search') : (selectedCategory() ? lang.translate('home.category_label') : lang.translate('home.all_products')) }}
+                  {{ searchQuery() ? lang.translate('nav.search') : (selectedCategory() ? lang.translate('home.category_label') : (showAllCatalog() || router.url.includes('/products') ? lang.translate('home.full_catalog') : lang.translate('home.all_products'))) }}
                 </span>
                 <span class="text-xs">✨</span>
               </div>
@@ -142,18 +142,18 @@ const DEFAULT_CATEGORIES = [
               <h2 class="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-tight max-w-2xl">
                 {{ lang.isRTL() ? 'اكتشف' : 'Découvrez' }}
                 <span class="text-transparent bg-clip-text bg-gradient-to-br from-terracotta to-primary">
-                  {{ searchQuery() ? '"' + searchQuery() + '"' : (selectedCategory() ? lang.translateCategory(selectedCategory()!) : (lang.isRTL() ? 'منتجاتنا المختارة' : 'Nos Pépites')) }}
+                  {{ searchQuery() ? '"' + searchQuery() + '"' : (selectedCategory() ? lang.translateCategory(selectedCategory()!) : (showAllCatalog() || router.url.includes('/products') ? 'Catalogue Complet' : (lang.isRTL() ? 'منتجاتنا المختارة' : 'Nos Pépites'))) }}
                 </span>
               </h2>
 
               <!-- Subtitle -->
               <p class="text-gray-400 text-xs font-black uppercase tracking-[0.4em]">
-                {{ searchQuery() ? (lang.isRTL() ? 'نتائج البحث' : 'Résultats de recherche') : (selectedCategory() ? lang.translate('home.cat_msg') : lang.translate('home.all_msg')) }}
+                {{ searchQuery() ? (lang.isRTL() ? 'نتائج البحث' : 'Résultats de recherche') : (selectedCategory() ? lang.translate('home.cat_msg') : (showAllCatalog() || router.url.includes('/products') ? (lang.isRTL() ? 'جميع المنتجات المتوفرة' : 'Tous nos produits disponibles') : lang.translate('home.all_msg'))) }}
               </p>
 
-              <!-- Full Catalog Link - Visible only when a category IS selected OR search IS present -->
-              <div class="pt-4" *ngIf="selectedCategory() || searchQuery()">
-                <a (click)="resetAndScroll()"
+              <!-- Full Catalog Link -->
+              <div class="pt-4" *ngIf="(!showAllCatalog() && !router.url.includes('/products')) || selectedCategory() || searchQuery()">
+                <a (click)="resetAndShowAll()"
                    class="group inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-primary hover:text-primary-dark transition-all no-underline cursor-pointer animate-in zoom-in duration-500">
                   <span>{{ lang.translate('home.full_catalog') }}</span>
                   <div class="flex items-center">
@@ -277,11 +277,14 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  showAllCatalog = signal<boolean>(false);
+
   filteredProducts = computed(() => {
     let prods = this.allProducts();
     const cat = this.selectedCategory();
     const gender = this.selectedGender();
     const q = this.searchQuery();
+    const isFull = this.showAllCatalog() || this.router.url.includes('/products');
 
     if (q) {
       const lowerQ = q.toLowerCase();
@@ -295,7 +298,12 @@ export class HomeComponent implements OnInit {
     if (cat) {
       return prods.filter(p => p.category === cat);
     }
-    
+
+    // Default "Nos Pépites" view: show ONLY products chosen/marked by admin (isFeatured === true)
+    if (!isFull && !cat && !q) {
+      return prods.filter(p => Boolean(p.isFeatured));
+    }
+
     return prods;
   });
 
@@ -305,7 +313,7 @@ export class HomeComponent implements OnInit {
     if (cat) {
       return prods.filter(p => p.category === cat);
     }
-    return prods.filter(p => p.isFeatured);
+    return prods.filter(p => Boolean(p.isFeatured));
   });
 
   ngOnInit() {
@@ -313,6 +321,10 @@ export class HomeComponent implements OnInit {
       this.selectedCategory.set(params['category'] || null);
       this.selectedGender.set(params['gender'] || null);
       this.searchQuery.set(params['q'] || null);
+
+      if (this.router.url.includes('/products')) {
+        this.showAllCatalog.set(true);
+      }
 
       if (params['gender'] || params['category'] || params['q'] || this.router.url.includes('/products')) {
         setTimeout(() => {
@@ -360,11 +372,23 @@ export class HomeComponent implements OnInit {
     this.notificationService.show(`${product.name}: ${this.lang.translate('msg.added_to_cart')}`);
   }
 
+  resetAndShowAll() {
+    this.selectedCategory.set(null);
+    this.selectedGender.set(null);
+    this.searchQuery.set(null);
+    this.showAllCatalog.set(true);
+    this.router.navigate(['/products'], { queryParams: {} });
+    setTimeout(() => {
+      document.getElementById('products-list')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
   resetAndScroll() {
     this.selectedCategory.set(null);
     this.selectedGender.set(null);
     this.searchQuery.set(null);
-    this.router.navigate(['/products'], { queryParams: {} });
+    this.showAllCatalog.set(false);
+    this.router.navigate(['/home'], { queryParams: {} });
     setTimeout(() => {
       document.getElementById('products-list')?.scrollIntoView({ behavior: 'smooth' });
     }, 100);

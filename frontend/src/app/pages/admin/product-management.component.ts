@@ -109,15 +109,9 @@ import { LanguageService } from '../../services/language.service';
               </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Étoiles (Note / 5)</label>
-                <input type="number" step="0.1" min="0" max="5" name="rating" [(ngModel)]="formData.rating" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: 4.5">
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre de vues</label>
-                <input type="number" name="views" [(ngModel)]="formData.views" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: 120">
-              </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Étoiles (Note / 5)</label>
+              <input type="number" step="0.1" min="0" max="5" name="rating" [(ngModel)]="formData.rating" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: 4.5">
             </div>
 
             <!-- Main Image + Gallery -->
@@ -365,7 +359,6 @@ export class AdminProductsComponent implements OnInit {
     stock: 0,
     shippingPrice: 0,
     rating: 0,
-    views: 0,
     imageUrl: '',
     images: [] as string[],
     description: '',
@@ -567,7 +560,6 @@ export class AdminProductsComponent implements OnInit {
       stock: 0,
       shippingPrice: 0,
       rating: 0,
-      views: 0,
       imageUrl: '',
       images: [] as string[],
       description: '',
@@ -589,7 +581,6 @@ export class AdminProductsComponent implements OnInit {
     this.formData = { 
       ...product,
       rating: product.rating || 0,
-      views: product.views || 0,
       images: imgs,
       featuresText: product.features && Array.isArray(product.features) ? product.features.join('\n') : '',
       colorsText: product.colors && Array.isArray(product.colors) ? product.colors.join(', ') : '',
@@ -613,7 +604,6 @@ export class AdminProductsComponent implements OnInit {
     const productData = { 
       ...this.formData,
       rating: Number(this.formData.rating) || 0,
-      views: Number(this.formData.views) || 0,
       imageUrl: this.formData.images[0], // Always sync imageUrl from gallery
       images: this.formData.images,
       gender: this.formGender(),
