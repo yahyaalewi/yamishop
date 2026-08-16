@@ -37,86 +37,12 @@ import { LanguageService } from '../../services/language.service';
           </div>
         </div>
         <div class="flex items-center gap-3">
-          <button (click)="showCategoryModal.set(true)" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 border-none cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            Catégories
-          </button>
           <app-button variant="primary" size="md" (onClick)="showForm.set(true); currentProduct = null; resetForm()">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Nouveau Produit
           </app-button>
-        </div>
-      </div>
-
-      <!-- Categories Management Modal -->
-      <div *ngIf="showCategoryModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-lg max-h-[85vh] overflow-y-auto p-6 border border-gray-100 animate-in fade-in zoom-in duration-300">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-black text-gray-900 tracking-tight">Gestion des Catégories</h2>
-            <button (click)="showCategoryModal.set(false)" class="w-8 h-8 rounded-full bg-gray-100/50 text-gray-500 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all border-none cursor-pointer">
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-
-          <!-- Add / Edit Category Form -->
-          <div class="mb-6 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-            <h3 class="text-sm font-bold text-gray-900 mb-3">{{ editingCategoryId() ? 'Modifier la catégorie' : 'Ajouter une nouvelle catégorie' }}</h3>
-            <div class="flex flex-col gap-3">
-              <input type="text" [(ngModel)]="newCategoryName" placeholder="Nom de la catégorie (ex: Électronique)" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm bg-white">
-              
-              <div class="flex gap-2 items-center">
-                <input type="text" [(ngModel)]="newCategoryImage" placeholder="URL de l'image ou téléversez une photo" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm bg-white">
-                
-                <input type="file" #catFileInput (change)="onCategoryImageSelected($event)" accept="image/*" class="hidden">
-                <button type="button" (click)="catFileInput.click()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 border border-gray-200">
-                  <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                  <span>{{ uploadingCategoryImage() ? 'Envoi...' : 'Choisir une photo' }}</span>
-                </button>
-              </div>
-
-              <!-- Image Preview if available -->
-              <div *ngIf="newCategoryImage" class="flex items-center gap-3 p-2 bg-white rounded-xl border border-gray-200">
-                <img [src]="getImageUrl(newCategoryImage)" class="w-12 h-12 rounded-lg object-cover border border-gray-100">
-                <span class="text-xs text-gray-500 truncate flex-1">{{ newCategoryImage }}</span>
-                <button (click)="newCategoryImage = ''" class="text-red-500 text-xs font-bold px-2 py-1 hover:bg-red-50 rounded-lg border-none cursor-pointer">Supprimer</button>
-              </div>
-
-              <div class="flex gap-2 justify-end mt-1">
-                <button *ngIf="editingCategoryId()" (click)="cancelEditCategory()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-300 transition-all border-none cursor-pointer">
-                  Annuler
-                </button>
-                <button (click)="saveCategory()" [disabled]="addingCategory()" class="px-5 py-2 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all border-none cursor-pointer disabled:opacity-50">
-                  {{ addingCategory() ? 'Enregistrement...' : (editingCategoryId() ? 'Mettre à jour' : 'Ajouter') }}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Category List -->
-          <div class="space-y-2">
-            <h3 class="text-xs font-black uppercase text-gray-400 tracking-wider mb-2">Catégories existantes ({{ categories().length }})</h3>
-            <div *ngFor="let cat of categories()" class="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow transition-all">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200">
-                  <img *ngIf="cat.image" [src]="getImageUrl(cat.image)" [alt]="cat.name" class="w-full h-full object-cover">
-                  <span *ngIf="!cat.image" class="text-gray-400 text-xs font-bold">{{ cat.name.charAt(0) }}</span>
-                </div>
-                <span class="font-bold text-gray-800 text-sm">{{ cat.name }}</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <button (click)="startEditCategory(cat)" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all border-none cursor-pointer" title="Modifier">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                </button>
-                <button (click)="removeCategory(cat._id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all border-none cursor-pointer" title="Supprimer">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
