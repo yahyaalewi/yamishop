@@ -242,9 +242,12 @@ const getOrderInvoice = async (req, res) => {
       }
     };
 
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    const doc = new PDFDocument({ margin: 40, size: 'A4' });
 
     // Use Almarai as universal font to support both French and Arabic
+    const mainFont = fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica';
+    const boldFont = fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Bold';
+    
     if (fs.existsSync(fontPath)) {
       doc.registerFont('Almarai', fontPath);
       doc.font('Almarai');
@@ -261,111 +264,263 @@ const getOrderInvoice = async (req, res) => {
 
     doc.pipe(res);
 
-    // Layout Constants
-    const pageStart = 50;
-    const pageEnd = 550;
-    const pageWidth = 500;
-    const alignMain = isRtl ? 'right' : 'left';
-    const alignMeta = isRtl ? 'left' : 'right';
+    // Color Palette
+    const primaryColor = '#E05A47'; // Terracotta Brand Color
+    const darkColor = '#1E293B';    // Charcoal Dark
+    const grayText = '#64748B';     // Muted Gray
+    const lightBg = '#F8FAFC';      // Soft Card Light BG
+    const borderGray = '#E2E8F0';   // Light Border
+    const successColor = '#10B981'; // Green status
+
+    const pageStart = 40;
+    const pageEnd = 555;
+    const pageWidth = 515;
+
     const displayDate = order.confirmedAt || order.createdAt;
-    const formattedDate = new Date(displayDate).toLocaleDateString(lang === 'ar' ? 'ar-MA' : 'fr-FR');
-
-    // Header
-    doc
-      .fillColor('#444444')
-      .fontSize(25)
-      .text('YAMISHOP', pageStart, 45, { align: alignMain, width: pageWidth }) 
-      .fontSize(10)
-      .text(reshapeText(t.invoice), pageStart, 50, { align: alignMeta, width: pageWidth })
-      .text(reshapeText(`${t.orderNum}: ${shortId}`), pageStart, 65, { align: alignMeta, width: pageWidth })
-      .text(reshapeText(`${t.date}: ${formattedDate}`), pageStart, 80, { align: alignMeta, width: pageWidth })
-      .moveDown();
-
-    doc.moveTo(pageStart, 100).lineTo(pageEnd, 100).stroke();
-
-    // Customer Info
-    const customerY = 115;
-    doc
-      .fontSize(12)
-      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Bold')
-      .text(reshapeText(t.billTo), pageStart, customerY, { align: alignMain, width: pageWidth })
-      .fontSize(10)
-      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica')
-      .text(reshapeText(order.user.name || ''), pageStart, customerY + 15, { align: alignMain, width: pageWidth })
-      .text(order.user.phone || '', pageStart, customerY + 30, { align: alignMain, width: pageWidth })
-      .text(reshapeText((order.shippingAddress?.district || '') + ' ' + (order.shippingAddress?.city || '')), pageStart, customerY + 45, { align: alignMain, width: pageWidth })
-      .text(reshapeText(order.shippingAddress?.street || ''), pageStart, customerY + 60, { align: alignMain, width: pageWidth });
-
-    // Table Setup
-    const tableTop = 210;
-    let col1, col2, col3, col4, colWidths;
-    
-    if (isRtl) {
-      col1 = 300; // Product (Right)
-      col2 = 210; // Qty (Middle right)
-      col3 = 110; // Price (Middle left)
-      col4 = 50;  // Total (Left)
-    } else {
-      col1 = 50;  // Product (Left)
-      col2 = 300; // Qty
-      col3 = 390; // Price
-      col4 = 480; // Total
-    }
-    const cellWidth = 90;
-
-    doc
-      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Bold')
-      .fontSize(10)
-      .text(reshapeText(t.product), col1, tableTop, { align: alignMain, width: 250 })
-      .text(reshapeText(t.quantity), col2, tableTop, { width: cellWidth, align: 'center' })
-      .text(reshapeText(t.unitPrice), col3, tableTop, { width: cellWidth, align: 'center' })
-      .text(reshapeText(t.total), col4, tableTop, { width: cellWidth, align: alignMeta });
-
-    doc.moveTo(pageStart, tableTop + 15).lineTo(pageEnd, tableTop + 15).stroke();
-
-    doc.font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica');
-    let i = 0;
-    order.orderItems.forEach((item) => {
-      const y = tableTop + 30 + i * 25;
-      const itemName = `${item.name}${item.size ? ' (' + item.size + ')' : ''}${item.color ? ' - ' + item.color : ''}`;
-      
-      doc
-        .text(reshapeText(itemName), col1, y, { align: alignMain, width: 250 })
-        .text(item.quantity.toString(), col2, y, { width: cellWidth, align: 'center' })
-        .text(reshapeText(`${item.price} ${t.priceLabel}`), col3, y, { width: cellWidth, align: 'center' })
-        .text(reshapeText(`${(item.quantity * item.price)} ${t.priceLabel}`), col4, y, { width: cellWidth, align: alignMeta });
-      i++;
+    const formattedDate = new Date(displayDate).toLocaleDateString(lang === 'ar' ? 'ar-MA' : 'fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     });
 
-    const summaryY = tableTop + 40 + i * 25;
-    doc.moveTo(pageStart, summaryY).lineTo(pageEnd, summaryY).stroke();
+    // 1. TOP BRAND ACCENT BAR
+    doc.rect(0, 0, 595, 10).fill(primaryColor);
 
-    const deliveryCost = order.shippingPrice || 150;
-    const productsCost = order.totalPrice - deliveryCost;
+    // 2. HEADER: LOGO & INVOICE META
+    let currentY = 30;
+
+    // Brand Title
+    doc
+      .fillColor(primaryColor)
+      .font(boldFont)
+      .fontSize(24)
+      .text('YAMISHOP', pageStart, currentY, { width: 300 });
+
+    doc
+      .fillColor(grayText)
+      .font(mainFont)
+      .fontSize(8)
+      .text('Votre E-Commerce de Référence en Mauritanie', pageStart, currentY + 28, { width: 300 });
+
+    // Invoice Title & Ref Badge (Right Aligned)
+    doc
+      .fillColor(darkColor)
+      .font(boldFont)
+      .fontSize(18)
+      .text('FACTURE', pageStart, currentY, { align: 'right', width: pageWidth });
+
+    doc
+      .fillColor(primaryColor)
+      .font(boldFont)
+      .fontSize(10)
+      .text(`N° FACT-${shortId}`, pageStart, currentY + 22, { align: 'right', width: pageWidth });
+
+    doc
+      .fillColor(grayText)
+      .font(mainFont)
+      .fontSize(9)
+      .text(`Date: ${formattedDate}`, pageStart, currentY + 36, { align: 'right', width: pageWidth });
+
+    // Separator line
+    currentY += 55;
+    doc.moveTo(pageStart, currentY).lineTo(pageEnd, currentY).strokeColor(borderGray).lineWidth(1).stroke();
+
+    // 3. CUSTOMER & SHIPPING CARDS (Side by side)
+    currentY += 15;
+    const cardWidth = 248;
+    const cardHeight = 85;
+
+    // Card 1: Client Info
+    doc
+      .rect(pageStart, currentY, cardWidth, cardHeight)
+      .fillAndStroke(lightBg, borderGray);
+    doc.rect(pageStart, currentY, 4, cardHeight).fill(primaryColor); // Accent left bar
+
+    doc
+      .fillColor(darkColor)
+      .font(boldFont)
+      .fontSize(9)
+      .text('CLIENT & FACTURATION', pageStart + 12, currentY + 10);
+
+    doc
+      .fillColor(darkColor)
+      .font(boldFont)
+      .fontSize(10)
+      .text(reshapeText(order.user?.name || 'Client'), pageStart + 12, currentY + 26);
+
+    doc
+      .fillColor(grayText)
+      .font(mainFont)
+      .fontSize(9)
+      .text(`Tél: ${order.user?.phone || 'N/A'}`, pageStart + 12, currentY + 42)
+      .text(order.user?.email ? `Email: ${order.user.email}` : 'Paiement à la livraison', pageStart + 12, currentY + 56);
+
+    // Card 2: Shipping Destination
+    const card2X = pageStart + cardWidth + 19;
+    doc
+      .rect(card2X, currentY, cardWidth, cardHeight)
+      .fillAndStroke(lightBg, borderGray);
+    doc.rect(card2X, currentY, 4, cardHeight).fill(darkColor); // Accent left bar
+
+    doc
+      .fillColor(darkColor)
+      .font(boldFont)
+      .fontSize(9)
+      .text('LIVRAISON & DESTINATION', card2X + 12, currentY + 10);
+
+    const addressLine1 = (order.shippingAddress?.street || 'Adresse non spécifiée');
+    const addressLine2 = [order.shippingAddress?.district, order.shippingAddress?.city, 'Mauritanie'].filter(Boolean).join(', ');
+
+    doc
+      .fillColor(darkColor)
+      .font(mainFont)
+      .fontSize(9)
+      .text(reshapeText(addressLine1), card2X + 12, currentY + 26, { width: cardWidth - 20 })
+      .text(reshapeText(addressLine2), card2X + 12, currentY + 42, { width: cardWidth - 20 });
+
+    if (order.shippingAddress?.notes) {
+      doc
+        .fillColor(primaryColor)
+        .fontSize(8)
+        .text(reshapeText(`Note: ${order.shippingAddress.notes}`), card2X + 12, currentY + 58, { width: cardWidth - 20 });
+    }
+
+    // 4. TABLE ITEMS
+    currentY += cardHeight + 20;
+
+    const colCodeX = pageStart;
+    const colNameX = pageStart + 10;
+    const colQtyX = pageStart + 290;
+    const colPriceX = pageStart + 360;
+    const colTotalX = pageStart + 440;
+
+    // Header Row Background
+    doc.rect(pageStart, currentY, pageWidth, 24).fill(darkColor);
+
+    doc
+      .fillColor('#FFFFFF')
+      .font(boldFont)
+      .fontSize(9)
+      .text('ARTICLE / DESCRIPTION', colNameX, currentY + 7, { width: 270 })
+      .text('QTÉ', colQtyX, currentY + 7, { width: 60, align: 'center' })
+      .text('PRIX UNIT.', colPriceX, currentY + 7, { width: 75, align: 'right' })
+      .text('TOTAL', colTotalX, currentY + 7, { width: 75, align: 'right' });
+
+    currentY += 24;
+
+    // Table Data Rows
+    doc.font(mainFont).fontSize(9);
     
-    // Final Summary (Subtotal, Tax, Shipping, Grand Total)
-    const labelX = pageStart;
-    const labelAlignArr = isRtl ? 'right' : 'right';
-    const valAlignArr = isRtl ? 'left' : 'right';
+    order.orderItems.forEach((item, index) => {
+      const rowBg = index % 2 === 0 ? '#FFFFFF' : '#F8FAFC';
+      doc.rect(pageStart, currentY, pageWidth, 28).fill(rowBg);
+
+      // Item Name & Options
+      let variantDetails = [];
+      if (item.color) variantDetails.push(`Couleur: ${item.color}`);
+      if (item.size) variantDetails.push(`Taille: ${item.size}`);
+      const variantStr = variantDetails.length > 0 ? ` (${variantDetails.join(' | ')})` : '';
+
+      const fullItemText = `${item.name}${variantStr}`;
+      const qty = item.qty || item.quantity || 1;
+      const unitPrice = item.price || 0;
+      const rowTotal = qty * unitPrice;
+
+      doc
+        .fillColor(darkColor)
+        .text(reshapeText(fullItemText), colNameX, currentY + 8, { width: 270, height: 18, ellipsis: true })
+        .text(qty.toString(), colQtyX, currentY + 8, { width: 60, align: 'center' })
+        .text(`${unitPrice.toLocaleString('fr-FR')} MRU`, colPriceX, currentY + 8, { width: 75, align: 'right' })
+        .font(boldFont)
+        .text(`${rowTotal.toLocaleString('fr-FR')} MRU`, colTotalX, currentY + 8, { width: 75, align: 'right' })
+        .font(mainFont);
+
+      // Bottom border line for row
+      doc.moveTo(pageStart, currentY + 28).lineTo(pageEnd, currentY + 28).strokeColor('#E2E8F0').lineWidth(0.5).stroke();
+
+      currentY += 28;
+    });
+
+    // 5. SUMMARY & TOTALS BOX
+    currentY += 15;
+
+    const deliveryCost = order.shippingPrice || 0;
+    const grandTotal = order.totalPrice || 0;
+    const subtotal = grandTotal - deliveryCost;
+
+    const summaryBoxX = pageStart + 260;
+    const summaryBoxWidth = 255;
+
+    // Subtotal
+    doc
+      .fillColor(grayText)
+      .font(mainFont)
+      .fontSize(9)
+      .text('Sous-total produits :', summaryBoxX, currentY, { width: 130, align: 'right' })
+      .fillColor(darkColor)
+      .font(boldFont)
+      .text(`${subtotal.toLocaleString('fr-FR')} MRU`, summaryBoxX + 135, currentY, { width: 120, align: 'right' });
+
+    currentY += 16;
+
+    // Shipping Fee
+    doc
+      .fillColor(grayText)
+      .font(mainFont)
+      .fontSize(9)
+      .text('Frais de livraison :', summaryBoxX, currentY, { width: 130, align: 'right' })
+      .fillColor(darkColor)
+      .font(boldFont)
+      .text(`${deliveryCost.toLocaleString('fr-FR')} MRU`, summaryBoxX + 135, currentY, { width: 120, align: 'right' });
+
+    currentY += 22;
+
+    // Grand Total Banner (Terracotta Box)
+    doc.rect(summaryBoxX, currentY, summaryBoxWidth, 32).fill(primaryColor);
 
     doc
+      .fillColor('#FFFFFF')
+      .font(boldFont)
       .fontSize(10)
-      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica')
-      .text(reshapeText(t.subtotal), pageStart, summaryY + 10, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(reshapeText(`${productsCost} ${t.priceLabel}`), pageStart, summaryY + 10, { width: 500, align: isRtl ? 'left' : 'right' })
-      
-      .text(reshapeText(t.shipping), pageStart, summaryY + 25, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(reshapeText(`${deliveryCost} ${t.priceLabel}`), pageStart, summaryY + 25, { width: 500, align: isRtl ? 'left' : 'right' })
-
+      .text('TOTAL À PAYER :', summaryBoxX + 12, currentY + 10, { width: 120 })
       .fontSize(12)
-      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Bold')
-      .text(reshapeText(t.grandTotal), pageStart, summaryY + 45, { width: 400, align: isRtl ? 'right' : 'right' })
-      .text(reshapeText(`${order.totalPrice} ${t.priceLabel}`), pageStart, summaryY + 45, { width: 500, align: isRtl ? 'left' : 'right' });
+      .text(`${grandTotal.toLocaleString('fr-FR')} MRU`, summaryBoxX + 125, currentY + 9, { width: 120, align: 'right' });
+
+    // Payment Status Pill (Left side of Summary)
+    const statusY = currentY - 30;
+    doc
+      .rect(pageStart, statusY, 200, 48)
+      .fillAndStroke('#ECFDF5', '#A7F3D0'); // Soft green card
 
     doc
-      .fontSize(10)
-      .font(fs.existsSync(fontPath) ? 'Almarai' : 'Helvetica-Oblique')
-      .text(reshapeText(t.thanks), pageStart, 750, { align: 'center', width: pageWidth });
+      .fillColor(successColor)
+      .font(boldFont)
+      .fontSize(9)
+      .text('STATUT DE COMMANDE', pageStart + 12, statusY + 10);
+
+    doc
+      .fillColor('#065F46')
+      .font(mainFont)
+      .fontSize(9)
+      .text('✓ Confirmée — Paiement à la livraison', pageStart + 12, statusY + 26);
+
+    // 6. FOOTER TRUST & CONTACT
+    const footerY = 740;
+
+    doc.moveTo(pageStart, footerY).lineTo(pageEnd, footerY).strokeColor(borderGray).lineWidth(1).stroke();
+
+    doc
+      .fillColor(darkColor)
+      .font(boldFont)
+      .fontSize(9)
+      .text('Merci pour votre confiance chez YamiShop !', pageStart, footerY + 12, { align: 'center', width: pageWidth });
+
+    doc
+      .fillColor(grayText)
+      .font(mainFont)
+      .fontSize(8)
+      .text('Pour toute question concernant votre commande, contactez notre service client en Mauritanie.', pageStart, footerY + 26, { align: 'center', width: pageWidth })
+      .text('www.yamishop.com — Support & Livraison Express', pageStart, footerY + 38, { align: 'center', width: pageWidth });
 
     doc.end();
   } catch (error) {

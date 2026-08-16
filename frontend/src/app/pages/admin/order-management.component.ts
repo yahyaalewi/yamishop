@@ -86,8 +86,17 @@ import { NotificationService } from '../../services/notification.service';
               Valider la Commande
             </button>
             
-            <div class="bg-green-100 text-green-700 p-3 rounded-xl text-center text-[10px] font-black uppercase tracking-widest" *ngIf="selectedOrder()?.isConfirmed">
-              Commande Confirmée ✓
+            <div class="flex flex-col gap-2.5" *ngIf="selectedOrder()?.isConfirmed">
+              <div class="bg-green-100 text-green-700 p-3 rounded-xl text-center text-[10px] font-black uppercase tracking-widest">
+                Commande Confirmée ✓
+              </div>
+              <button (click)="downloadInvoice(selectedOrder()?._id)"
+                      class="w-full bg-primary text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all border-none cursor-pointer flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Télécharger la Facture PDF
+              </button>
             </div>
           </div>
         </div>
@@ -217,6 +226,27 @@ export class AdminOrdersComponent implements OnInit {
       error: (err) => {
         console.error('Confirm order error:', err);
         this.notificationService.show('Erreur lors de la confirmation', 'error');
+      }
+    });
+  }
+
+  downloadInvoice(orderId?: string) {
+    if (!orderId) return;
+    this.orderService.downloadInvoice(orderId, 'fr').subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `facture-${orderId.substring(orderId.length - 6).toUpperCase()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        this.notificationService.show('Facture téléchargée avec succès !');
+      },
+      error: (err) => {
+        console.error('Invoice download error:', err);
+        this.notificationService.show('Erreur lors du téléchargement de la facture', 'error');
       }
     });
   }
