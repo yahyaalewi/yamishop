@@ -264,10 +264,12 @@ import { LanguageService } from '../../services/language.service';
                   </span>
                 </td>
                 <td class="px-6 py-4 text-center">
-                  <span *ngIf="product.isFeatured" class="bg-yellow-50 text-yellow-600 py-1.5 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1 shadow-sm border border-yellow-100">
-                    <span class="text-xs">✨</span> OUI
-                  </span>
-                  <span *ngIf="!product.isFeatured" class="text-[10px] font-black uppercase tracking-widest text-gray-200">NON</span>
+                  <button (click)="toggleFeatured(product)"
+                          [title]="product.isFeatured ? 'Retirer de Nos Pépites' : 'Ajouter à Nos Pépites'"
+                          class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1.5 border cursor-pointer transition-all shadow-sm active:scale-95"
+                          [class]="product.isFeatured ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'">
+                    <span>{{ product.isFeatured ? '✨ PÉPITE' : '☆ NORMAL' }}</span>
+                  </button>
                 </td>
                 <td class="px-6 py-4 text-right">
                   <div class="flex items-center justify-end gap-1">
@@ -308,7 +310,12 @@ import { LanguageService } from '../../services/language.service';
                 <span [class]="product.stock > 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'" class="py-1 px-3 rounded-full text-[10px] font-bold">
                   {{product.stock > 0 ? product.stock + ' en stock' : 'Rupture'}}
                 </span>
-                <div class="flex gap-2">
+                <div class="flex items-center gap-1">
+                  <button (click)="toggleFeatured(product)"
+                          class="px-2 py-1 rounded-lg text-[9px] font-black uppercase border cursor-pointer transition-all"
+                          [class]="product.isFeatured ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-gray-50 text-gray-400 border-gray-200'">
+                    {{ product.isFeatured ? '✨ Pépite' : '☆ Normal' }}
+                  </button>
                   <button (click)="editProduct(product)" class="p-2 text-primary hover:bg-primary/5 rounded-full transition-all border-none bg-transparent cursor-pointer">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                   </button>
@@ -548,6 +555,26 @@ export class AdminProductsComponent implements OnInit {
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
+    });
+  }
+
+  toggleFeatured(product: Product) {
+    const newStatus = !product.isFeatured;
+    this.productService.updateProduct(product._id, { isFeatured: newStatus }).subscribe({
+      next: () => {
+        product.isFeatured = newStatus;
+        this.products.update(prods => 
+          prods.map(p => p._id === product._id ? { ...p, isFeatured: newStatus } : p)
+        );
+        const msg = newStatus 
+          ? `"${product.name}" ajouté à Nos Pépites ! ✨` 
+          : `"${product.name}" retiré de Nos Pépites.`;
+        this.notificationService.show(msg);
+      },
+      error: (err) => {
+        const errorMsg = err.error?.message || 'Erreur lors du changement de statut Pépite';
+        this.notificationService.show(errorMsg, 'error');
+      }
     });
   }
 
