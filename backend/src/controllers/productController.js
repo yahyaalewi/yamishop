@@ -1,9 +1,25 @@
-const Product = require('../models/Product');
-const Order = require('../models/Order');
+const jwt = require('jsonwebtoken');
 
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    let filter = {};
+    if (req.query.storeId) {
+      filter.storeId = req.query.storeId;
+    } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const User = require('../models/User');
+        const user = await User.findById(decoded.id);
+        if (user && user.role === 'store_admin' && user.storeId) {
+          filter.storeId = user.storeId;
+        }
+      } catch (e) {
+        // ignore token error on public GET
+      }
+    }
+
+    const products = await Product.find(filter).sort({ createdAt: -1 });
     res.status(200).json({ 
       message: "List of products", 
       data: products 

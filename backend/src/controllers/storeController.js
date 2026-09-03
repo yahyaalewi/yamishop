@@ -264,3 +264,16 @@ exports.getMyStore = async (req, res) => {
   }
 };
 
+// ─── Store Admin: Get own store stats ────────────────────────────────────────
+exports.getMyStoreStats = async (req, res) => {
+  try {
+    if (!req.user.storeId) {
+      return res.status(404).json({ message: 'Aucune boutique associée à ce compte.' });
+    }
+    req.params.id = req.user.storeId.toString();
+    return exports.getStoreStats(req, res);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

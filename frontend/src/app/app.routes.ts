@@ -22,6 +22,10 @@ import { clientGuard } from './guards/client.guard';
 
 import { PolicyComponent } from './pages/policy.component';
 
+import { StoreAdminLayoutComponent } from './pages/store-admin/store-layout.component';
+import { StoreDashboardComponent } from './pages/store-admin/store-dashboard.component';
+import { storeAdminGuard } from './guards/store-admin.guard';
+
 export const routes: Routes = [
   { path: '', component: WelcomeComponent, canActivate: [clientGuard] },
   { path: 'privacy', component: PolicyComponent, canActivate: [clientGuard] },
@@ -38,7 +42,6 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard, clientGuard] },
   {
     path: 'admin',
-
     component: AdminLayoutComponent,
     canActivate: [adminGuard],
     children: [
@@ -49,6 +52,17 @@ export const routes: Routes = [
       { path: 'stores', component: StoreManagementComponent },
       { path: 'orders', component: AdminOrdersComponent },
       { path: 'users', component: UserManagementComponent }
+    ]
+  },
+  {
+    path: 'store-admin',
+    component: StoreAdminLayoutComponent,
+    canActivate: [storeAdminGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: StoreDashboardComponent },
+      { path: 'products', component: AdminProductsComponent },
+      { path: 'orders', component: AdminOrdersComponent }
     ]
   },
   { path: '**', redirectTo: '' }

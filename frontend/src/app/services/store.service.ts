@@ -101,4 +101,8 @@ export class StoreService {
   getMyStore(): Observable<Store> {
     return this.http.get<Store>(`${this.apiUrl}/me`, this.getAuthHeaders());
   }
+
+  getMyStoreStats(): Observable<StoreStats> {
+    return this.http.get<StoreStats>(`${this.apiUrl}/my-stats`, this.getAuthHeaders());
+  }
 }

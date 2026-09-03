@@ -88,6 +88,23 @@ const getMyOrders = async (req, res) => {
 
 const getOrders = async (req, res) => {
   try {
+    if (req.user && req.user.role === 'store_admin' && req.user.storeId) {
+      const storeProductIds = await Product.find({ storeId: req.user.storeId }).distinct('_id');
+      const orders = await Order.find({ 'orderItems.product': { $in: storeProductIds } })
+        .populate('user', 'id name phone')
+        .sort({ createdAt: -1 });
+
+      const storeProductStrIds = storeProductIds.map(id => id.toString());
+      const filteredOrders = orders.map(order => {
+        const orderObj = order.toObject();
+        orderObj.orderItems = orderObj.orderItems.filter(item => 
+          item.product && storeProductStrIds.includes(item.product.toString())
+        );
+        return orderObj;
+      });
+      return res.json({ data: filteredOrders });
+    }
+
     const orders = await Order.find({}).populate('user', 'id name phone').sort({ createdAt: -1 });
     res.json({ data: orders });
   } catch (error) {

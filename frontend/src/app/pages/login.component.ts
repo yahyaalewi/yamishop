@@ -157,7 +157,13 @@ export class LoginComponent {
         next: (user) => {
           this.loading.set(false);
           this.notificationService.show(`${this.lang.translate('msg.welcome')}, ${user.name}`);
-          this.router.navigate(['/admin']);
+          if (user.role === 'admin') {
+            this.router.navigate(['/admin']);
+          } else if (user.role === 'store_admin') {
+            this.router.navigate(['/store-admin']);
+          } else {
+            this.router.navigate(['/home']);
+          }
         },
         error: (err) => {
           this.loading.set(false);
@@ -193,6 +199,8 @@ export class LoginComponent {
           this.notificationService.show(`${this.lang.translate('msg.welcome')}, ${res.name}`);
           if (res.role === 'admin') {
             this.router.navigate(['/admin']);
+          } else if (res.role === 'store_admin') {
+            this.router.navigate(['/store-admin']);
           } else {
             this.router.navigate(['/home']);
           }
