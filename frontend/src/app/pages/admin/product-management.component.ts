@@ -180,7 +180,7 @@ import { LanguageService } from '../../services/language.service';
               </div>
             </div>
 
-            <div class="flex items-center gap-3 bg-primary/5 p-4 rounded-2xl border border-primary/10">
+            <div *ngIf="authService.isAdmin()" class="flex items-center gap-3 bg-primary/5 p-4 rounded-2xl border border-primary/10">
               <input type="checkbox" name="isFeatured" [(ngModel)]="formData.isFeatured" id="isFeatured" class="w-5 h-5 accent-primary cursor-pointer">
               <label for="isFeatured" class="text-sm font-bold text-gray-900 cursor-pointer flex flex-col">
                 <span class="flex items-center gap-2">🌟 {{ lang.isRTL() ? 'تمييز المنتج (Pépites)' : 'Mettre en avant (Nos Pépites)' }}</span>
@@ -264,12 +264,16 @@ import { LanguageService } from '../../services/language.service';
                   </span>
                 </td>
                 <td class="px-6 py-4 text-center">
-                  <button (click)="toggleFeatured(product)"
+                  <button *ngIf="authService.isAdmin()" (click)="toggleFeatured(product)"
                           [title]="product.isFeatured ? 'Retirer de Nos Pépites' : 'Ajouter à Nos Pépites'"
                           class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1.5 border cursor-pointer transition-all shadow-sm active:scale-95"
                           [class]="product.isFeatured ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'">
                     <span>{{ product.isFeatured ? '✨ PÉPITE' : '☆ NORMAL' }}</span>
                   </button>
+                  <span *ngIf="!authService.isAdmin() && product.isFeatured" class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200">
+                    ✨ PÉPITE
+                  </span>
+                  <span *ngIf="!authService.isAdmin() && !product.isFeatured" class="text-xs text-gray-400 font-medium">—</span>
                 </td>
                 <td class="px-6 py-4 text-right">
                   <div class="flex items-center justify-end gap-1">
@@ -559,6 +563,10 @@ export class AdminProductsComponent implements OnInit {
   }
 
   toggleFeatured(product: Product) {
+    if (!this.authService.isAdmin()) {
+      this.notificationService.show('Seul le Super Admin peut mettre en avant un produit', 'error');
+      return;
+    }
     const newStatus = !product.isFeatured;
     this.productService.updateProduct(product._id, { isFeatured: newStatus }).subscribe({
       next: () => {

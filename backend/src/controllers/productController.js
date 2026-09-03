@@ -48,8 +48,11 @@ const getProductById = async (req, res) => {
 const createProduct = async (req, res) => {
   try {
     const productData = { ...req.body };
-    if (req.user && req.user.role === 'store_admin' && req.user.storeId) {
-      productData.storeId = req.user.storeId;
+    if (req.user && req.user.role === 'store_admin') {
+      if (req.user.storeId) {
+        productData.storeId = req.user.storeId;
+      }
+      productData.isFeatured = false; // Only Super Admin can mark products as featured
     }
     const product = new Product(productData);
     const createdProduct = await product.save();
@@ -67,10 +70,11 @@ const updateProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    if (req.user && req.user.role === 'store_admin' && req.user.storeId) {
+    if (req.user && req.user.role === 'store_admin') {
       if (product.storeId && product.storeId.toString() !== req.user.storeId.toString()) {
         return res.status(403).json({ message: "Non autorisé à modifier ce produit" });
       }
+      delete req.body.isFeatured; // Only Super Admin can modify isFeatured
     }
 
     Object.assign(product, req.body);
