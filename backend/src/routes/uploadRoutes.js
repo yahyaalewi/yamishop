@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const { storage } = require('../config/cloudinary');
-const { protect, admin } = require('../middleware/auth');
+const { protect, adminOrStoreAdmin } = require('../middleware/auth');
 
 const upload = multer({ storage });
 
-router.post('/', protect, admin, (req, res) => {
+router.post('/', protect, adminOrStoreAdmin, (req, res) => {
   console.log('Upload request received');
   upload.single('image')(req, res, (err) => {
     if (err) {
