@@ -10,6 +10,7 @@ export interface User {
   phone: string;
   role: string;
   token?: string;
+  storeId?: string;
 }
 
 @Injectable({
@@ -73,6 +74,10 @@ export class AuthService {
 
   isAdmin(): boolean {
     return !!this.currentUser() && this.currentUser()!.role === 'admin';
+  }
+
+  isStoreAdmin(): boolean {
+    return !!this.currentUser() && this.currentUser()!.role === 'store_admin';
   }
 
   getProfile(): Observable<User> {

@@ -14,6 +14,7 @@ import { AdminProductsComponent } from './pages/admin/product-management.compone
 import { AdminOrdersComponent } from './pages/admin/order-management.component';
 import { UserManagementComponent } from './pages/admin/user-management.component';
 import { CategoryManagementComponent } from './pages/admin/category-management.component';
+import { StoreManagementComponent } from './pages/admin/store-management.component';
 import { adminGuard } from './guards/admin.guard';
 import { guestGuard } from './guards/guest.guard';
 import { authGuard } from './guards/auth.guard';
@@ -45,6 +46,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: AdminDashboardComponent },
       { path: 'products', component: AdminProductsComponent },
       { path: 'categories', component: CategoryManagementComponent },
+      { path: 'stores', component: StoreManagementComponent },
       { path: 'orders', component: AdminOrdersComponent },
       { path: 'users', component: UserManagementComponent }
     ]

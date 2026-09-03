@@ -33,4 +33,22 @@ const admin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, admin };
+// Middleware: store admin only
+const storeAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'store_admin') {
+    next();
+  } else {
+    res.status(403).json({ message: 'Not authorized as a store admin' });
+  }
+};
+
+// Middleware: super admin OR store admin
+const adminOrStoreAdmin = (req, res, next) => {
+  if (req.user && (req.user.role === 'admin' || req.user.role === 'store_admin')) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Not authorized' });
+  }
+};
+
+module.exports = { protect, admin, storeAdmin, adminOrStoreAdmin };

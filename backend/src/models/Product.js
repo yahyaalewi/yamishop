@@ -18,6 +18,7 @@ const productSchema = new mongoose.Schema({
   rating: { type: Number, default: 0 },
   numReviews: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Store', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

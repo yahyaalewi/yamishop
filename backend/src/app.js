@@ -105,6 +105,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const storeRoutes = require('./routes/storeRoutes');
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -112,6 +113,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/stores', storeRoutes);
 
 app.get('/', (req, res) => {
   res.send('Yamishop API is running');
