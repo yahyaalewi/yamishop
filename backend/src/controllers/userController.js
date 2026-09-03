@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
-const { sendPasswordResetOtp } = require('../config/emailService');
+const { sendPasswordResetOtp, sendStoreAdminLoginOtp } = require('../config/emailService');
 
 const generateToken = (id) => {
   if (!process.env.JWT_SECRET) {
@@ -84,22 +84,29 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ phone });
 
     if (user && (await user.matchPassword(password))) {
-      if (user.role === 'admin') {
+      if (user.role === 'admin' || user.role === 'store_admin') {
         // Generate OTP
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
         user.otpCode = otpCode;
-        user.otpExpires = new Date(Date.now() + 1 * 60 * 1000); // 1 minute (60s)
+        user.otpExpires = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes (180s)
         await user.save();
         
-        // Simulating SMS for now
         console.log(`\n\n-----------------------------`);
-        console.log(`[SMS] Admin OTP for ${phone}: ${otpCode}`);
+        console.log(`[2FA OTP] ${user.role} OTP for ${user.email || user.phone}: ${otpCode}`);
         console.log(`-----------------------------\n\n`);
+
+        if (user.email) {
+          try {
+            await sendStoreAdminLoginOtp(user.email, otpCode, user.name);
+          } catch (err) {
+            console.error('[EMAIL 2FA] Failed to send email:', err.message);
+          }
+        }
 
         return res.status(200).json({
           requiresOtp: true,
           userId: user._id,
-          message: 'OTP envoyé au numéro de l\'administrateur'
+          message: user.email ? `Code OTP envoyé par email à ${user.email}` : 'OTP généré avec succès'
         });
       }
 
@@ -109,6 +116,7 @@ const loginUser = async (req, res) => {
         phone: user.phone,
         email: user.email,
         role: user.role,
+        storeId: user.storeId,
         token: generateToken(user.id)
       });
     } else {
@@ -128,8 +136,8 @@ const verifyOtp = async (req, res) => {
 
     const user = await User.findById(userId);
 
-    if (!user || user.role !== 'admin') {
-      return res.status(404).json({ message: 'User not found or not an admin' });
+    if (!user || (user.role !== 'admin' && user.role !== 'store_admin')) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé ou rôle invalide' });
     }
 
     if (user.otpCode !== otpCode || user.otpExpires < new Date()) {
@@ -147,6 +155,7 @@ const verifyOtp = async (req, res) => {
       phone: user.phone,
       email: user.email,
       role: user.role,
+      storeId: user.storeId,
       token: generateToken(user.id)
     });
   } catch (error) {

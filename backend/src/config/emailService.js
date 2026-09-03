@@ -135,4 +135,74 @@ const sendPasswordResetOtp = async (toEmail, otpCode, userName) => {
   }
 };
 
-module.exports = { sendPasswordResetOtp };
+const sendStoreAdminLoginOtp = async (toEmail, otpCode, userName) => {
+  try {
+    const fromEmail = "YamiShop 🛍️ <noreply@yamishop.store>";
+
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to: [toEmail],
+      subject: 'Code de connexion 2FA - YamiShop 🔐',
+      html: `
+        <!DOCTYPE html>
+        <html dir="ltr" lang="fr">
+        <head><meta charset="UTF-8"></head>
+        <body style="margin:0;padding:0;background:#f8f9fa;font-family:'Inter', Arial, sans-serif;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f9fa;padding:30px 10px;">
+            <tr>
+              <td align="center">
+                <table width="100%" maxWidth="550" cellpadding="0" cellspacing="0" 
+                  style="background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.06);border:1px solid #eee;max-width:550px;">
+                  <tr>
+                    <td style="padding:40px 40px 20px;text-align:center;">
+                        <img src="https://res.cloudinary.com/dzknjtpa4/image/upload/v1/assets/logo_resized.png" alt="YamiShop Logo" style="height:50px;width:auto;display:block;margin:0 auto;">
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:20px 40px 40px;">
+                      <h2 style="color:#111827;font-size:22px;margin:0 0 16px;font-weight:800;text-align:center;">
+                        Bonjour, ${userName} 🔐
+                      </h2>
+                      <p style="color:#4b5563;font-size:15px;line-height:1.6;margin:0 0 24px;text-align:center;">
+                        Authentification 2FA — Espace Administrateur.<br>
+                        Voici votre code de vérification à 6 chiffres :
+                      </p>
+                      <div style="background:#f0fdf4;border:2px dashed #10B981;border-radius:20px;padding:30px;text-align:center;margin-bottom:24px;">
+                        <p style="color:#059669;font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 10px;">Code OTP de connexion</p>
+                        <span style="font-size:42px;font-weight:900;letter-spacing:12px;color:#059669;font-family:'Courier New', monospace;display:block;">${otpCode}</span>
+                        <p style="color:#6B7280;font-size:12px;margin:15px 0 0;">
+                          ⏱ Ce code expire dans <b>3 minutes</b>.
+                        </p>
+                      </div>
+                      <div style="background:#FEF2F2;border-radius:12px;padding:15px;margin-top:20px;">
+                        <p style="color:#B91C1C;font-size:12px;margin:0;line-height:1.5;text-align:center;">
+                          Ne partagez jamais ce code avec quiconque.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="background:#F9FAFB;padding:20px 40px;text-align:center;border-top:1px solid #F3F4F6;">
+                      <p style="color:#9CA3AF;font-size:12px;margin:0;">YamiShop - Authentification Sécurisée</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `
+    });
+
+    if (error) {
+      console.error('[RESEND 2FA] API Error:', error);
+    } else {
+      console.log(`[EMAIL 2FA] Code OTP envoyé via Resend à ${toEmail} (ID: ${data.id})`);
+    }
+  } catch (error) {
+    console.error('[EMAIL 2FA] Erreur d\'envoi :', error.message);
+  }
+};
+
+module.exports = { sendPasswordResetOtp, sendStoreAdminLoginOtp };

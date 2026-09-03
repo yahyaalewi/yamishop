@@ -65,7 +65,7 @@ import { LanguageService } from '../services/language.service';
           <!-- OTP Input -->
           <div *ngIf="requiresOtp()">
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">{{ lang.translate('auth.otp_verify') }}</label>
-            <p class="text-xs text-gray-500 mb-2">{{ lang.translate('auth.otp_msg') }}</p>
+            <p class="text-xs text-gray-500 mb-2">{{ otpMessage() || lang.translate('auth.otp_msg') }}</p>
             
             <div class="relative mb-4">
               <input type="text" name="otpCode" [(ngModel)]="otpCode" placeholder="••••••" maxlength="6"
@@ -132,6 +132,7 @@ export class LoginComponent {
   
   // OTP states
   requiresOtp = signal(false);
+  otpMessage = signal<string>('');
   otpCode = '';
   pendingUserId = '';
 
@@ -193,7 +194,8 @@ export class LoginComponent {
         if (res.requiresOtp) {
           this.requiresOtp.set(true);
           this.pendingUserId = res.userId;
-          this.notificationService.show(this.lang.translate('auth.otp_msg'));
+          this.otpMessage.set(res.message || 'Un code de vérification OTP a été envoyé à votre adresse email.');
+          this.notificationService.show(res.message || this.lang.translate('auth.otp_msg'));
           this.startTimer();
         } else {
           this.notificationService.show(`${this.lang.translate('msg.welcome')}, ${res.name}`);
