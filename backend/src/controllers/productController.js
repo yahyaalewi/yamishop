@@ -30,7 +30,11 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const product = new Product(req.body);
+    const productData = { ...req.body };
+    if (req.user && req.user.role === 'store_admin' && req.user.storeId) {
+      productData.storeId = req.user.storeId;
+    }
+    const product = new Product(productData);
     const createdProduct = await product.save();
     res.status(201).json({ message: "Product created", data: createdProduct });
   } catch (error) {

@@ -7,16 +7,15 @@ const {
   updateProduct,
   deleteProduct
 } = require('../controllers/productController');
-const { protect, admin } = require('../middleware/auth');
+const { protect, adminOrStoreAdmin } = require('../middleware/auth');
 
 // Public routes
 router.get('/', getProducts);
 router.get('/:id', getProductById);
 
-
-// Admin routes
-router.post('/', protect, admin, createProduct);
-router.put('/:id', protect, admin, updateProduct);
-router.delete('/:id', protect, admin, deleteProduct);
+// Admin / Store Admin routes
+router.post('/', protect, adminOrStoreAdmin, createProduct);
+router.put('/:id', protect, adminOrStoreAdmin, updateProduct);
+router.delete('/:id', protect, adminOrStoreAdmin, deleteProduct);
 
 module.exports = router;

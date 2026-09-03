@@ -240,6 +240,16 @@ exports.resetStoreAdminPassword = async (req, res) => {
   }
 };
 
+// ─── Public: Get active stores ───────────────────────────────────────────────
+exports.getPublicStores = async (req, res) => {
+  try {
+    const stores = await Store.find({ status: 'active' }).sort({ createdAt: -1 });
+    res.json(stores);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // ─── Store Admin: Get own store profile ──────────────────────────────────────
 exports.getMyStore = async (req, res) => {
   try {
@@ -253,3 +263,4 @@ exports.getMyStore = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+

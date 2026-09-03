@@ -58,6 +58,10 @@ export class StoreService {
     };
   }
 
+  getPublicStores(): Observable<Store[]> {
+    return this.http.get<Store[]>(`${this.apiUrl}/public`);
+  }
+
   getStores(): Observable<Store[]> {
     return this.http.get<Store[]>(this.apiUrl, this.getAuthHeaders());
   }

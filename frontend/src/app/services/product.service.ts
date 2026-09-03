@@ -21,6 +21,7 @@ export interface Product {
   isFeatured?: boolean;
   shippingPrice?: number;
   views?: number;
+  storeId?: string;
 }
 
 @Injectable({

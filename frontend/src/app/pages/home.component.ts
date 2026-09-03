@@ -11,6 +11,7 @@ import { NotificationService } from '../services/notification.service';
 import { SeoService } from '../services/seo.service';
 
 import { CategoryService, Category } from '../services/category.service';
+import { StoreService, Store } from '../services/store.service';
 
 const DEFAULT_CATEGORIES = [
   { name: 'Mode', image: '/images/categories/fashion.png' },
@@ -119,6 +120,69 @@ const DEFAULT_CATEGORIES = [
                 <div class="h-1 w-0 bg-primary/40 rounded-full mt-1.5 transition-all duration-500 group-hover:w-full"
                      [class.w-full]="selectedCategory() === cat.name"
                      [class.bg-primary]="selectedCategory() === cat.name"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Stores / Boutiques -->
+        <section id="stores-section" *ngIf="stores().length > 0" class="py-10 container mx-auto px-4 border-t border-gray-100/80">
+          <div class="flex items-center justify-between mb-8">
+            <div>
+              <h2 class="text-3xl font-black text-gray-900 tracking-tighter">
+                {{ selectedStore() ? (lang.isRTL() ? 'المتجر المحدد: ' : 'Boutique : ') + getSelectedStoreName() : (lang.isRTL() ? 'متاجرنا' : 'Nos Boutiques') }}
+              </h2>
+              <div class="h-1.5 w-12 bg-primary mt-2 rounded-full shadow-sm shadow-primary/20"></div>
+            </div>
+            
+            <div class="flex items-center gap-2 text-primary/30">
+               <span class="text-[9px] font-black uppercase tracking-[0.3em]">{{ lang.isRTL() ? 'اسحب' : 'Glisser' }}</span>
+               <div class="flex items-center bg-gray-50 p-2 rounded-full border border-gray-100 shadow-inner">
+                  <svg class="h-4 w-4 animate-bounce-horizontal" [class.rotate-180]="lang.isRTL()" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+               </div>
+            </div>
+          </div>
+          
+          <div class="flex overflow-x-auto gap-6 md:gap-8 pb-6 pt-2 scrollbar-hide px-2">
+            <div *ngFor="let st of stores()" (click)="filterByStore(st._id!)"
+              class="flex-shrink-0 flex flex-col items-center gap-3 cursor-pointer group transition-all duration-300 active:scale-95">
+              
+              <div class="relative">
+                <div 
+                  [class.ring-4]="selectedStore() === st._id"
+                  [class.ring-primary]="selectedStore() === st._id"
+                  [class.ring-offset-4]="selectedStore() === st._id"
+                  [class.scale-105]="selectedStore() === st._id"
+                  class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border-2 border-gray-100 shadow-md group-hover:shadow-xl group-hover:border-primary/20 transition-all duration-500 bg-white relative flex items-center justify-center p-2">
+                  
+                  <img *ngIf="st.logo" [src]="productService.getImageUrl(st.logo)" [alt]="st.name" class="w-full h-full object-cover rounded-xl transition-transform duration-700 group-hover:scale-110">
+                  <div *ngIf="!st.logo" class="w-full h-full rounded-xl bg-gradient-to-br from-primary/10 to-primary/30 flex items-center justify-center text-primary text-2xl font-black">
+                    {{ st.name.charAt(0).toUpperCase() }}
+                  </div>
+
+                  <div *ngIf="selectedStore() === st._id" class="absolute inset-0 bg-primary/20 flex items-center justify-center backdrop-blur-[1px] rounded-2xl">
+                     <div class="bg-primary text-white p-1.5 rounded-full shadow-lg transform scale-110">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                     </div>
+                  </div>
+                </div>
+
+                <div *ngIf="selectedStore() === st._id" class="absolute -inset-1 bg-primary/20 blur-xl rounded-2xl -z-10 animate-pulse"></div>
+              </div>
+
+              <div class="flex flex-col items-center text-center max-w-[120px]">
+                <span [class.text-primary]="selectedStore() === st._id"
+                      [class.font-black]="selectedStore() === st._id"
+                      class="text-xs font-bold text-gray-800 tracking-tight transition-all duration-300 group-hover:text-primary truncate w-full">
+                  {{ st.name }}
+                </span>
+                <span *ngIf="st.address" class="text-[10px] text-gray-400 font-medium truncate w-full mt-0.5">
+                  📍 {{ st.address }}
+                </span>
               </div>
             </div>
           </div>
@@ -251,13 +315,16 @@ export class HomeComponent implements OnInit {
   lang = inject(LanguageService);
   allProducts = signal<Product[]>([]);
   selectedCategory = signal<string | null>(null);
+  selectedStore = signal<string | null>(null);
   selectedGender = signal<string | null>(null);
   searchQuery = signal<string | null>(null);
   categories = signal<Category[]>(DEFAULT_CATEGORIES);
+  stores = signal<Store[]>([]);
   loading = signal(true);
 
   productService = inject(ProductService);
   categoryService = inject(CategoryService);
+  storeService = inject(StoreService);
   cartService = inject(CartService);
   notificationService = inject(NotificationService);
   route = inject(ActivatedRoute);
@@ -282,6 +349,7 @@ export class HomeComponent implements OnInit {
   filteredProducts = computed(() => {
     let prods = this.allProducts();
     const cat = this.selectedCategory();
+    const storeId = this.selectedStore();
     const gender = this.selectedGender();
     const q = this.searchQuery();
     const isFull = this.showAllCatalog() || this.router.url.includes('/products');
@@ -296,11 +364,15 @@ export class HomeComponent implements OnInit {
     }
 
     if (cat) {
-      return prods.filter(p => p.category === cat);
+      prods = prods.filter(p => p.category === cat);
+    }
+
+    if (storeId) {
+      prods = prods.filter(p => p.storeId === storeId);
     }
 
     // Default "Nos Pépites" view: show ONLY products chosen/marked by admin (isFeatured === true)
-    if (!isFull && !cat && !q) {
+    if (!isFull && !cat && !storeId && !q) {
       return prods.filter(p => Boolean(p.isFeatured));
     }
 
@@ -310,8 +382,12 @@ export class HomeComponent implements OnInit {
   featuredProducts = computed(() => {
     let prods = this.allProducts();
     const cat = this.selectedCategory();
+    const storeId = this.selectedStore();
     if (cat) {
-      return prods.filter(p => p.category === cat);
+      prods = prods.filter(p => p.category === cat);
+    }
+    if (storeId) {
+      prods = prods.filter(p => p.storeId === storeId);
     }
     return prods.filter(p => Boolean(p.isFeatured));
   });
@@ -335,6 +411,7 @@ export class HomeComponent implements OnInit {
 
     this.loadProducts();
     this.loadCategories();
+    this.loadStores();
     this.seo.updateTags();
   }
 
@@ -343,6 +420,17 @@ export class HomeComponent implements OnInit {
       next: (cats) => {
         if (cats && cats.length > 0) {
           this.categories.set(cats);
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  loadStores() {
+    this.storeService.getPublicStores().subscribe({
+      next: (sts) => {
+        if (sts && sts.length > 0) {
+          this.stores.set(sts);
         }
       },
       error: () => {}
@@ -361,8 +449,25 @@ export class HomeComponent implements OnInit {
   }
 
   filterByCategory(category: string) {
+    this.selectedStore.set(null);
     this.selectedCategory.set(category);
     document.getElementById('products-list')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  filterByStore(storeId: string) {
+    if (this.selectedStore() === storeId) {
+      this.selectedStore.set(null);
+    } else {
+      this.selectedStore.set(storeId);
+    }
+    document.getElementById('products-list')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  getSelectedStoreName(): string {
+    const id = this.selectedStore();
+    if (!id) return '';
+    const st = this.stores().find(s => s._id === id);
+    return st ? st.name : '';
   }
 
   addToCart(event: Event, product: Product) {
@@ -374,6 +479,7 @@ export class HomeComponent implements OnInit {
 
   resetAndShowAll() {
     this.selectedCategory.set(null);
+    this.selectedStore.set(null);
     this.selectedGender.set(null);
     this.searchQuery.set(null);
     this.showAllCatalog.set(true);
@@ -385,6 +491,7 @@ export class HomeComponent implements OnInit {
 
   resetAndScroll() {
     this.selectedCategory.set(null);
+    this.selectedStore.set(null);
     this.selectedGender.set(null);
     this.searchQuery.set(null);
     this.showAllCatalog.set(false);
