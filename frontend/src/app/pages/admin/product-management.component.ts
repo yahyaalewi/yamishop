@@ -648,9 +648,10 @@ export class AdminProductsComponent implements OnInit {
           this.loadProducts();
           this.notificationService.show('Produit mis à jour');
         },
-        error: () => {
+        error: (err: any) => {
           this.saving.set(false);
-          this.notificationService.show('Erreur lors de la mise à jour', 'error');
+          const msg = err.error?.message || err.error?.error || 'Erreur lors de la mise à jour';
+          this.notificationService.show(msg, 'error');
         }
       });
     } else {
@@ -662,9 +663,10 @@ export class AdminProductsComponent implements OnInit {
           this.loadProducts();
           this.notificationService.show('Produit ajouté avec succès');
         },
-        error: () => {
+        error: (err: any) => {
           this.saving.set(false);
-          this.notificationService.show('Erreur lors de la création', 'error');
+          const msg = err.error?.message || err.error?.error || 'Erreur lors de la création';
+          this.notificationService.show(msg, 'error');
         }
       });
     }
