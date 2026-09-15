@@ -1,5 +1,69 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const Store = require('../models/Store');
+const User = require('../models/User');
+const { sendStoreAdminOrderNotification } = require('../config/emailService');
+
+const notifyStoreAdmins = async (order, clientUser) => {
+  try {
+    if (!order || !order.orderItems || order.orderItems.length === 0) return;
+
+    const productIds = order.orderItems.map(item => item.product).filter(Boolean);
+    const products = await Product.find({ _id: { $in: productIds } });
+
+    // Group items by storeId
+    const itemsByStore = {};
+    for (const item of order.orderItems) {
+      const prod = products.find(p => p._id.toString() === item.product?.toString());
+      const storeId = prod?.storeId ? prod.storeId.toString() : null;
+      if (storeId) {
+        if (!itemsByStore[storeId]) itemsByStore[storeId] = [];
+        itemsByStore[storeId].push({
+          name: item.name || prod.name,
+          qty: item.quantity || item.qty || 1,
+          price: item.price || prod.price,
+          image: item.image || prod.imageUrl,
+          color: item.color,
+          size: item.size
+        });
+      }
+    }
+
+    // For each store, find the store admin and send notification email
+    for (const [storeId, storeItems] of Object.entries(itemsByStore)) {
+      const store = await Store.findById(storeId).populate('adminUser');
+      if (!store) continue;
+
+      let adminEmail = store.email || store.adminUser?.email;
+      let adminName = store.adminUser?.name || store.name;
+
+      if (!adminEmail) {
+        const storeAdminUser = await User.findOne({ storeId: store._id, role: 'store_admin' });
+        if (storeAdminUser?.email) {
+          adminEmail = storeAdminUser.email;
+          adminName = storeAdminUser.name;
+        }
+      }
+
+      if (adminEmail) {
+        await sendStoreAdminOrderNotification({
+          toEmail: adminEmail,
+          storeName: store.name,
+          order: {
+            ...(order.toObject ? order.toObject() : order),
+            user: clientUser
+          },
+          storeItems,
+          adminName
+        });
+      } else {
+        console.warn(`[ORDER EMAIL NOTIF] Aucun email trouvé pour la boutique "${store.name}" (${store._id})`);
+      }
+    }
+  } catch (err) {
+    console.error('[ORDER EMAIL NOTIF] Erreur lors de la notification des boutiques:', err);
+  }
+};
 
 const addOrderItems = async (req, res) => {
   try {
@@ -33,6 +97,12 @@ const addOrderItems = async (req, res) => {
 
     const createdOrder = await order.save();
     console.log('Order created:', createdOrder._id);
+
+    // Envoi des notifications par mail aux administrateurs des boutiques concernées (en arrière-plan)
+    notifyStoreAdmins(createdOrder, req.user).catch(err => {
+      console.error('[ORDER EMAIL NOTIF] Background task error:', err);
+    });
+
     res.status(201).json(createdOrder);
   } catch (error) {
     console.error('Add order error:', error);
