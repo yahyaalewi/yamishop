@@ -10,11 +10,12 @@ import { NotificationService } from '../services/notification.service';
 import { AuthService } from '../services/auth.service';
 import { LanguageService } from '../services/language.service';
 import { SeoService } from '../services/seo.service';
+import { AutoTranslatePipe } from '../pipes/auto-translate.pipe';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AutoTranslatePipe],
   styles: [':host { display: block; }'],
   template: `
     <div class="h-full">
@@ -35,7 +36,7 @@ import { SeoService } from '../services/seo.service';
                 <span *ngIf="!lang.isRTL()">›</span>
                 <a routerLink="/products" class="hover:text-primary no-underline text-gray-500">{{ lang.translate('nav.shop') }}</a>
                 <span>›</span>
-                <span class="text-gray-800 font-medium truncate">{{product.name}}</span>
+                <span class="text-gray-800 font-medium truncate">{{ translatedName() || (product.name | autoTranslate) }}</span>
               </div>
             </nav>
 
@@ -65,7 +66,7 @@ import { SeoService } from '../services/seo.service';
                 <div class="lg:w-1/2 space-y-6">
                   <div>
                     <p class="text-terracotta font-semibold text-sm tracking-wide mb-1 uppercase">{{ lang.translateCategory(product.category) }}</p>
-                    <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">{{ translatedName() || product.name }}</h1>
+                    <h1 class="text-3xl font-extrabold text-gray-900 leading-tight">{{ translatedName() || (product.name | autoTranslate) }}</h1>
                   </div>
 
                   <div class="flex items-center gap-2">
@@ -117,7 +118,7 @@ import { SeoService } from '../services/seo.service';
                     <div *ngIf="product.colors?.length">
                       <span class="text-sm font-bold text-gray-900 block mb-2 uppercase tracking-wide">{{ lang.translate('product.colors') }}</span>
                       <div class="flex flex-wrap gap-2">
-                        <button *ngFor="let color of product.colors" (click)="selectedColor.set(color)" class="px-4 py-2 rounded-xl text-xs font-bold border-2 transition-all bg-white cursor-pointer" [class.border-primary]="selectedColor() === color" [class.border-gray-200]="selectedColor() !== color">{{color}}</button>
+                        <button *ngFor="let color of product.colors" (click)="selectedColor.set(color)" class="px-4 py-2 rounded-xl text-xs font-bold border-2 transition-all bg-white cursor-pointer" [class.border-primary]="selectedColor() === color" [class.border-gray-200]="selectedColor() !== color">{{ color | autoTranslate }}</button>
                       </div>
                     </div>
                     <div *ngIf="product.sizes?.length">
@@ -151,12 +152,12 @@ import { SeoService } from '../services/seo.service';
                   <div class="mt-12 space-y-8 pt-8 border-t border-gray-100">
                     <div>
                       <h3 class="text-lg font-bold text-gray-900 mb-4 uppercase tracking-wider">{{ lang.translate('product.description') }}</h3>
-                      <p class="text-gray-600 leading-relaxed font-inter text-base whitespace-pre-wrap">{{ translatedDescription() || product.description }}</p>
+                      <p class="text-gray-600 leading-relaxed font-inter text-base whitespace-pre-wrap">{{ translatedDescription() || (product.description | autoTranslate) }}</p>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div *ngFor="let feat of (translatedFeatures().length ? translatedFeatures() : product.features)" class="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
                         <div class="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm text-primary">✓</div>
-                        <span class="text-sm font-bold text-gray-700">{{feat}}</span>
+                        <span class="text-sm font-bold text-gray-700">{{ feat | autoTranslate }}</span>
                       </div>
                     </div>
                   </div>
@@ -189,6 +190,7 @@ export class ProductDetailsComponent implements OnInit {
   seo = inject(SeoService);
 
   product: Product | null = null;
+  productSignal = signal<Product | null>(null);
   loading = signal(true);
   qty = signal(1);
   
@@ -202,12 +204,14 @@ export class ProductDetailsComponent implements OnInit {
 
   constructor() {
     effect(() => {
-      const currentProduct = this.product;
+      const currentProduct = this.productSignal();
       const locale = this.lang.currentLocale();
       
       if (currentProduct) {
         this.lang.translateText(currentProduct.name, locale).then(res => this.translatedName.set(res));
-        this.lang.translateText(currentProduct.description, locale).then(res => this.translatedDescription.set(res));
+        if (currentProduct.description) {
+          this.lang.translateText(currentProduct.description, locale).then(res => this.translatedDescription.set(res));
+        }
         if (currentProduct.features?.length) {
           Promise.all(currentProduct.features.map((f: string) => this.lang.translateText(f, locale))).then(res => this.translatedFeatures.set(res));
         } else {
@@ -224,6 +228,7 @@ export class ProductDetailsComponent implements OnInit {
       this.productService.getProductById(id).subscribe({
         next: (data) => {
           this.product = data;
+          this.productSignal.set(data);
           if (this.product.colors?.length) this.selectedColor.set(this.product.colors[0]);
           if (this.product.sizes?.length) this.selectedSize.set(this.product.sizes[0]);
           this.loading.set(false);
@@ -242,6 +247,7 @@ export class ProductDetailsComponent implements OnInit {
         },
         error: () => {
           this.product = null;
+          this.productSignal.set(null);
           this.loading.set(false);
         }
       });
@@ -268,7 +274,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   addToCart() {
-    const currentImage = this.selectedImage(); // image currently displayed (may differ from imageUrl)
+    const currentImage = this.selectedImage();
     this.cartService.addItem(this.product!, this.qty(), this.selectedColor(), this.selectedSize(), currentImage);
     this.notificationService.show(`${this.translatedName() || this.product!.name}: ${this.lang.translate('msg.added_to_cart')}`);
   }

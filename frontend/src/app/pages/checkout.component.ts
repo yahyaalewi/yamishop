@@ -11,11 +11,12 @@ import { ProductService } from '../services/product.service';
 import { AuthService } from '../services/auth.service';
 import { OrderService } from '../services/order.service';
 import { LanguageService } from '../services/language.service';
+import { AutoTranslatePipe } from '../pipes/auto-translate.pipe';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, AutoTranslatePipe],
   styles: [':host { display: block; }'],
   template: `
     <div class="h-full">
@@ -23,59 +24,61 @@ import { LanguageService } from '../services/language.service';
 
         <!-- Success screen -->
         <div *ngIf="orderPlaced()" class="max-w-md mx-auto text-center py-20 bg-white rounded-3xl shadow-xl border border-gray-100 p-8 space-y-5 animate-in fade-in zoom-in duration-500">
-          <div class="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-2 shadow-inner">✓</div>
-          <h1 class="text-2xl font-extrabold text-gray-900 font-inter">{{ lang.translate('checkout.success_title') }}</h1>
-          <p class="text-gray-500 text-sm">{{ lang.translate('checkout.success_msg') }}</p>
-          <div class="bg-primary/5 py-4 rounded-2xl border border-primary/10">
-            <p class="text-xs text-primary/60 uppercase font-bold tracking-widest mb-1">{{ lang.translate('checkout.order_num') }}</p>
-            <p class="font-extrabold text-primary text-2xl tracking-tight">YM-{{orderNumber()}}</p>
+          <div class="w-20 h-20 bg-green-500/10 text-green-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
+            ✓
           </div>
-          <div class="flex flex-col gap-4 pt-6">
-            <a [routerLink]="['/profile']" fragment="orders"
-               class="w-full inline-flex items-center justify-center bg-primary text-white px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-primary-dark transition-all duration-300 no-underline cursor-pointer border-2 border-white/20 active:scale-95 premium-button-shine animate-button-hover shadow-primary/30">
-              <svg class="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-              <span>{{ lang.translate('checkout.track_order') }}</span>
-            </a>
-            
-            <a routerLink="/home" 
-               class="w-full inline-flex items-center justify-center bg-white text-gray-400 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border-2 border-gray-100 hover:border-primary hover:text-primary transition-all no-underline cursor-pointer active:scale-95">
-              <svg class="h-4 w-4 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <span>{{ lang.translate('common.back') }}</span>
-            </a>
+          <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ lang.translate('checkout.success_title') }}</h1>
+          <p class="text-gray-500 text-sm leading-relaxed">{{ lang.translate('checkout.success_msg') }}</p>
+          <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+            <span class="text-xs text-gray-400 font-bold uppercase tracking-wider block mb-1">{{ lang.translate('checkout.order_num') }}</span>
+            <span class="text-2xl font-black text-primary font-mono">#{{orderNumber()}}</span>
+          </div>
+          <div class="pt-4 flex flex-col gap-3">
+            <a routerLink="/profile" class="w-full bg-primary text-white py-4 rounded-xl font-bold text-sm tracking-wide shadow-lg hover:bg-primary-dark transition-all no-underline block">{{ lang.translate('checkout.track_order') }}</a>
+            <a routerLink="/products" class="w-full bg-gray-50 text-gray-700 py-3 rounded-xl font-semibold text-xs hover:bg-gray-100 transition-all no-underline block">{{ lang.translate('home.shop_now') }}</a>
           </div>
         </div>
 
-        <!-- Checkout form -->
+        <!-- Checkout Form -->
         <div *ngIf="!orderPlaced()">
-          <h1 class="text-2xl font-extrabold text-gray-900 mb-8 font-inter flex items-center gap-3">
-             {{ lang.translate('checkout.confirm') }}
-             <span class="text-sm font-medium text-gray-400 bg-gray-100 px-3 py-1 rounded-full">{{items().length}} {{ lang.isRTL() ? 'منتجات مختارة' : 'article(s)' }}</span>
-          </h1>
+          <div class="mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ lang.translate('checkout.title') }}</h1>
+            <div class="h-1.5 w-12 bg-primary mt-2 rounded-full"></div>
+          </div>
 
-          <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Shipping Form -->
+          <div class="flex flex-col lg:flex-row gap-10">
+
+            <!-- Form -->
             <div class="lg:w-2/3 space-y-6">
+
+              <!-- Delivery info -->
               <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
                 <h2 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-3">
                   <span class="w-9 h-9 bg-primary text-white rounded-xl flex items-center justify-center text-sm font-bold shadow-lg shadow-primary/20 italic">1</span>
                   {{ lang.translate('checkout.delivery') }}
                 </h2>
-                <form (ngSubmit)="placeOrder()" #f="ngForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
+
+                <form class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div class="md:col-span-2">
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{{ lang.translate('checkout.name') }} *</label>
-                    <input type="text" name="name" [(ngModel)]="form.name" required placeholder="Ex: Mohamed Ahmed"
+                    <input type="text" name="name" [(ngModel)]="form.name" required placeholder="Ex: Mohamed Lemine"
                       class="w-full px-4 py-3.5 border border-gray-100 rounded-2xl bg-gray-50 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-gray-900 placeholder-gray-300"
                       [class.border-red-400]="submitted && !form.name">
                   </div>
-                  <div>
+
+                  <div class="md:col-span-2">
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{{ lang.translate('checkout.phone') }} *</label>
-                    <input type="tel" name="phone" [(ngModel)]="form.phone" required placeholder="+222 4X XX XX XX"
-                      class="w-full px-4 py-3.5 border border-gray-100 rounded-2xl bg-gray-50 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-gray-900 placeholder-gray-300"
-                      [class.border-red-400]="submitted && !form.phone">
+                    <div class="relative flex items-center">
+                      <div class="absolute" [class.left-4]="!lang.isRTL()" [class.right-4]="lang.isRTL()" class="flex items-center gap-2 pointer-events-none text-gray-400 font-bold text-sm">
+                        <span>🇲🇷</span>
+                        <span>+222</span>
+                        <div class="h-4 w-px bg-gray-200 ml-1"></div>
+                      </div>
+                      <input type="tel" name="phone" [(ngModel)]="form.phone" required placeholder="4XXXXXXX"
+                        [class.pl-24]="!lang.isRTL()" [class.pr-24]="lang.isRTL()"
+                        class="w-full py-3.5 px-4 border border-gray-100 rounded-2xl bg-gray-50 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-gray-900 font-bold placeholder-gray-300"
+                        [class.border-red-400]="submitted && !form.phone">
+                    </div>
                   </div>
 
                   <div>
@@ -128,10 +131,11 @@ import { LanguageService } from '../services/language.service';
                   </div>
                     <div>
                       <p class="font-bold text-green-800">💵 {{ lang.translate('checkout.payment_cash') }}</p>
-                      <p class="text-xs text-green-600/70">{{ lang.translate('checkout.exact_amount') }}</p>
+                      <p class="text-xs text-green-600 mt-0.5">{{ lang.translate('checkout.exact_amount') }}</p>
                     </div>
                 </div>
               </div>
+
             </div>
 
             <!-- Summary -->
@@ -149,9 +153,9 @@ import { LanguageService } from '../services/language.service';
                       </span>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">{{item.name}}</p>
+                      <p class="text-xs font-bold text-gray-900 truncate uppercase tracking-tight">{{ item.name | autoTranslate }}</p>
                       <div class="flex gap-1.5 text-[8px] font-bold uppercase text-gray-400 mt-0.5" *ngIf="item.color || item.size">
-                        <span *ngIf="item.color" class="bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 italic">{{item.color}}</span>
+                        <span *ngIf="item.color" class="bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 italic">{{ item.color | autoTranslate }}</span>
                         <span *ngIf="item.size" class="bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 italic">{{item.size}}</span>
                       </div>
                       <p class="text-xs text-gray-400 mt-0.5">{{item.price | number}} MRU / pc</p>

@@ -2,11 +2,129 @@ import { Injectable, signal, computed } from '@angular/core';
 
 export type Locale = 'fr' | 'ar';
 
+// Comprehensive built-in dictionary for instant 0ms translation
+const DICTIONARY: Record<string, { ar: string; fr: string }> = {
+  // Categories
+  'mode': { fr: 'Mode', ar: 'الموضة والملابس' },
+  'vêtements': { fr: 'Vêtements', ar: 'الملابس' },
+  'vetements': { fr: 'Vêtements', ar: 'الملابس' },
+  'électronique': { fr: 'Électronique', ar: 'إلكترونيات' },
+  'electronique': { fr: 'Électronique', ar: 'إلكترونيات' },
+  'maison': { fr: 'Maison', ar: 'الأجهزة المنزلية' },
+  'appareils de la maison': { fr: 'Appareils de la Maison', ar: 'الأجهزة المنزلية' },
+  'beauté': { fr: 'Beauté', ar: 'مستحضرات التجميل' },
+  'beaute': { fr: 'Beauté', ar: 'مستحضرات التجميل' },
+  'cosmétiques': { fr: 'Cosmétiques', ar: 'مستحضرات التجميل' },
+  'cosmetiques': { fr: 'Cosmétiques', ar: 'مستحضرات التجميل' },
+  'accessoires': { fr: 'Accessoires', ar: 'إكسسوارات' },
+  'chaussures': { fr: 'Chaussures', ar: 'الأحذية' },
+  'chaussure': { fr: 'Chaussure', ar: 'حذاء' },
+  'parfum': { fr: 'Parfum', ar: 'عطور' },
+  'parfums': { fr: 'Parfums', ar: 'العطور' },
+
+  // Genders
+  'homme': { fr: 'Homme', ar: 'رجالي' },
+  'hommes': { fr: 'Hommes', ar: 'رجال' },
+  'femme': { fr: 'Femme', ar: 'نسائي' },
+  'femmes': { fr: 'Femmes', ar: 'نساء' },
+  'enfant': { fr: 'Enfant', ar: 'أطفال' },
+  'enfants': { fr: 'Enfants', ar: 'أطفال' },
+  'mixte': { fr: 'Mixte', ar: 'للجنسين' },
+  'unisexe': { fr: 'Unisexe', ar: 'للجنسين' },
+
+  // Colors
+  'noir': { fr: 'Noir', ar: 'أسود' },
+  'noire': { fr: 'Noire', ar: 'سوداء' },
+  'blanc': { fr: 'Blanc', ar: 'أبيض' },
+  'blanche': { fr: 'Blanche', ar: 'بيضاء' },
+  'rouge': { fr: 'Rouge', ar: 'أحمر' },
+  'bleu': { fr: 'Bleu', ar: 'أزرق' },
+  'bleue': { fr: 'Bleue', ar: 'زرقاء' },
+  'vert': { fr: 'Vert', ar: 'أخضر' },
+  'verte': { fr: 'Verte', ar: 'خضراء' },
+  'jaune': { fr: 'Jaune', ar: 'أصفر' },
+  'marron': { fr: 'Marron', ar: 'بني' },
+  'gris': { fr: 'Gris', ar: 'رمادي' },
+  'grise': { fr: 'Grise', ar: 'رمادية' },
+  'rose': { fr: 'Rose', ar: 'وردي' },
+  'violet': { fr: 'Violet', ar: 'بنفسجي' },
+  'orange': { fr: 'Orange', ar: 'برتقالي' },
+  'doré': { fr: 'Doré', ar: 'ذهبي' },
+  'dore': { fr: 'Doré', ar: 'ذهبي' },
+  'argenté': { fr: 'Argenté', ar: 'فضي' },
+  'argente': { fr: 'Argenté', ar: 'فضي' },
+  'or': { fr: 'Or', ar: 'ذهبي' },
+  'argent': { fr: 'Argent', ar: 'فضي' },
+  'beige': { fr: 'Beige', ar: 'بيج' },
+  'kaki': { fr: 'Kaki', ar: 'كاكي' },
+  'multicolore': { fr: 'Multicolore', ar: 'متعدد الألوان' },
+
+  // Sizes & Attributes
+  'taille': { fr: 'Taille', ar: 'المقاس' },
+  'tailles': { fr: 'Tailles', ar: 'المقاسات' },
+  'couleur': { fr: 'Couleur', ar: 'اللون' },
+  'couleurs': { fr: 'Couleurs', ar: 'الألوان' },
+  'petit': { fr: 'Petit', ar: 'صغير' },
+  'petite': { fr: 'Petite', ar: 'صغيرة' },
+  'moyen': { fr: 'Moyen', ar: 'متوسط' },
+  'moyenne': { fr: 'Moyenne', ar: 'متوسطة' },
+  'grand': { fr: 'Grand', ar: 'كبير' },
+  'grande': { fr: 'Grande', ar: 'كبيرة' },
+
+  // Common Product Words
+  'montre': { fr: 'Montre', ar: 'ساعة' },
+  'montre connectée': { fr: 'Montre connectée', ar: 'ساعة ذكية' },
+  'smartwatch': { fr: 'Smartwatch', ar: 'ساعة ذكية' },
+  'sac': { fr: 'Sac', ar: 'حقيبة' },
+  'sac à main': { fr: 'Sac à main', ar: 'حقيبة يد' },
+  'sac à dos': { fr: 'Sac à dos', ar: 'حقيبة ظهر' },
+  'lunettes': { fr: 'Lunettes', ar: 'نظارات' },
+  'lunettes de soleil': { fr: 'Lunettes de soleil', ar: 'نظارات شمسية' },
+  'chemise': { fr: 'Chemise', ar: 'قميص' },
+  't-shirt': { fr: 'T-shirt', ar: 'تيشيرت' },
+  'robe': { fr: 'Robe', ar: 'فستان' },
+  'pantalon': { fr: 'Pantalon', ar: 'بنطلون' },
+  'jeans': { fr: 'Jeans', ar: 'جينز' },
+  'veste': { fr: 'Veste', ar: 'سترة' },
+  'manteau': { fr: 'Manteau', ar: 'معطف' },
+  'baskets': { fr: 'Baskets', ar: 'حذاء رياضي' },
+  'sandales': { fr: 'Sandales', ar: 'صندل' },
+  'escarpins': { fr: 'Escarpins', ar: 'حذاء كعب' },
+  'collier': { fr: 'Collier', ar: 'قلادة' },
+  'bague': { fr: 'Bague', ar: 'خاتم' },
+  'bracelet': { fr: 'Bracelet', ar: 'سوار' },
+  'écouteurs': { fr: 'Écouteurs', ar: 'سماعات أذن' },
+  'casque': { fr: 'Casque', ar: 'سماعات رأس' },
+  'airpods': { fr: 'AirPods', ar: 'سماعات لاسلكية' },
+  'téléphone': { fr: 'Téléphone', ar: 'هاتف' },
+  'smartphone': { fr: 'Smartphone', ar: 'هاتف ذكي' },
+  'coque': { fr: 'Coque', ar: 'غلاف حماية' },
+  'chargeur': { fr: 'Chargeur', ar: 'شاحن' },
+  'câble': { fr: 'Câble', ar: 'سلك شحن' },
+  'luxe': { fr: 'Luxe', ar: 'فاخر' },
+  'qualité': { fr: 'Qualité', ar: 'جودة' },
+  'cuir': { fr: 'Cuir', ar: 'جلد' },
+  'coton': { fr: 'Coton', ar: 'قطن' },
+  'étanche': { fr: 'Étanche', ar: 'مقاوم للماء' },
+  'sans fil': { fr: 'Sans fil', ar: 'لاسلكي' },
+  'bluetooth': { fr: 'Bluetooth', ar: 'بلوتوث' },
+  'livraison': { fr: 'Livraison', ar: 'توصيل' },
+  'livraison gratuite': { fr: 'Livraison gratuite', ar: 'توصيل مجاني' },
+  'en stock': { fr: 'En stock', ar: 'متوفر' },
+  'rupture de stock': { fr: 'Rupture de stock', ar: 'نفذت الكمية' },
+  'nouveau': { fr: 'Nouveau', ar: 'جديد' },
+  'promotion': { fr: 'Promotion', ar: 'تخفيض' },
+  'solde': { fr: 'Solde', ar: 'تخفيضات' },
+  'gratuit': { fr: 'Gratuit', ar: 'مجاني' },
+  'gratuite': { fr: 'Gratuite', ar: 'مجاني' }
+};
+
 @Injectable({
   providedIn: 'root'
 })
 export class LanguageService {
   currentLocale = signal<Locale>('ar');
+  cacheVersion = signal<number>(0);
   
   isRTL = computed(() => this.currentLocale() === 'ar');
 
@@ -325,68 +443,207 @@ export class LanguageService {
     },
   };
 
+  private translationCache = new Map<string, string>();
+  private inFlightRequests = new Set<string>();
+
+  constructor() {
+    this.loadPersistentCache();
+    const saved = (typeof localStorage !== 'undefined' && localStorage.getItem('yamishop_locale') as Locale) || 'ar';
+    this.setLocale(saved);
+  }
+
+  private loadPersistentCache() {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const raw = localStorage.getItem('yamishop_translations_v2');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        Object.entries(parsed).forEach(([k, v]) => {
+          if (typeof v === 'string') this.translationCache.set(k, v);
+        });
+      }
+    } catch (e) {
+      console.warn('Could not load translation cache', e);
+    }
+  }
+
+  private savePersistentCache() {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const obj: Record<string, string> = {};
+      this.translationCache.forEach((v, k) => { obj[k] = v; });
+      localStorage.setItem('yamishop_translations_v2', JSON.stringify(obj));
+    } catch (e) {}
+  }
+
   setLocale(locale: Locale) {
     this.currentLocale.set(locale);
-    document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = locale;
-    localStorage.setItem('yamishop_locale', locale);
+    if (typeof document !== 'undefined') {
+      document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.lang = locale;
+    }
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('yamishop_locale', locale);
+    }
+    this.cacheVersion.update(v => v + 1);
   }
 
+  /** Checks if the string contains Arabic characters */
+  isArabic(text: string): boolean {
+    return /[\u0600-\u06FF]/.test(text);
+  }
+
+  /**
+   * Translates an exact localization key (e.g. 'nav.home')
+   */
   translate(key: string, locale?: Locale): string {
     const targetLocale = locale || this.currentLocale();
-    return this.translations[targetLocale][key] || key;
+    return this.translations[targetLocale]?.[key] || key;
   }
 
+  /**
+   * Translates a category name
+   */
   translateCategory(category: string | undefined, locale?: Locale): string {
     if (!category) return '';
-    const map: Record<string, string> = {
-      'Mode': 'cat.fashion',
-      'Vêtements': 'cat.fashion',
-      'Électronique': 'cat.electronics',
-      'Maison': 'cat.home',
-      'Appareils de la Maison': 'cat.home',
-      'Beauté': 'cat.beauty',
-      'Cosmétiques': 'cat.beauty',
-      'Accessoires': 'cat.accessories',
-      'Chaussures': 'cat.shoes',
-      'Parfum': 'cat.perfume'
-    };
-    const key = map[category] || category;
-    return this.translate(key, locale);
+    return this.autoTranslate(category, locale);
   }
 
-  private translationCache = new Map<string, string>();
+  /**
+   * Fast synchronous dictionary lookup (0ms)
+   */
+  lookupDictionary(text: string, targetLocale: Locale): string | null {
+    const clean = text.trim().toLowerCase();
+    
+    // Direct match in dictionary
+    if (DICTIONARY[clean]) {
+      return DICTIONARY[clean][targetLocale];
+    }
 
+    // Check if clean matches Arabic value in dictionary
+    for (const item of Object.values(DICTIONARY)) {
+      if (item.ar.toLowerCase() === clean) {
+        return item[targetLocale];
+      }
+      if (item.fr.toLowerCase() === clean) {
+        return item[targetLocale];
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Smart automatic translation for ANY text (product names, colors, categories, etc.)
+   * Returns immediately (from dictionary or cache or source) and triggers background translation if needed.
+   */
+  autoTranslate(text: string | null | undefined, locale?: Locale): string {
+    if (!text || typeof text !== 'string') return '';
+    const trimmed = text.trim();
+    if (!trimmed) return '';
+
+    const targetLocale = locale || this.currentLocale();
+    this.cacheVersion(); // dependency tracking for reactive signals / impure pipes
+
+    // If text is already in the target script, return it immediately!
+    const hasArabic = this.isArabic(trimmed);
+    if (targetLocale === 'ar' && hasArabic) {
+      return trimmed;
+    }
+    if (targetLocale === 'fr' && !hasArabic) {
+      return trimmed;
+    }
+
+    // Check static dictionary
+    const dictResult = this.lookupDictionary(trimmed, targetLocale);
+    if (dictResult) {
+      return dictResult;
+    }
+
+    // Check cache
+    const cacheKey = `${targetLocale}:${trimmed}`;
+    if (this.translationCache.has(cacheKey)) {
+      return this.translationCache.get(cacheKey)!;
+    }
+
+    // Trigger async background translation if not already in flight
+    if (!this.inFlightRequests.has(cacheKey)) {
+      this.inFlightRequests.add(cacheKey);
+      this.translateText(trimmed, targetLocale)
+        .then(translated => {
+          this.translationCache.set(cacheKey, translated);
+          this.savePersistentCache();
+          this.inFlightRequests.delete(cacheKey);
+          this.cacheVersion.update(v => v + 1);
+        })
+        .catch(() => {
+          this.inFlightRequests.delete(cacheKey);
+        });
+    }
+
+    return trimmed;
+  }
+
+  /**
+   * Translates arbitrary text asynchronously via Google Translate API
+   */
   async translateText(text: string, targetLocale: Locale): Promise<string> {
     if (!text || text.trim().length === 0) return text;
-    
-    // Auto-detect is best, but we assume source is either fr or ar.
-    // If target is same as source (if we knew source), we'd skip.
-    // Here we just use the cache.
-    const cacheKey = `${targetLocale}:${text}`;
+    const trimmed = text.trim();
+
+    // Check if already in target script
+    const hasArabic = this.isArabic(trimmed);
+    if (targetLocale === 'ar' && hasArabic) return trimmed;
+    if (targetLocale === 'fr' && !hasArabic) return trimmed;
+
+    // Check dictionary
+    const dict = this.lookupDictionary(trimmed, targetLocale);
+    if (dict) return dict;
+
+    const cacheKey = `${targetLocale}:${trimmed}`;
     if (this.translationCache.has(cacheKey)) {
       return this.translationCache.get(cacheKey)!;
     }
 
     try {
-      // Unofficial Google Translate API (client=gtx)
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLocale}&dt=t&q=${encodeURIComponent(text)}`;
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLocale}&dt=t&q=${encodeURIComponent(trimmed)}`;
       const response = await fetch(url);
+      if (!response.ok) throw new Error('API failed');
       const data = await response.json();
       
-      // Data format: [[["translated_text", "source_text", ...]]]
       const translated = data[0].map((s: any) => s[0]).join('');
-      
-      this.translationCache.set(cacheKey, translated);
-      return translated;
+      if (translated && translated.trim()) {
+        this.translationCache.set(cacheKey, translated);
+        this.savePersistentCache();
+        return translated;
+      }
+      return trimmed;
     } catch (e) {
-      console.error('Translation failed', e);
-      return text; // Fallback to original
+      // Secondary fallback attempt via MyMemory
+      try {
+        const langPair = targetLocale === 'ar' ? 'fr|ar' : 'ar|fr';
+        const fallbackUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed)}&langpair=${langPair}`;
+        const fbRes = await fetch(fallbackUrl);
+        const fbData = await fbRes.json();
+        if (fbData?.responseData?.translatedText) {
+          const res = fbData.responseData.translatedText;
+          this.translationCache.set(cacheKey, res);
+          this.savePersistentCache();
+          return res;
+        }
+      } catch (err) {}
+      
+      return trimmed;
     }
   }
 
-  constructor() {
-    const saved = localStorage.getItem('yamishop_locale') as Locale || 'ar';
-    this.setLocale(saved);
+  /**
+   * Pre-load multiple translations in batch for instant smooth UI
+   */
+  preloadTranslations(texts: (string | undefined | null)[], locale?: Locale) {
+    const target = locale || this.currentLocale();
+    texts.filter(t => !!t).forEach(t => {
+      this.autoTranslate(t!, target);
+    });
   }
 }

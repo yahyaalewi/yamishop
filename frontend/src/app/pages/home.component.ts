@@ -12,6 +12,7 @@ import { SeoService } from '../services/seo.service';
 
 import { CategoryService, Category } from '../services/category.service';
 import { StoreService, Store } from '../services/store.service';
+import { AutoTranslatePipe } from '../pipes/auto-translate.pipe';
 
 const DEFAULT_CATEGORIES = [
   { name: 'Mode', image: '/images/categories/fashion.png' },
@@ -26,7 +27,7 @@ const DEFAULT_CATEGORIES = [
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AutoTranslatePipe],
   styles: [`
     :host { display: block; }
     .scrollbar-hide::-webkit-scrollbar {
@@ -291,7 +292,7 @@ const DEFAULT_CATEGORIES = [
                       {{ lang.translate('product.stock_left') }} {{ product.stock }}
                     </span>
                  </div>
-                 <a [routerLink]="['/product', product._id]" class="text-sm font-bold text-gray-900 hover:text-primary line-clamp-2 block mb-4 no-underline h-10">{{product.name}}</a>
+                 <a [routerLink]="['/product', product._id]" class="text-sm font-bold text-gray-900 hover:text-primary line-clamp-2 block mb-4 no-underline h-10">{{ product.name | autoTranslate }}</a>
                  <div class="flex items-center justify-between gap-2">
                    <span class="text-lg font-black text-primary whitespace-nowrap">{{product.price | number}} MRU</span>
                    <button (click)="addToCart($event, product)" 
@@ -441,7 +442,7 @@ export class HomeComponent implements OnInit {
     this.loading.set(true);
     this.productService.getProducts().subscribe({
       next: (data) => {
-        this.allProducts.set(data);
+        this.allProducts.set(data); this.lang.preloadTranslations(data.map(p => p.name).concat(data.map(p => p.category)));
         this.loading.set(false);
       },
       error: () => this.loading.set(false)

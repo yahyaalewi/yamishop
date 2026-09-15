@@ -8,11 +8,12 @@ import { CartService, cartCount, cartItems } from '../services/cart.service';
 import { ProductService } from '../services/product.service';
 import { LanguageService } from '../services/language.service';
 import { NotificationService } from '../services/notification.service';
+import { AutoTranslatePipe } from '../pipes/auto-translate.pipe';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AutoTranslatePipe],
   styles: [':host { display: block; }'],
   template: `
     <div class="h-full">
@@ -63,9 +64,9 @@ import { NotificationService } from '../services/notification.service';
                   <div class="flex justify-between items-start gap-4">
                     <div class="min-w-0">
                       <p class="text-[10px] font-black text-terracotta uppercase tracking-tighter mb-1">{{ lang.translate('cart.quality_badge') }}</p>
-                      <h3 class="font-black text-gray-900 text-base md:text-xl truncate tracking-tight mb-2">{{item.name}}</h3>
+                      <h3 class="font-black text-gray-900 text-base md:text-xl truncate tracking-tight mb-2">{{ item.name | autoTranslate }}</h3>
                       <div class="flex flex-wrap gap-2" *ngIf="item.color || item.size">
-                        <span *ngIf="item.color" class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{item.color}}</span>
+                        <span *ngIf="item.color" class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{ item.color | autoTranslate }}</span>
                         <span *ngIf="item.size" class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-500 px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{ lang.isRTL() ? 'مقاس' : 'Taille' }} {{item.size}}</span>
                       </div>
                     </div>
@@ -79,9 +80,9 @@ import { NotificationService } from '../services/notification.service';
                       <div class="flex items-center bg-gray-50/50 p-1 rounded-2xl border border-gray-100 w-fit">
                         <button (click)="updateQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all disabled:opacity-30 disabled:grayscale cursor-pointer border-none" [disabled]="item.qty <= 1">−</button>
                         <input type="number" 
-                               [value]="item.qty" 
-                               (input)="onQtyInput($event, item)"
-                               class="w-10 h-full font-black text-gray-900 text-center text-xs bg-transparent outline-none py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                [value]="item.qty" 
+                                (input)="onQtyInput($event, item)"
+                                class="w-10 h-full font-black text-gray-900 text-center text-xs bg-transparent outline-none py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                         <button (click)="incQty(item)" class="w-8 h-8 flex items-center justify-center rounded-xl bg-white shadow-sm hover:text-primary transition-all cursor-pointer border-none disabled:opacity-30 disabled:grayscale" [disabled]="item.qty >= (item.stock || 0)">+</button>
                       </div>
                       <p *ngIf="item.qty > (item.stock || 0)" class="text-[9px] font-black uppercase text-red-500 animate-pulse mt-1">
@@ -197,5 +198,3 @@ export class CartComponent {
     }
   }
 }
-
-

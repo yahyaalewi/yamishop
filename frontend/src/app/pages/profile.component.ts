@@ -10,11 +10,12 @@ import { FooterComponent } from '../components/layout/footer.component';
 import { NotificationService } from '../services/notification.service';
 import { ProductService } from '../services/product.service';
 import { LanguageService } from '../services/language.service';
+import { AutoTranslatePipe } from '../pipes/auto-translate.pipe';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, ButtonComponent, RouterLink],
+  imports: [CommonModule, FormsModule, ButtonComponent, RouterLink, AutoTranslatePipe],
   template: `
     <div class="h-full">
       <main class="flex-grow container mx-auto px-4 pt-24 pb-12">
@@ -23,77 +24,83 @@ import { LanguageService } from '../services/language.service';
           <div class="flex flex-col md:flex-row gap-8">
             <!-- Profile Info Section -->
             <div class="w-full md:w-1/3 space-y-6">
-              <h1 class="text-3xl font-extrabold text-gray-900 font-inter">{{ lang.translate('profile.title') }}</h1>
-              <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
-                <form (ngSubmit)="updateProfile()" #f="ngForm" class="space-y-6">
-                  <!-- Name -->
+              <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="flex flex-col items-center text-center">
+                  <div class="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center text-2xl font-black mb-4">
+                    {{ profileData.name ? profileData.name.charAt(0).toUpperCase() : 'U' }}
+                  </div>
+                  <h1 class="text-3xl font-extrabold text-gray-900 font-inter">{{ lang.translate('profile.title') }}</h1>
+                  <p class="text-xs text-gray-400 font-bold tracking-widest mt-1">{{ profileData.phone }}</p>
+                </div>
+
+                <form (ngSubmit)="updateProfile()" class="mt-8 space-y-4">
                   <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">{{ lang.translate('checkout.name') }}</label>
-                    <input type="text" name="name" [(ngModel)]="profileData.name"
-                      class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+                    <input type="text" [(ngModel)]="profileData.name" name="name" 
+                           class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20">
                   </div>
 
-                  <!-- Phone -->
                   <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">{{ lang.translate('checkout.phone') }}</label>
-                    <input type="tel" [value]="profileData.phone" disabled
-                      class="w-full px-4 py-3 border border-gray-100 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed outline-none">
+                    <input type="text" [value]="profileData.phone" disabled 
+                           class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-xs font-semibold text-gray-400 cursor-not-allowed">
                   </div>
 
-                  <!-- Email -->
                   <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">{{ lang.translate('profile.email_optional') }}</label>
-                    <input type="email" name="email" [(ngModel)]="profileData.email"
-                      class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary transition-all">
+                    <input type="email" [(ngModel)]="profileData.email" name="email" 
+                           placeholder="exemple@email.com"
+                           class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20">
                   </div>
 
                   <div class="pt-4 border-t border-gray-100">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">{{ lang.translate('profile.password_change') }}</h3>
                     <input type="password" name="password" [(ngModel)]="newPassword" [placeholder]="lang.translate('profile.password_placeholder')"
-                      class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary transition-all text-sm">
+                           class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20">
                   </div>
 
-                  <div class="flex flex-col gap-3 pt-4">
-                    <app-button type="submit" variant="primary" [disabled]="loading()" [fullWidth]="true">
-                      <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                      </svg>
+                  <div class="pt-4">
+                    <button type="submit" [disabled]="loading()" 
+                            class="w-full bg-primary text-white py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg hover:bg-primary-dark transition-all border-none cursor-pointer disabled:opacity-50">
                       {{ loading() ? lang.translate('common.loading') : lang.translate('profile.save') }}
-                    </app-button>
-                    <app-button type="button" variant="outline" (onClick)="logout()" [fullWidth]="true">
-                      <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                      {{ lang.translate('nav.logout') }}
-                    </app-button>
+                    </button>
                   </div>
                 </form>
+
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                  <button (click)="logout()" class="w-full bg-red-50 text-red-600 py-3 rounded-xl font-bold text-xs hover:bg-red-100 transition-colors border-none cursor-pointer flex items-center justify-center gap-2">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                    {{ lang.translate('nav.logout') }}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <!-- Order History Section -->
+            <!-- Orders History Section -->
             <div class="w-full md:w-2/3 space-y-6" id="orders">
-              <h2 class="text-3xl font-extrabold text-gray-900 font-inter">{{ lang.translate('profile.orders') }}</h2>
-              
-              <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 min-h-[400px]">
-                <div *ngIf="loadingOrders()" class="flex flex-col items-center justify-center py-20 animate-pulse">
-                  <div class="w-12 h-12 rounded-full border-4 border-primary/30 border-t-primary animate-spin mb-4"></div>
+              <div class="bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 font-inter">{{ lang.translate('profile.orders') }}</h2>
+                    <div class="h-1 w-8 bg-terracotta mt-1 rounded-full"></div>
+                  </div>
+                  <span class="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">{{ orders().length }} {{ lang.isRTL() ? 'طلبات' : 'commandes' }}</span>
+                </div>
+
+                <div *ngIf="loadingOrders()" class="py-12 flex flex-col items-center justify-center gap-3">
+                  <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                   <p class="text-gray-400 font-medium">{{ lang.translate('profile.loading_orders') }}</p>
                 </div>
 
-                <div *ngIf="!loadingOrders() && orders().length === 0" class="flex flex-col items-center justify-center py-20 text-center">
-                  <div class="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center mb-6">
-                    <svg class="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
+                <!-- Empty Orders -->
+                <div *ngIf="!loadingOrders() && orders().length === 0" class="py-16 text-center">
+                  <div class="w-16 h-16 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-gray-100">
+                    📦
                   </div>
                   <h3 class="text-xl font-bold text-gray-900 mb-2">{{ lang.translate('profile.no_orders') }}</h3>
                   <p class="text-gray-500 mb-8 max-w-xs">{{ lang.translate('profile.no_orders_msg') }}</p>
-                  <a routerLink="/home" 
-                     class="inline-flex items-center justify-center bg-terracotta text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-terracotta-dark transition-all duration-300 no-underline cursor-pointer border-2 border-white/20 active:scale-95 premium-button-shine animate-button-hover">
-                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
+                  <a routerLink="/products" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-primary-dark transition-all no-underline shadow-md">
+                    <span class="text-sm">✨</span>
                     <span>{{ lang.translate('home.all_products') }}</span>
                   </a>
                 </div>
@@ -132,8 +139,8 @@ import { LanguageService } from '../services/language.service';
                         <div class="flex items-center gap-3">
                           <img [src]="productService.getImageUrl(item.image)" class="w-12 h-12 rounded-lg object-cover">
                           <div>
-                            <p class="text-xs font-bold text-gray-900 line-clamp-1 max-w-[150px] sm:max-w-[200px]">{{item.name}}</p>
-                            <p class="text-[10px] text-gray-500 font-medium">x{{item.qty || item.quantity}} <span *ngIf="item.color">· {{item.color}}</span> <span *ngIf="item.size">· {{item.size}}</span></p>
+                            <p class="text-xs font-bold text-gray-900 line-clamp-1 max-w-[150px] sm:max-w-[200px]">{{ item.name | autoTranslate }}</p>
+                            <p class="text-[10px] text-gray-500 font-medium">x{{item.qty || item.quantity}} <span *ngIf="item.color">· {{ item.color | autoTranslate }}</span> <span *ngIf="item.size">· {{item.size}}</span></p>
                           </div>
                         </div>
                         <button *ngIf="order.isConfirmed && !item.rating" (click)="openReviewModal(order, item)" class="text-[10px] font-bold px-3 py-1.5 rounded-lg bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors border border-yellow-200/50 cursor-pointer flex items-center gap-1 shrink-0">
@@ -168,7 +175,7 @@ import { LanguageService } from '../services/language.service';
           
           <div class="flex flex-col items-center mb-6">
             <img *ngIf="currentReviewContext()?.item" [src]="productService.getImageUrl(currentReviewContext()?.item.image)" class="w-16 h-16 rounded-xl object-cover mb-3">
-            <p class="font-bold text-center text-sm">{{ currentReviewContext()?.item?.name }}</p>
+            <p class="font-bold text-center text-sm">{{ currentReviewContext()?.item?.name | autoTranslate }}</p>
           </div>
 
           <div class="flex justify-center gap-2 mb-6">
