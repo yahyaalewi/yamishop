@@ -214,8 +214,8 @@ const sendStoreAdminOrderNotification = async ({ toEmail, storeName, order, stor
     const orderIdShort = orderIdStr.substring(Math.max(0, orderIdStr.length - 6)).toUpperCase();
     const baseUrl = process.env.FRONTEND_URL || 'https://yamishop.store';
     const directAccessUrl = autoLoginToken 
-      ? `${baseUrl}/store-admin/orders?token=${autoLoginToken}`
-      : `${baseUrl}/store-admin/orders`;
+      ? `${baseUrl}/#/store-admin/orders?token=${autoLoginToken}`
+      : `${baseUrl}/#/store-admin/orders`;
     
     const itemsHtml = storeItems.map(item => `
       <tr>
