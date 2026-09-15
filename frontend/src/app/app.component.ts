@@ -58,9 +58,12 @@ export class AppComponent {
   showNavigation = computed(() => {
     this.currentUrl(); 
     const isAdmin = this.authService.isAdmin();
-    if (isAdmin) return false;
+    const isStoreAdmin = this.authService.isStoreAdmin();
+    if (isAdmin || isStoreAdmin) return false;
     
     const url = this.router.url;
+    if (url.startsWith('/admin') || url.startsWith('/store-admin')) return false;
+
     // Hide ONLY on welcome and splash screen, show on login/register for stability
     return url !== '/' && url !== '/welcome';
   });
