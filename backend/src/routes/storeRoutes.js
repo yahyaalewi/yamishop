@@ -31,7 +31,4 @@ router.patch('/:id/status', protect, admin, toggleStoreStatus);
 router.get('/:id/stats', protect, admin, getStoreStats);
 router.patch('/:id/reset-password', protect, admin, resetStoreAdminPassword);
 
-// ─── Store Admin routes ──────────────────────────────────────────────────────
-router.get('/me', protect, storeAdmin, getMyStore);
-
 module.exports = router;
