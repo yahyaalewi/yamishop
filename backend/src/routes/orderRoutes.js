@@ -4,6 +4,7 @@ const {
   addOrderItems,
   getOrderById,
   updateOrderToPaid,
+  confirmOrder,
   updateOrderStatus,
   getMyOrders,
   getOrders,
@@ -21,7 +22,7 @@ router.put('/:id/review', protect, addReview);
 
 // Admin & Store Admin routes
 router.put('/:id/pay', protect, adminOrStoreAdmin, updateOrderToPaid);
-router.put('/:id/confirm', protect, adminOrStoreAdmin, updateOrderStatus);
+router.put('/:id/confirm', protect, adminOrStoreAdmin, confirmOrder);
 router.get('/', protect, adminOrStoreAdmin, getOrders);
 
 module.exports = router;

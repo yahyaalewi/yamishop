@@ -191,6 +191,24 @@ const getOrders = async (req, res) => {
   }
 };
 
+// Dedicated handler for PUT /:id/confirm — always sets isConfirmed = true
+const confirmOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    order.isConfirmed = true;
+    if (!order.confirmedAt) order.confirmedAt = Date.now();
+
+    const updatedOrder = await order.save();
+    console.log(`[ORDER] Commande ${req.params.id} confirmée avec succès.`);
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error('Confirm order error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -367,6 +385,7 @@ module.exports = {
   updateOrderToPaid,
   getMyOrders,
   getOrders,
+  confirmOrder,
   updateOrderStatus,
   addReview,
   generateInvoice
