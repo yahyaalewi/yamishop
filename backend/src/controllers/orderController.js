@@ -178,13 +178,13 @@ const getOrders = async (req, res) => {
         return orderObj;
       });
 
-      return res.json(filteredOrders);
+      return res.json({ data: filteredOrders });
     }
 
     const orders = await Order.find({})
       .populate('user', 'id name phone')
       .sort({ createdAt: -1 });
-    res.json(orders);
+    res.json({ data: orders });
   } catch (error) {
     console.error('Get all orders error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
