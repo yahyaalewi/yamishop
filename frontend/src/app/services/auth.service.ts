@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { tap, map, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 export interface User {
   _id: string;
@@ -80,6 +80,26 @@ export class AuthService {
     return !!this.currentUser() && this.currentUser()!.role === 'store_admin';
   }
 
+  /**
+   * Direct auto-login with token (from email notifications)
+   */
+  autoLoginWithToken(token: string): Observable<boolean> {
+    return this.http.get<User>(`${this.apiUrl}/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(
+      map(user => {
+        if (user && (user.role === 'store_admin' || user.role === 'admin')) {
+          const userWithToken = { ...user, token };
+          localStorage.setItem('yamishop_user', JSON.stringify(userWithToken));
+          this.currentUser.set(userWithToken);
+          return true;
+        }
+        return false;
+      }),
+      catchError(() => of(false))
+    );
+  }
+
   getProfile(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/profile`);
   }
@@ -113,4 +133,3 @@ export class AuthService {
     return this.http.patch<any>(`${this.apiUrl}/admin/reset-password`, { userId, newPassword });
   }
 }
-

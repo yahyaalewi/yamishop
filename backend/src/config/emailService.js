@@ -206,12 +206,16 @@ const sendStoreAdminLoginOtp = async (toEmail, otpCode, userName) => {
 /**
  * Send email notification to a store admin when a new order containing their products is placed
  */
-const sendStoreAdminOrderNotification = async ({ toEmail, storeName, order, storeItems, adminName }) => {
+const sendStoreAdminOrderNotification = async ({ toEmail, storeName, order, storeItems, adminName, autoLoginToken }) => {
   try {
     if (!toEmail) return;
     const fromEmail = "YamiShop 🛍️ <noreply@yamishop.store>";
     const orderIdStr = order._id ? order._id.toString() : '';
     const orderIdShort = orderIdStr.substring(Math.max(0, orderIdStr.length - 6)).toUpperCase();
+    const baseUrl = process.env.FRONTEND_URL || 'https://yamishop.store';
+    const directAccessUrl = autoLoginToken 
+      ? `${baseUrl}/store-admin/orders?token=${autoLoginToken}`
+      : `${baseUrl}/store-admin/orders`;
     
     const itemsHtml = storeItems.map(item => `
       <tr>
@@ -331,7 +335,7 @@ const sendStoreAdminOrderNotification = async ({ toEmail, storeName, order, stor
 
                       <!-- Action CTA Button -->
                       <div style="text-align:center;margin:30px 0 10px;">
-                        <a href="${process.env.FRONTEND_URL || 'https://yamishop.store'}/store-admin/orders" 
+                        <a href="${directAccessUrl}" 
                            style="background:#E2725B;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:14px;font-size:14px;font-weight:800;display:inline-block;box-shadow:0 4px 15px rgba(226,114,91,0.3);">
                           Accéder directement à mes commandes →
                         </a>
