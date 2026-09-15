@@ -331,9 +331,9 @@ const sendStoreAdminOrderNotification = async ({ toEmail, storeName, order, stor
 
                       <!-- Action CTA Button -->
                       <div style="text-align:center;margin:30px 0 10px;">
-                        <a href="https://yamishop.store/store-admin/orders" 
+                        <a href="${process.env.FRONTEND_URL || 'https://yamishop.store'}/store-admin/orders" 
                            style="background:#E2725B;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:14px;font-size:14px;font-weight:800;display:inline-block;box-shadow:0 4px 15px rgba(226,114,91,0.3);">
-                          Accéder à mon espace Boutique →
+                          Accéder directement à mes commandes →
                         </a>
                       </div>
                     </td>
