@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Store {
@@ -49,60 +49,52 @@ export class StoreService {
 
   constructor(private http: HttpClient) {}
 
-  private getAuthHeaders() {
-    const token = localStorage.getItem('token');
-    return {
-      headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}`
-      })
-    };
-  }
+  // NOTE: Auth token is automatically attached by the global authInterceptor
 
   getPublicStores(): Observable<Store[]> {
     return this.http.get<Store[]>(`${this.apiUrl}/public`);
   }
 
   getStores(): Observable<Store[]> {
-    return this.http.get<Store[]>(this.apiUrl, this.getAuthHeaders());
+    return this.http.get<Store[]>(this.apiUrl);
   }
 
   getStoreById(id: string): Observable<Store> {
-    return this.http.get<Store>(`${this.apiUrl}/${id}`, this.getAuthHeaders());
+    return this.http.get<Store>(`${this.apiUrl}/${id}`);
   }
 
   createStore(payload: CreateStorePayload): Observable<{ store: Store; adminUser: any }> {
-    return this.http.post<{ store: Store; adminUser: any }>(this.apiUrl, payload, this.getAuthHeaders());
+    return this.http.post<{ store: Store; adminUser: any }>(this.apiUrl, payload);
   }
 
   updateStore(id: string, payload: Partial<CreateStorePayload>): Observable<Store> {
-    return this.http.put<Store>(`${this.apiUrl}/${id}`, payload, this.getAuthHeaders());
+    return this.http.put<Store>(`${this.apiUrl}/${id}`, payload);
   }
 
   deleteStore(id: string): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`, this.getAuthHeaders());
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
   }
 
   toggleStoreStatus(id: string): Observable<Store> {
-    return this.http.patch<Store>(`${this.apiUrl}/${id}/status`, {}, this.getAuthHeaders());
+    return this.http.patch<Store>(`${this.apiUrl}/${id}/status`, {});
   }
 
   getStoreStats(id: string): Observable<StoreStats> {
-    return this.http.get<StoreStats>(`${this.apiUrl}/${id}/stats`, this.getAuthHeaders());
+    return this.http.get<StoreStats>(`${this.apiUrl}/${id}/stats`);
   }
 
   resetStoreAdminPassword(id: string, newPassword: string): Observable<{ message: string }> {
     return this.http.patch<{ message: string }>(
       `${this.apiUrl}/${id}/reset-password`,
-      { newPassword },
-      this.getAuthHeaders()
+      { newPassword }
     );
   }
 
   getMyStore(): Observable<Store> {
-    return this.http.get<Store>(`${this.apiUrl}/me`, this.getAuthHeaders());
+    return this.http.get<Store>(`${this.apiUrl}/me`);
   }
 
   getMyStoreStats(): Observable<StoreStats> {
-    return this.http.get<StoreStats>(`${this.apiUrl}/my-stats`, this.getAuthHeaders());
+    return this.http.get<StoreStats>(`${this.apiUrl}/my-stats`);
   }
 }

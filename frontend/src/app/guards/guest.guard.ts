@@ -7,11 +7,15 @@ export const guestGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   if (authService.currentUser()) {
-    // If user is already logged in, redirect to their respective area
-    const path = authService.isAdmin() ? '/admin' : '/home';
-    return router.createUrlTree([path]);
+    // Redirect each role to their respective area
+    if (authService.isAdmin()) {
+      return router.createUrlTree(['/admin']);
+    } else if (authService.isStoreAdmin()) {
+      return router.createUrlTree(['/store-admin/dashboard']);
+    } else {
+      return router.createUrlTree(['/home']);
+    }
   }
 
-  
   return true;
 };

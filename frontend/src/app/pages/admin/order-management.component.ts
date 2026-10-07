@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../../components/ui/card.component';
@@ -164,18 +164,18 @@ export class AdminOrdersComponent implements OnInit {
   
   orders = signal<Order[]>([]);
   loading = signal(true);
-  searchTerm = signal('');
-  statusFilter = signal('all');
+  searchTerm = '';        // plain string for [(ngModel)]
+  statusFilter = 'all';   // plain string for [(ngModel)]
   selectedOrder = signal<Order | null>(null);
 
-  filteredOrders = computed(() => {
-    const search = this.searchTerm().toLowerCase().trim();
-    const status = this.statusFilter();
+  get filteredOrders(): Order[] {
+    const search = this.searchTerm.toLowerCase().trim();
+    const status = this.statusFilter;
     let result = this.orders();
 
     if (search) {
-      result = result.filter(o => 
-        o._id.toLowerCase().includes(search) || 
+      result = result.filter(o =>
+        o._id.toLowerCase().includes(search) ||
         o.user?.name?.toLowerCase().includes(search) ||
         o.user?.phone?.toLowerCase().includes(search) ||
         o.shippingAddress?.street?.toLowerCase().includes(search)
@@ -188,7 +188,7 @@ export class AdminOrdersComponent implements OnInit {
     }
 
     return result;
-  });
+  }
 
   constructor() {}
 

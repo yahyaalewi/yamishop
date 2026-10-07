@@ -6,11 +6,15 @@ export const clientGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // If the user is an admin, redirect them to the admin dashboard
-  // when they try to access a client route.
+  // If the user is a super admin, redirect to the admin dashboard
   if (authService.currentUser() && authService.isAdmin()) {
     return router.createUrlTree(['/admin']);
   }
-  
+
+  // If the user is a store admin, redirect to the store admin dashboard
+  if (authService.currentUser() && authService.isStoreAdmin()) {
+    return router.createUrlTree(['/store-admin/dashboard']);
+  }
+
   return true;
 };

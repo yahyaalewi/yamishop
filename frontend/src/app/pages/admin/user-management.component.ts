@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../../components/ui/card.component';
@@ -128,21 +128,21 @@ export class UserManagementComponent implements OnInit {
   private notificationService = inject(NotificationService);
 
   users = signal<any[]>([]);
-  searchTerm = signal('');
-  roleFilter = signal('all');
+  searchTerm = '';        // plain string for [(ngModel)]
+  roleFilter = 'all';    // plain string for [(ngModel)]
   loading = signal(false);
 
   selectedUser = signal<any | null>(null);
   newPassword = '';
 
-  filteredUsers = computed(() => {
-    const search = this.searchTerm().toLowerCase().trim();
-    const role = this.roleFilter();
+  get filteredUsers(): any[] {
+    const search = this.searchTerm.toLowerCase().trim();
+    const role = this.roleFilter;
     let result = this.users();
 
     if (search) {
-      result = result.filter(u => 
-        u.name.toLowerCase().includes(search) || 
+      result = result.filter(u =>
+        u.name.toLowerCase().includes(search) ||
         u.phone.includes(search) ||
         (u.email && u.email.toLowerCase().includes(search))
       );
@@ -153,7 +153,7 @@ export class UserManagementComponent implements OnInit {
     }
 
     return result;
-  });
+  }
 
   ngOnInit() {
     this.loadUsers();

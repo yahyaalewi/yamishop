@@ -153,7 +153,7 @@ export class LoginComponent {
     if (role === 'admin') {
       this.router.navigate(['/admin']);
     } else if (role === 'store_admin') {
-      this.router.navigate(['/store-admin/orders']);
+      this.router.navigate(['/store-admin/dashboard']);
     } else {
       this.router.navigate(['/home']);
     }
