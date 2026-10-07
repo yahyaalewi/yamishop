@@ -55,6 +55,10 @@ export class StoreService {
     return this.http.get<Store[]>(`${this.apiUrl}/public`);
   }
 
+  getPublicStoreById(id: string): Observable<Store> {
+    return this.http.get<Store>(`${this.apiUrl}/public/${id}`);
+  }
+
   getStores(): Observable<Store[]> {
     return this.http.get<Store[]>(this.apiUrl);
   }

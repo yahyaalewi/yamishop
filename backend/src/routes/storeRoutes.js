@@ -11,12 +11,14 @@ const {
   resetStoreAdminPassword,
   getMyStore,
   getPublicStores,
+  getPublicStoreById,
   getMyStoreStats,
 } = require('../controllers/storeController');
 const { protect, admin, storeAdmin } = require('../middleware/auth');
 
 // ─── Public routes ───────────────────────────────────────────────────────────
 router.get('/public', getPublicStores);
+router.get('/public/:id', getPublicStoreById);
 
 // ─── Store Admin routes ──────────────────────────────────────────────────────
 router.get('/me', protect, storeAdmin, getMyStore);

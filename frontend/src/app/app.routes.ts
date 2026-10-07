@@ -65,5 +65,6 @@ export const routes: Routes = [
       { path: 'orders', component: AdminOrdersComponent }
     ]
   },
+  { path: 'store/:id', loadComponent: () => import('./pages/store-details.component').then(m => m.StoreDetailsComponent) },
   { path: '**', redirectTo: '' }
 ];

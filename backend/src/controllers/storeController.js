@@ -250,6 +250,19 @@ exports.getPublicStores = async (req, res) => {
   }
 };
 
+// ─── Public: Get single active store by ID ───────────────────────────────────
+exports.getPublicStoreById = async (req, res) => {
+  try {
+    const store = await Store.findOne({ _id: req.params.id, status: 'active' });
+    if (!store) {
+      return res.status(404).json({ message: 'Boutique introuvable ou inactive.' });
+    }
+    res.json(store);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // ─── Store Admin: Get own store profile ──────────────────────────────────────
 exports.getMyStore = async (req, res) => {
   try {

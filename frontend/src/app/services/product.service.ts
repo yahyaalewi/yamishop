@@ -60,8 +60,12 @@ export class ProductService {
     return `${backendBase}${cleanPath}`;
   }
 
-  getProducts(): Observable<Product[]> {
-    return this.http.get<{ data: Product[] }>(this.apiUrl).pipe(
+  getProducts(storeId?: string): Observable<Product[]> {
+    let url = this.apiUrl;
+    if (storeId) {
+      url += `?storeId=${storeId}`;
+    }
+    return this.http.get<{ data: Product[] }>(url).pipe(
       map(response => response.data)
     );
   }
