@@ -9,7 +9,8 @@ const {
   getMyOrders,
   getOrders,
   generateInvoice,
-  addReview
+  addReview,
+  deleteOrder
 } = require('../controllers/orderController');
 const { protect, admin, adminOrStoreAdmin } = require('../middleware/auth');
 
@@ -24,5 +25,6 @@ router.put('/:id/review', protect, addReview);
 router.put('/:id/pay', protect, adminOrStoreAdmin, updateOrderToPaid);
 router.put('/:id/confirm', protect, adminOrStoreAdmin, confirmOrder);
 router.get('/', protect, adminOrStoreAdmin, getOrders);
+router.delete('/:id', protect, admin, deleteOrder);
 
 module.exports = router;

@@ -379,6 +379,22 @@ const generateInvoice = async (req, res) => {
   }
 };
 
+const deleteOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: 'Commande non trouvée' });
+    }
+    
+    // Pour des raisons de sécurité, seul un super admin devrait pouvoir supprimer une commande physiquement
+    await order.deleteOne();
+    res.json({ message: 'Commande supprimée avec succès' });
+  } catch (error) {
+    console.error('Delete order error:', error);
+    res.status(500).json({ message: 'Erreur lors de la suppression', error: error.message });
+  }
+};
+
 module.exports = {
   addOrderItems,
   getOrderById,
@@ -388,5 +404,6 @@ module.exports = {
   confirmOrder,
   updateOrderStatus,
   addReview,
-  generateInvoice
+  generateInvoice,
+  deleteOrder
 };
