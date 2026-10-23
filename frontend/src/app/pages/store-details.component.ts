@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductService, Product } from '../services/product.service';
 import { StoreService, Store } from '../services/store.service';
-import { HeaderComponent } from '../components/layout/header.component';
 import { LanguageService } from '../services/language.service';
 import { CartService } from '../services/cart.service';
 import { NotificationService } from '../services/notification.service';
@@ -11,11 +10,10 @@ import { NotificationService } from '../services/notification.service';
 @Component({
   selector: 'app-store-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, HeaderComponent],
+  imports: [CommonModule, RouterLink],
   template: `
-    <app-header></app-header>
     
-    <div class="min-h-screen bg-gray-50 pt-20">
+    <div class="min-h-screen bg-gray-50 py-4">
       <div *ngIf="loadingStore()" class="flex justify-center items-center py-32">
         <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
       </div>
