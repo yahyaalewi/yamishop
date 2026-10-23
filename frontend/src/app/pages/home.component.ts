@@ -187,6 +187,66 @@ const DEFAULT_CATEGORIES = [
               </div>
             </div>
           </div>
+
+          <!-- Active Store Card Info & Share (when a store is clicked) -->
+          <div *ngIf="getSelectedStore() as activeStore" class="mt-8 bg-gradient-to-r from-primary/5 via-white to-primary/5 rounded-3xl p-6 md:p-8 border border-primary/20 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+            <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
+              <div class="flex flex-col md:flex-row items-center md:items-start gap-5 text-center md:text-left">
+                <!-- Store Avatar -->
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white border border-gray-100 shadow-md overflow-hidden flex items-center justify-center text-2xl font-black text-primary shrink-0 ring-2 ring-primary/20">
+                  <img *ngIf="activeStore.logo" [src]="productService.getImageUrl(activeStore.logo)" [alt]="activeStore.name" class="w-full h-full object-cover">
+                  <span *ngIf="!activeStore.logo">{{ activeStore.name.charAt(0).toUpperCase() }}</span>
+                </div>
+
+                <!-- Info -->
+                <div>
+                  <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-primary/10 text-primary">
+                      {{ lang.isRTL() ? 'متجر معتمد' : 'Boutique vérifiée' }}
+                    </span>
+                    <span *ngIf="activeStore.status === 'active'" class="w-2 h-2 rounded-full bg-green-500"></span>
+                  </div>
+
+                  <h3 class="text-2xl font-black text-gray-900 tracking-tight">{{ activeStore.name }}</h3>
+                  <p *ngIf="activeStore.description" class="text-xs text-gray-500 font-medium max-w-xl mt-1">{{ activeStore.description }}</p>
+
+                  <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3 text-xs font-bold text-gray-600">
+                    <span *ngIf="activeStore.address" class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm">
+                      📍 <span>{{ activeStore.address }}</span>
+                    </span>
+                    <a *ngIf="activeStore.phone" [href]="'tel:' + activeStore.phone" class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm text-gray-700 hover:text-primary transition-colors no-underline">
+                      📞 <span>{{ activeStore.phone }}</span>
+                    </a>
+                    <a *ngIf="activeStore.email" [href]="'mailto:' + activeStore.email" class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm text-gray-700 hover:text-primary transition-colors no-underline">
+                      ✉️ <span>{{ activeStore.email }}</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions: Share & View Full Store Page -->
+              <div class="flex items-center gap-3 shrink-0">
+                <button (click)="shareStore(activeStore, $event)" 
+                  class="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-primary-dark transition-all cursor-pointer shadow-md active:scale-95 border-none">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  <span>{{ lang.isRTL() ? 'مشاركة الرابط' : 'Partager' }}</span>
+                </button>
+
+                <a [routerLink]="['/store', activeStore._id]" 
+                  class="flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl text-xs font-black uppercase tracking-wider hover:border-primary hover:text-primary transition-all shadow-sm no-underline">
+                  <span>{{ lang.isRTL() ? 'زيارة المتجر' : 'Voir boutique' }}</span>
+                  <span>→</span>
+                </a>
+
+                <button (click)="filterByStore(activeStore._id!)" title="Fermer le filtre"
+                  class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors cursor-pointer border-none text-sm font-bold">
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- Products List Section -->
@@ -464,11 +524,37 @@ export class HomeComponent implements OnInit {
     document.getElementById('products-list')?.scrollIntoView({ behavior: 'smooth' });
   }
 
-  getSelectedStoreName(): string {
+  getSelectedStore(): Store | undefined {
     const id = this.selectedStore();
-    if (!id) return '';
-    const st = this.stores().find(s => s._id === id);
+    if (!id) return undefined;
+    return this.stores().find(s => s._id === id);
+  }
+
+  getSelectedStoreName(): string {
+    const st = this.getSelectedStore();
     return st ? st.name : '';
+  }
+
+  shareStore(st?: Store, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    const target = st || this.getSelectedStore();
+    if (!target || !target._id) return;
+    
+    const url = `${window.location.origin}/store/${target._id}`;
+    if (navigator.share) {
+      navigator.share({
+        title: target.name,
+        text: `Découvrez la boutique ${target.name} sur YamiShop !`,
+        url: url
+      }).catch(console.error);
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        this.notificationService.show('Lien de la boutique copié avec succès !');
+      });
+    }
   }
 
   addToCart(event: Event, product: Product) {

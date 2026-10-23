@@ -7,6 +7,7 @@ import { HeaderComponent } from '../components/layout/header.component';
 import { FooterComponent } from '../components/layout/footer.component';
 import { LanguageService } from '../services/language.service';
 import { CartService } from '../services/cart.service';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
   selector: 'app-store-details',
@@ -50,19 +51,22 @@ import { CartService } from '../services/cart.service';
                 <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2">{{ store()?.name }}</h1>
                 <p class="text-gray-500 font-medium max-w-2xl mb-4">{{ store()?.description || 'Découvrez nos produits exclusifs !' }}</p>
                 
-                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm font-bold text-gray-600">
-                  <div *ngIf="store()?.address" class="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-                    <span>📍</span> {{ store()?.address }}
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm font-bold text-gray-600">
+                  <div *ngIf="store()?.address" class="flex items-center gap-1.5 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100 shadow-sm">
+                    <span>📍</span> <span>{{ store()?.address }}</span>
                   </div>
-                  <div *ngIf="store()?.phone" class="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-                    <span>📞</span> {{ store()?.phone }}
-                  </div>
+                  <a *ngIf="store()?.phone" [href]="'tel:' + store()?.phone" class="flex items-center gap-1.5 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100 shadow-sm text-gray-700 hover:text-primary transition-colors no-underline">
+                    <span>📞</span> <span>{{ store()?.phone }}</span>
+                  </a>
+                  <a *ngIf="store()?.email" [href]="'mailto:' + store()?.email" class="flex items-center gap-1.5 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100 shadow-sm text-gray-700 hover:text-primary transition-colors no-underline">
+                    <span>✉️</span> <span>{{ store()?.email }}</span>
+                  </a>
                 </div>
               </div>
 
               <!-- Share Button -->
               <div class="shrink-0 mt-4 md:mt-0">
-                <button (click)="shareStore()" class="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm shadow-lg hover:bg-gray-800 transition-all border-none cursor-pointer active:scale-95">
+                <button (click)="shareStore()" class="flex items-center gap-2 px-6 py-3.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg hover:bg-primary-dark transition-all border-none cursor-pointer active:scale-95">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
                   <span>Partager la boutique</span>
                 </button>
@@ -139,6 +143,7 @@ export class StoreDetailsComponent implements OnInit {
   storeService = inject(StoreService);
   productService = inject(ProductService);
   cartService = inject(CartService);
+  notificationService = inject(NotificationService);
   lang = inject(LanguageService);
   route = inject(ActivatedRoute);
 
@@ -188,19 +193,21 @@ export class StoreDetailsComponent implements OnInit {
   addToCart(product: Product, event: Event) {
     event.stopPropagation();
     this.cartService.addItem(product, 1);
+    this.notificationService.show(`${product.name}: ${this.lang.translate('msg.added_to_cart')}`);
   }
 
   shareStore() {
     const url = window.location.href;
+    const name = this.store()?.name || 'Boutique';
     if (navigator.share) {
       navigator.share({
-        title: this.store()?.name || 'Boutique',
-        text: 'Découvrez cette superbe boutique sur YamiShop !',
+        title: name,
+        text: `Découvrez la boutique ${name} sur YamiShop !`,
         url: url
       }).catch(console.error);
     } else {
       navigator.clipboard.writeText(url).then(() => {
-        alert('Lien copié dans le presse-papier !');
+        this.notificationService.show('Lien de la boutique copié avec succès !');
       });
     }
   }
