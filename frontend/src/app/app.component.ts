@@ -28,7 +28,7 @@ import { effect } from '@angular/core';
       <div class="flex-grow">
         <router-outlet></router-outlet>
       </div>
-      <app-footer *ngIf="showNavigation()"></app-footer>
+      <app-footer *ngIf="showFooter()"></app-footer>
     </main>
     
     <!-- Stable Bottom Navigation for Mobile -->
@@ -66,6 +66,13 @@ export class AppComponent {
 
     // Hide ONLY on welcome and splash screen, show on login/register for stability
     return url !== '/' && url !== '/welcome';
+  });
+
+  showFooter = computed(() => {
+    this.currentUrl();
+    if (!this.showNavigation()) return false;
+    const url = this.router.url.split('?')[0];
+    return url === '/home';
   });
 }
 

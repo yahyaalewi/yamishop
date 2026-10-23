@@ -4,7 +4,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductService, Product } from '../services/product.service';
 import { StoreService, Store } from '../services/store.service';
 import { HeaderComponent } from '../components/layout/header.component';
-import { FooterComponent } from '../components/layout/footer.component';
 import { LanguageService } from '../services/language.service';
 import { CartService } from '../services/cart.service';
 import { NotificationService } from '../services/notification.service';
@@ -12,7 +11,7 @@ import { NotificationService } from '../services/notification.service';
 @Component({
   selector: 'app-store-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, HeaderComponent, FooterComponent],
+  imports: [CommonModule, RouterLink, HeaderComponent],
   template: `
     <app-header></app-header>
     
@@ -128,8 +127,6 @@ import { NotificationService } from '../services/notification.service';
 
       </div>
     </div>
-    
-    <app-footer></app-footer>
   `
 })
 export class StoreDetailsComponent implements OnInit {
