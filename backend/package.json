@@ -35,6 +35,9 @@
   },
   "overrides": {
     "qs": "^6.16.1",
-    "chokidar": "^4.0.3"
+    "chokidar": "^4.0.3",
+    "multer-storage-cloudinary": {
+      "cloudinary": "$cloudinary"
+    }
   }
 }
