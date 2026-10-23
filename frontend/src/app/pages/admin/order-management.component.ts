@@ -134,7 +134,7 @@ import { NotificationService } from '../../services/notification.service';
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let order of filteredOrders()" class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <tr *ngFor="let order of filteredOrders" class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                 <td class="px-4 py-3 font-black text-gray-900">#{{order._id.slice(-6).toUpperCase()}}</td>
                 <td class="px-4 py-3">
                   <p class="font-bold text-gray-900">{{order.user?.name || 'Client Inconnu'}}</p>
@@ -147,7 +147,7 @@ import { NotificationService } from '../../services/notification.service';
                   <button (click)="openDetails(order)" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-pointer hover:border-primary hover:text-primary transition-all shadow-sm active:scale-95">Détails</button>
                 </td>
               </tr>
-              <tr *ngIf="filteredOrders().length === 0 && !loading()">
+              <tr *ngIf="filteredOrders.length === 0 && !loading()">
                  <td colspan="6" class="py-20 text-center text-gray-400 italic font-medium">Aucune commande trouvée</td>
               </tr>
             </tbody>

@@ -81,7 +81,7 @@ import { NotificationService } from '../../services/notification.service';
               </tr>
             </thead>
             <tbody class="text-gray-900">
-              <tr *ngFor="let user of filteredUsers()" class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors group">
+              <tr *ngFor="let user of filteredUsers" class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors group">
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm">
@@ -110,7 +110,7 @@ import { NotificationService } from '../../services/notification.service';
                   </button>
                 </td>
               </tr>
-              <tr *ngIf="filteredUsers().length === 0">
+              <tr *ngIf="filteredUsers.length === 0">
                 <td colspan="4" class="py-20 text-center">
                   <div class="text-gray-300 text-4xl mb-2">🔍</div>
                   <p class="text-gray-400 italic">Aucun utilisateur ne correspond à votre recherche.</p>
