@@ -1,9 +1,20 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0f4d5c;
+  --color-primary-light: #1a6f85;
+  --color-primary-dark: #08333e;
+  --color-sage: #8FBC8F;
+  --color-beige: #F5F5DC;
+  --color-beige-light: #FAFAEE;
+  --color-terracotta: #E2725B;
+  --color-terracotta-light: #E88D7A;
+  --font-inter: Inter, sans-serif;
+  --font-cairo: Cairo, sans-serif;
+}
 
 @layer base {
   *, ::before, ::after {
@@ -11,13 +22,21 @@
   }
   
   html, body {
-    @apply font-inter bg-white text-gray-800 md:pb-0;
+    font-family: var(--font-inter);
+    background-color: #ffffff;
+    color: #1f2937;
     overflow-x: hidden;
     width: 100vw;
     margin: 0;
     padding: 0;
     position: relative;
     max-width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    html, body {
+      padding-bottom: 0;
+    }
   }
   
   img, svg, video, canvas, audio, iframe, embed, object {
@@ -26,7 +45,7 @@
   }
 
   html[dir="rtl"] body {
-    @apply font-cairo;
+    font-family: var(--font-cairo);
   }
 }
 

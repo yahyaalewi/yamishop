@@ -49,13 +49,34 @@ import { LanguageService } from '../services/language.service';
   styles: [`
     :host { display: block; }
     ::ng-deep .policy-content h2 { 
-      @apply text-2xl font-black text-primary-dark mt-8 mb-4 flex items-center gap-3;
+      font-size: 1.5rem;
+      line-height: 2rem;
+      font-weight: 900;
+      color: var(--color-primary-dark, #08333e);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
     ::ng-deep .policy-content p { 
-      @apply text-primary-dark/70 leading-relaxed mb-6 block whitespace-pre-wrap; 
+      color: rgba(8, 51, 62, 0.7);
+      line-height: 1.625;
+      margin-bottom: 1.5rem;
+      display: block;
+      white-space: pre-wrap;
     }
     ::ng-deep .policy-content ul { 
-      @apply list-disc list-inside space-y-2 mb-6 text-primary-dark/70 block px-4; 
+      list-style-type: disc;
+      list-style-position: inside;
+      margin-bottom: 1.5rem;
+      color: rgba(8, 51, 62, 0.7);
+      display: block;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+    ::ng-deep .policy-content ul > * + * {
+      margin-top: 0.5rem;
     }
   `]
 })
