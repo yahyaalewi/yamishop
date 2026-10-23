@@ -147,106 +147,31 @@ const DEFAULT_CATEGORIES = [
           </div>
           
           <div class="flex overflow-x-auto gap-6 md:gap-8 pb-6 pt-2 scrollbar-hide px-2">
-            <div *ngFor="let st of stores()" (click)="filterByStore(st._id!)"
-              class="flex-shrink-0 flex flex-col items-center gap-3 cursor-pointer group transition-all duration-300 active:scale-95">
+            <a *ngFor="let st of stores()" [routerLink]="['/store', st._id]"
+              class="flex-shrink-0 flex flex-col items-center gap-3 cursor-pointer group transition-all duration-300 active:scale-95 no-underline">
               
               <div class="relative">
                 <div 
-                  [class.ring-4]="selectedStore() === st._id"
-                  [class.ring-primary]="selectedStore() === st._id"
-                  [class.ring-offset-4]="selectedStore() === st._id"
-                  [class.scale-105]="selectedStore() === st._id"
                   class="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden border-2 border-gray-100 shadow-md group-hover:shadow-xl group-hover:border-primary/20 transition-all duration-500 bg-white relative flex items-center justify-center p-2">
                   
                   <img *ngIf="st.logo" [src]="productService.getImageUrl(st.logo)" [alt]="st.name" class="w-full h-full object-cover rounded-xl transition-transform duration-700 group-hover:scale-110">
                   <div *ngIf="!st.logo" class="w-full h-full rounded-xl bg-gradient-to-br from-primary/10 to-primary/30 flex items-center justify-center text-primary text-2xl font-black">
                     {{ st.name.charAt(0).toUpperCase() }}
                   </div>
-
-                  <div *ngIf="selectedStore() === st._id" class="absolute inset-0 bg-primary/20 flex items-center justify-center backdrop-blur-[1px] rounded-2xl">
-                     <div class="bg-primary text-white p-1.5 rounded-full shadow-lg transform scale-110">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                     </div>
-                  </div>
                 </div>
-
-                <div *ngIf="selectedStore() === st._id" class="absolute -inset-1 bg-primary/20 blur-xl rounded-2xl -z-10 animate-pulse"></div>
               </div>
 
               <div class="flex flex-col items-center text-center max-w-[120px]">
-                <span [class.text-primary]="selectedStore() === st._id"
-                      [class.font-black]="selectedStore() === st._id"
-                      class="text-xs font-bold text-gray-800 tracking-tight transition-all duration-300 group-hover:text-primary truncate w-full">
+                <span class="text-xs font-bold text-gray-800 tracking-tight transition-all duration-300 group-hover:text-primary truncate w-full">
                   {{ st.name }}
                 </span>
                 <span *ngIf="st.address" class="text-[10px] text-gray-400 font-medium truncate w-full mt-0.5">
                   📍 {{ st.address }}
                 </span>
               </div>
-            </div>
+            </a>
           </div>
 
-          <!-- Active Store Card Info & Share (when a store is clicked) -->
-          <div *ngIf="getSelectedStore() as activeStore" class="mt-8 bg-gradient-to-r from-primary/5 via-white to-primary/5 rounded-3xl p-6 md:p-8 border border-primary/20 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
-            <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
-              <div class="flex flex-col md:flex-row items-center md:items-start gap-5 text-center md:text-left">
-                <!-- Store Avatar -->
-                <div class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-white border border-gray-100 shadow-md overflow-hidden flex items-center justify-center text-2xl font-black text-primary shrink-0 ring-2 ring-primary/20">
-                  <img *ngIf="activeStore.logo" [src]="productService.getImageUrl(activeStore.logo)" [alt]="activeStore.name" class="w-full h-full object-cover">
-                  <span *ngIf="!activeStore.logo">{{ activeStore.name.charAt(0).toUpperCase() }}</span>
-                </div>
-
-                <!-- Info -->
-                <div>
-                  <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-primary/10 text-primary">
-                      {{ lang.isRTL() ? 'متجر معتمد' : 'Boutique vérifiée' }}
-                    </span>
-                    <span *ngIf="activeStore.status === 'active'" class="w-2 h-2 rounded-full bg-green-500"></span>
-                  </div>
-
-                  <h3 class="text-2xl font-black text-gray-900 tracking-tight">{{ activeStore.name }}</h3>
-                  <p *ngIf="activeStore.description" class="text-xs text-gray-500 font-medium max-w-xl mt-1">{{ activeStore.description }}</p>
-
-                  <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3 text-xs font-bold text-gray-600">
-                    <span *ngIf="activeStore.address" class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm">
-                      📍 <span>{{ activeStore.address }}</span>
-                    </span>
-                    <a *ngIf="activeStore.phone" [href]="'tel:' + activeStore.phone" class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm text-gray-700 hover:text-primary transition-colors no-underline">
-                      📞 <span>{{ activeStore.phone }}</span>
-                    </a>
-                    <a *ngIf="activeStore.email" [href]="'mailto:' + activeStore.email" class="inline-flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm text-gray-700 hover:text-primary transition-colors no-underline">
-                      ✉️ <span>{{ activeStore.email }}</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Actions: Share & View Full Store Page -->
-              <div class="flex items-center gap-3 shrink-0">
-                <button (click)="shareStore(activeStore, $event)" 
-                  class="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-primary-dark transition-all cursor-pointer shadow-md active:scale-95 border-none">
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                  <span>{{ lang.isRTL() ? 'مشاركة الرابط' : 'Partager' }}</span>
-                </button>
-
-                <a [routerLink]="['/store', activeStore._id]" 
-                  class="flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl text-xs font-black uppercase tracking-wider hover:border-primary hover:text-primary transition-all shadow-sm no-underline">
-                  <span>{{ lang.isRTL() ? 'زيارة المتجر' : 'Voir boutique' }}</span>
-                  <span>→</span>
-                </a>
-
-                <button (click)="filterByStore(activeStore._id!)" title="Fermer le filtre"
-                  class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 flex items-center justify-center transition-colors cursor-pointer border-none text-sm font-bold">
-                  ✕
-                </button>
-              </div>
-            </div>
-          </div>
         </section>
 
         <!-- Products List Section -->

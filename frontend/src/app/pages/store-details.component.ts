@@ -57,9 +57,7 @@ import { NotificationService } from '../services/notification.service';
                   <a *ngIf="store()?.phone" [href]="'tel:' + store()?.phone" class="flex items-center gap-1.5 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100 shadow-sm text-gray-700 hover:text-primary transition-colors no-underline">
                     <span>📞</span> <span>{{ store()?.phone }}</span>
                   </a>
-                  <a *ngIf="store()?.email" [href]="'mailto:' + store()?.email" class="flex items-center gap-1.5 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100 shadow-sm text-gray-700 hover:text-primary transition-colors no-underline">
-                    <span>✉️</span> <span>{{ store()?.email }}</span>
-                  </a>
+
                 </div>
               </div>
 
