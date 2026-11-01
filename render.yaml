@@ -14,7 +14,6 @@ services:
         value: 5000
       - key: NODE_ENV
         value: production
-      - fromGroup: yamishop-secrets # Maintenant défini au début
     healthCheckPath: /api/health
 
   # ── Yamishop Frontend (SPA) ────────────────────────────────────────────────
@@ -50,16 +49,3 @@ services:
         name: X-Content-Type-Options
         value: nosniff
 
-envVarGroups:
-  - name: yamishop-secrets
-    envVars:
-      - key: MONGO_URI
-        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
-      - key: JWT_SECRET
-        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
-      - key: ALLOWED_ORIGINS
-        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
-      - key: EMAIL_USER
-        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
-      - key: EMAIL_PASS
-        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
