@@ -446,6 +446,11 @@ export class LanguageService {
   private translationCache = new Map<string, string>();
   private inFlightRequests = new Set<string>();
 
+  // Batch queue: texts waiting to be sent to the API
+  private batchQueue: Array<{ text: string; locale: Locale; key: string }> = [];
+  private batchTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly BATCH_DELAY_MS = 50;
+
   constructor() {
     this.loadPersistentCache();
     const saved = (typeof localStorage !== 'undefined' && localStorage.getItem('yamishop_locale') as Locale) || 'ar';
@@ -520,7 +525,7 @@ export class LanguageService {
       return DICTIONARY[clean][targetLocale];
     }
 
-    // Check if clean matches Arabic value in dictionary
+    // Check if clean matches Arabic or French value in dictionary
     for (const item of Object.values(DICTIONARY)) {
       if (item.ar.toLowerCase() === clean) {
         return item[targetLocale];
@@ -534,8 +539,8 @@ export class LanguageService {
   }
 
   /**
-   * Smart automatic translation for ANY text (product names, colors, categories, etc.)
-   * Returns immediately (from dictionary or cache or source) and triggers background translation if needed.
+   * Smart automatic translation for ANY text.
+   * Returns immediately (dictionary/cache) and queues background batch translation.
    */
   autoTranslate(text: string | null | undefined, locale?: Locale): string {
     if (!text || typeof text !== 'string') return '';
@@ -543,107 +548,179 @@ export class LanguageService {
     if (!trimmed) return '';
 
     const targetLocale = locale || this.currentLocale();
-    this.cacheVersion(); // dependency tracking for reactive signals / impure pipes
+    this.cacheVersion(); // reactive tracking for impure pipes
 
-    // If text is already in the target script, return it immediately!
+    // Already in target script → return immediately
     const hasArabic = this.isArabic(trimmed);
-    if (targetLocale === 'ar' && hasArabic) {
-      return trimmed;
-    }
-    if (targetLocale === 'fr' && !hasArabic) {
-      return trimmed;
-    }
+    if (targetLocale === 'ar' && hasArabic) return trimmed;
+    if (targetLocale === 'fr' && !hasArabic) return trimmed;
 
-    // Check static dictionary
+    // Static dictionary hit
     const dictResult = this.lookupDictionary(trimmed, targetLocale);
-    if (dictResult) {
-      return dictResult;
-    }
+    if (dictResult) return dictResult;
 
-    // Check cache
+    // Cache hit
     const cacheKey = `${targetLocale}:${trimmed}`;
     if (this.translationCache.has(cacheKey)) {
       return this.translationCache.get(cacheKey)!;
     }
 
-    // Trigger async background translation if not already in flight
+    // Queue for batch translation
     if (!this.inFlightRequests.has(cacheKey)) {
       this.inFlightRequests.add(cacheKey);
-      this.translateText(trimmed, targetLocale)
-        .then(translated => {
-          this.translationCache.set(cacheKey, translated);
-          this.savePersistentCache();
-          this.inFlightRequests.delete(cacheKey);
-          this.cacheVersion.update(v => v + 1);
-        })
-        .catch(() => {
-          this.inFlightRequests.delete(cacheKey);
-        });
+      this.batchQueue.push({ text: trimmed, locale: targetLocale, key: cacheKey });
+      this.scheduleBatch();
     }
 
     return trimmed;
   }
 
   /**
-   * Translates arbitrary text asynchronously via Google Translate API
+   * Schedules a batch translation flush after BATCH_DELAY_MS.
+   * Multiple calls coalesce into a single API request.
    */
-  async translateText(text: string, targetLocale: Locale): Promise<string> {
-    if (!text || text.trim().length === 0) return text;
-    const trimmed = text.trim();
+  private scheduleBatch() {
+    if (this.batchTimer !== null) return;
+    this.batchTimer = setTimeout(() => {
+      this.batchTimer = null;
+      this.flushBatch();
+    }, this.BATCH_DELAY_MS);
+  }
 
-    // Check if already in target script
-    const hasArabic = this.isArabic(trimmed);
-    if (targetLocale === 'ar' && hasArabic) return trimmed;
-    if (targetLocale === 'fr' && !hasArabic) return trimmed;
+  /**
+   * Flushes the pending batch queue — sends all texts in parallel via MyMemory API.
+   * MyMemory is globally accessible (no Google dependency).
+   */
+  private async flushBatch() {
+    if (this.batchQueue.length === 0) return;
 
-    // Check dictionary
-    const dict = this.lookupDictionary(trimmed, targetLocale);
-    if (dict) return dict;
-
-    const cacheKey = `${targetLocale}:${trimmed}`;
-    if (this.translationCache.has(cacheKey)) {
-      return this.translationCache.get(cacheKey)!;
+    // De-duplicate by key across the whole queue
+    const seen = new Map<string, { text: string; locale: Locale; key: string }>();
+    for (const item of this.batchQueue) {
+      if (!seen.has(item.key)) seen.set(item.key, item);
     }
+    this.batchQueue = [];
 
-    try {
-      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLocale}&dt=t&q=${encodeURIComponent(trimmed)}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error('API failed');
-      const data = await response.json();
-      
-      const translated = data[0].map((s: any) => s[0]).join('');
-      if (translated && translated.trim()) {
-        this.translationCache.set(cacheKey, translated);
-        this.savePersistentCache();
-        return translated;
-      }
-      return trimmed;
-    } catch (e) {
-      // Secondary fallback attempt via MyMemory
+    const items = [...seen.values()];
+    if (items.length === 0) return;
+
+    // Translate all in parallel (MyMemory allows concurrent requests)
+    let anySuccess = false;
+
+    await Promise.all(items.map(async ({ text, locale, key }) => {
       try {
-        const langPair = targetLocale === 'ar' ? 'fr|ar' : 'ar|fr';
-        const fallbackUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed)}&langpair=${langPair}`;
-        const fbRes = await fetch(fallbackUrl);
-        const fbData = await fbRes.json();
-        if (fbData?.responseData?.translatedText) {
-          const res = fbData.responseData.translatedText;
-          this.translationCache.set(cacheKey, res);
-          this.savePersistentCache();
-          return res;
+        // Detect source language: if text has Arabic chars it's AR→FR, otherwise FR→AR
+        const srcLang = this.isArabic(text) ? 'ar' : 'fr';
+        const tgtLang = locale;
+        if (srcLang === tgtLang) {
+          // Nothing to translate
+          this.inFlightRequests.delete(key);
+          return;
         }
-      } catch (err) {}
-      
-      return trimmed;
+        const langPair = `${srcLang}|${tgtLang}`;
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
+
+        // 5-second timeout per request
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 5000);
+
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timer);
+
+        const data = await res.json();
+        const translated: string = data?.responseData?.translatedText;
+
+        if (translated && translated !== text) {
+          this.translationCache.set(key, translated);
+          anySuccess = true;
+        }
+      } catch {
+        // Silently ignore timeout / network errors
+      }
+      this.inFlightRequests.delete(key);
+    }));
+
+    if (anySuccess) {
+      this.savePersistentCache();
+      this.cacheVersion.update(v => v + 1);
     }
   }
 
   /**
-   * Pre-load multiple translations in batch for instant smooth UI
+   * Pre-load multiple translations in batch — fires immediately.
+   * Call this in ngOnInit after loading data for instant smooth UI.
    */
   preloadTranslations(texts: (string | undefined | null)[], locale?: Locale) {
     const target = locale || this.currentLocale();
-    texts.filter(t => !!t).forEach(t => {
-      this.autoTranslate(t!, target);
+    let queued = 0;
+
+    for (const t of texts) {
+      if (!t) continue;
+      const trimmed = t.trim();
+      if (!trimmed) continue;
+      const hasArabic = this.isArabic(trimmed);
+      if (target === 'ar' && hasArabic) continue;
+      if (target === 'fr' && !hasArabic) continue;
+      if (this.lookupDictionary(trimmed, target)) continue;
+      const key = `${target}:${trimmed}`;
+      if (this.translationCache.has(key) || this.inFlightRequests.has(key)) continue;
+
+      this.inFlightRequests.add(key);
+      this.batchQueue.push({ text: trimmed, locale: target, key });
+      queued++;
+    }
+
+    if (queued > 0) this.scheduleBatch();
+  }
+
+  /**
+   * Promise-based translation — resolves when the batch system has translated the text.
+   * Returns immediately from cache/dictionary, otherwise waits for the batch to flush.
+   */
+  translateText(text: string | null | undefined, locale?: Locale): Promise<string> {
+    if (!text || typeof text !== 'string') return Promise.resolve('');
+    const trimmed = text.trim();
+    if (!trimmed) return Promise.resolve('');
+
+    const targetLocale = locale || this.currentLocale();
+
+    // Already in target script
+    const hasArabic = this.isArabic(trimmed);
+    if (targetLocale === 'ar' && hasArabic) return Promise.resolve(trimmed);
+    if (targetLocale === 'fr' && !hasArabic) return Promise.resolve(trimmed);
+
+    // Dictionary hit
+    const dictResult = this.lookupDictionary(trimmed, targetLocale);
+    if (dictResult) return Promise.resolve(dictResult);
+
+    // Cache hit
+    const cacheKey = `${targetLocale}:${trimmed}`;
+    if (this.translationCache.has(cacheKey)) {
+      return Promise.resolve(this.translationCache.get(cacheKey)!);
+    }
+
+    // Queue and wait for batch
+    return new Promise<string>((resolve) => {
+      if (!this.inFlightRequests.has(cacheKey)) {
+        this.inFlightRequests.add(cacheKey);
+        this.batchQueue.push({ text: trimmed, locale: targetLocale, key: cacheKey });
+        this.scheduleBatch();
+      }
+
+      // Poll until available (batch usually flushes in <100ms)
+      const poll = setInterval(() => {
+        if (this.translationCache.has(cacheKey)) {
+          clearInterval(poll);
+          resolve(this.translationCache.get(cacheKey)!);
+        }
+      }, 50);
+
+      // Timeout fallback after 3s
+      setTimeout(() => {
+        clearInterval(poll);
+        resolve(this.translationCache.get(cacheKey) || trimmed);
+      }, 3000);
     });
   }
 }
+

@@ -6,11 +6,12 @@ import { StoreService, Store } from '../services/store.service';
 import { LanguageService } from '../services/language.service';
 import { CartService } from '../services/cart.service';
 import { NotificationService } from '../services/notification.service';
+import { AutoTranslatePipe } from '../pipes/auto-translate.pipe';
 
 @Component({
   selector: 'app-store-details',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AutoTranslatePipe],
   template: `
     
     <div class="min-h-screen bg-gray-50 py-4">
@@ -45,8 +46,8 @@ import { NotificationService } from '../services/notification.service';
                 <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
                   Boutique Partenaire
                 </div>
-                <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2">{{ store()?.name }}</h1>
-                <p class="text-gray-500 font-medium max-w-2xl mb-4">{{ store()?.description || 'Découvrez nos produits exclusifs !' }}</p>
+                <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-2">{{ store()?.name | autoTranslate }}</h1>
+                <p class="text-gray-500 font-medium max-w-2xl mb-4">{{ (store()?.description || 'Découvrez nos produits exclusifs !') | autoTranslate }}</p>
                 
                 <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm font-bold text-gray-600">
                   <div *ngIf="store()?.address" class="flex items-center gap-1.5 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100 shadow-sm">
@@ -75,7 +76,7 @@ import { NotificationService } from '../services/notification.service';
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div class="flex items-center justify-between mb-8">
             <h2 class="text-2xl font-black text-gray-900 tracking-tight">
-              Catalogue de <span class="text-primary">{{ store()?.name }}</span>
+              {{ lang.isRTL() ? 'منتجات' : 'Catalogue de' }} <span class="text-primary">{{ store()?.name | autoTranslate }}</span>
             </h2>
             <div class="text-sm font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
               {{ products().length }} {{ products().length > 1 ? 'Produits' : 'Produit' }}
@@ -108,8 +109,8 @@ import { NotificationService } from '../services/notification.service';
                </div>
 
                <div class="p-5 cursor-pointer" [routerLink]="['/product', product._id]">
-                 <h3 class="font-bold text-gray-900 text-sm truncate mb-1 group-hover:text-primary transition-colors">{{ product.name }}</h3>
-                 <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest truncate mb-3">{{ product.category }}</p>
+                 <h3 class="font-bold text-gray-900 text-sm truncate mb-1 group-hover:text-primary transition-colors">{{ product.name | autoTranslate }}</h3>
+                 <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest truncate mb-3">{{ product.category | autoTranslate }}</p>
                  <div class="flex items-center justify-between">
                    <div class="flex flex-col">
                      <span class="font-black text-primary text-base">{{ product.price | number }} <span class="text-[10px]">MRU</span></span>

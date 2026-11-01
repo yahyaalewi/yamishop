@@ -54,12 +54,12 @@ envVarGroups:
   - name: yamishop-secrets
     envVars:
       - key: MONGO_URI
-        value: "mongodb+srv://yahyaalewi:27076535@cluster0.rzpshho.mongodb.net/yamishop?appName=Cluster0"
+        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
       - key: JWT_SECRET
-        value: "supersecretkey_yamishop_dev_only"
+        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
       - key: ALLOWED_ORIGINS
-        value: "*"
+        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
       - key: EMAIL_USER
-        value: "yamishop.store@gmail.com"
+        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
       - key: EMAIL_PASS
-        value: "bvrytvrbksabdoxb"
+        sync: false   # ⚠️  À définir dans Render Dashboard → Environment Groups
