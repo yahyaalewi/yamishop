@@ -1,7 +1,6 @@
 import { Component, signal, inject, computed, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { filter } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { StoreService, Store } from '../../services/store.service';
 import { LanguageService } from '../../services/language.service';
@@ -29,26 +28,17 @@ import { LanguageService } from '../../services/language.service';
   template: `
     <div class="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-800 antialiased" dir="ltr">
 
-      <!-- Backdrop Overlay for Mobile Drawer -->
-      <div *ngIf="isMobileDrawerOpen()" 
-           (click)="closeMobileDrawer()" 
-           class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300">
-      </div>
-
-      <!-- Sidebar (Desktop Fixed / Mobile Slide-over Drawer) -->
+      <!-- Sidebar (Desktop only: hidden lg:flex) -->
       <aside 
         [ngClass]="{
-          'translate-x-0': isMobileDrawerOpen(),
-          '-translate-x-full': !isMobileDrawerOpen(),
-          'lg:translate-x-0': true,
           'lg:w-64 xl:w-72': !isDesktopCollapsed(),
           'lg:w-20': isDesktopCollapsed()
         }"
-        class="fixed top-0 bottom-0 left-0 z-50 bg-slate-900 text-slate-100 flex flex-col shadow-2xl border-r border-slate-800 transition-all duration-300 ease-in-out w-72 lg:static lg:h-screen lg:shrink-0">
+        class="hidden lg:flex bg-slate-900 text-slate-100 flex-col shadow-2xl border-r border-slate-800 transition-all duration-300 ease-in-out lg:static lg:h-screen lg:shrink-0">
         
         <!-- Sidebar Brand Header -->
         <div class="p-5 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
-          <a routerLink="/store-admin/dashboard" (click)="closeMobileDrawer()" class="flex items-center gap-3 no-underline group min-w-0">
+          <a routerLink="/store-admin/dashboard" class="flex items-center gap-3 no-underline group min-w-0">
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-emerald-500/25 shrink-0 group-hover:scale-105 transition-transform">
               🏪
             </div>
@@ -63,12 +53,9 @@ import { LanguageService } from '../../services/language.service';
             </div>
           </a>
 
-          <!-- Close button on mobile / Collapse on desktop -->
+          <!-- Collapse on desktop -->
           <div class="flex items-center gap-1">
-            <button (click)="closeMobileDrawer()" class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors border-none bg-transparent cursor-pointer">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-            <button (click)="toggleDesktopSidebar()" [title]="isDesktopCollapsed() ? 'Agrandir' : 'Réduire'" class="hidden lg:flex p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors border-none bg-transparent cursor-pointer">
+            <button (click)="toggleDesktopSidebar()" [title]="isDesktopCollapsed() ? 'Agrandir' : 'Réduire'" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors border-none bg-transparent cursor-pointer">
               <svg class="w-4 h-4 transition-transform" [class.rotate-180]="isDesktopCollapsed()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
               </svg>
@@ -84,7 +71,6 @@ import { LanguageService } from '../../services/language.service';
               
               <!-- Dashboard -->
               <a routerLink="/store-admin/dashboard" 
-                 (click)="closeMobileDrawer()"
                  routerLinkActive="nav-item-active" 
                  [routerLinkActiveOptions]="{exact: true}"
                  class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
@@ -97,7 +83,6 @@ import { LanguageService } from '../../services/language.service';
 
               <!-- Products -->
               <a routerLink="/store-admin/products" 
-                 (click)="closeMobileDrawer()"
                  routerLinkActive="nav-item-active"
                  class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
                  [title]="'Produits & Stock'">
@@ -109,7 +94,6 @@ import { LanguageService } from '../../services/language.service';
 
               <!-- Orders -->
               <a routerLink="/store-admin/orders" 
-                 (click)="closeMobileDrawer()"
                  routerLinkActive="nav-item-active"
                  class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
                  [title]="'Commandes'">
@@ -127,7 +111,6 @@ import { LanguageService } from '../../services/language.service';
             <p *ngIf="!isDesktopCollapsed()" class="px-3 text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-2">Visite client</p>
             <a [routerLink]="['/store', store()?._id]" 
                target="_blank"
-               (click)="closeMobileDrawer()"
                class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 hover:bg-emerald-900/40 transition-all no-underline group">
               <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
@@ -162,29 +145,23 @@ import { LanguageService } from '../../services/language.service';
       <div class="flex-1 flex flex-col min-w-0 min-h-screen">
 
         <!-- Topbar Header -->
-        <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-6 py-3 flex items-center justify-between shadow-xs">
+        <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-3.5 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between shadow-xs">
           
-          <div class="flex items-center gap-3 min-w-0">
-            <!-- Mobile Hamburger Button -->
-            <button (click)="openMobileDrawer()" 
-                    class="lg:hidden p-2 text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl border-none cursor-pointer transition-transform active:scale-95 flex items-center justify-center"
-                    aria-label="Ouvrir le menu">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-            </button>
-
-            <!-- Store Title & Status -->
-            <div class="flex items-center gap-2.5 min-w-0">
-              <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-base shrink-0 lg:hidden">
-                🏪
-              </div>
-              <div class="min-w-0">
+          <!-- Store Brand & Identity -->
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-base shrink-0 lg:hidden shadow-xs">
+              🏪
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
                 <h1 class="text-sm sm:text-base font-extrabold text-slate-900 m-0 truncate leading-tight">
                   {{ storeName() }}
                 </h1>
-                <p class="text-[10px] text-slate-400 font-semibold m-0 hidden sm:block">Panneau d'administration de la boutique</p>
+                <span class="px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase tracking-wider shrink-0 lg:hidden">
+                  Admin
+                </span>
               </div>
+              <p class="text-[10px] text-slate-400 font-semibold m-0 hidden sm:block">Panneau d'administration de la boutique</p>
             </div>
           </div>
 
@@ -194,25 +171,34 @@ import { LanguageService } from '../../services/language.service';
             <a *ngIf="store()?._id" 
                [routerLink]="['/store', store()?._id]" 
                target="_blank"
-               class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors no-underline">
+               class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 transition-colors no-underline">
               <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
               </svg>
-              <span>Aperçu boutique</span>
+              <span class="hidden xs:inline">Voir boutique</span>
             </a>
 
             <!-- Quick Add Product Action -->
             <a routerLink="/store-admin/products" 
-               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-light shadow-sm shadow-primary/25 transition-all no-underline">
+               class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-light shadow-sm shadow-primary/25 transition-all no-underline">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
               </svg>
               <span class="hidden xs:inline">Produit</span>
             </a>
 
-            <!-- User initials badge -->
-            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-xs flex items-center justify-center shadow-sm">
+            <!-- Direct Logout on Mobile -->
+            <button (click)="logout()" 
+                    class="lg:hidden p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors border-none bg-transparent cursor-pointer" 
+                    title="Déconnexion">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+              </svg>
+            </button>
+
+            <!-- User initials badge (desktop) -->
+            <div class="hidden lg:flex w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-xs items-center justify-center shadow-sm">
               {{ initials() }}
             </div>
           </div>
@@ -269,13 +255,14 @@ import { LanguageService } from '../../services/language.service';
             <span class="text-[10px] font-bold tracking-tight truncate">Boutique</span>
           </a>
 
-          <!-- Tab 5: Menu / Drawer Toggle -->
-          <button (click)="openMobileDrawer()" 
-                  class="flex flex-col items-center justify-center gap-1 py-1 px-3 text-slate-400 border-none bg-transparent cursor-pointer transition-all active:scale-95 flex-1 min-w-0">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <!-- Tab 5: Logout Action -->
+          <button (click)="logout()" 
+                  class="flex flex-col items-center justify-center gap-1 py-1 px-3 text-slate-400 hover:text-red-500 border-none bg-transparent cursor-pointer transition-all active:scale-95 flex-1 min-w-0"
+                  title="Déconnexion">
+            <svg class="w-5 h-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
             </svg>
-            <span class="text-[10px] tracking-tight truncate">Menu</span>
+            <span class="text-[10px] tracking-tight truncate">Quitter</span>
           </button>
 
         </nav>
@@ -285,7 +272,6 @@ import { LanguageService } from '../../services/language.service';
   `
 })
 export class StoreAdminLayoutComponent implements OnInit {
-  isMobileDrawerOpen = signal(false);
   isDesktopCollapsed = signal(false);
 
   authService = inject(AuthService);
@@ -300,13 +286,6 @@ export class StoreAdminLayoutComponent implements OnInit {
       next: (st) => this.store.set(st),
       error: () => {}
     });
-
-    // Auto-close mobile drawer on route navigation
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.isMobileDrawerOpen.set(false);
-    });
   }
 
   storeName = computed(() => this.store()?.name || 'Boutique');
@@ -320,14 +299,6 @@ export class StoreAdminLayoutComponent implements OnInit {
     const name = this.authService.currentUser()?.name || '';
     return name.split(' ')[0] || 'Admin';
   });
-
-  openMobileDrawer() {
-    this.isMobileDrawerOpen.set(true);
-  }
-
-  closeMobileDrawer() {
-    this.isMobileDrawerOpen.set(false);
-  }
 
   toggleDesktopSidebar() {
     this.isDesktopCollapsed.update(val => !val);
