@@ -81,9 +81,82 @@ import { NotificationService } from '../../services/notification.service';
         </button>
       </div>
 
-      <!-- Table -->
+      <!-- Store List: Mobile Cards + Desktop Table -->
       <div *ngIf="!loading() && filteredStores().length > 0" class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
+        
+        <!-- Mobile Cards (md:hidden) -->
+        <div class="md:hidden divide-y divide-gray-100">
+          <div *ngFor="let store of paginatedStores()" class="p-4 hover:bg-gray-50/50 transition-colors">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden shrink-0 border border-gray-200 flex items-center justify-center">
+                  <img *ngIf="store.logo" [src]="getImageUrl(store.logo)" [alt]="store.name" class="w-full h-full object-cover">
+                  <span *ngIf="!store.logo" class="text-gray-400 text-xl font-black">{{ store.name.charAt(0).toUpperCase() }}</span>
+                </div>
+                <div class="min-w-0">
+                  <p class="font-bold text-gray-900 text-sm truncate">{{ store.name }}</p>
+                  <p class="text-xs text-gray-400 truncate">{{ store.description || 'Aucune description' }}</p>
+                </div>
+              </div>
+              <!-- Status Pill Button -->
+              <button (click)="toggleStatus(store)"
+                      [class]="store.status === 'active'
+                        ? 'inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[10px] font-black border-none cursor-pointer shrink-0'
+                        : 'inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-600 rounded-lg text-[10px] font-black border-none cursor-pointer shrink-0'">
+                <span class="w-1.5 h-1.5 rounded-full" [class]="store.status === 'active' ? 'bg-emerald-500' : 'bg-red-500'"></span>
+                {{ store.status === 'active' ? 'Actif' : 'Inactif' }}
+              </button>
+            </div>
+
+            <!-- Details: Contact & Address -->
+            <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-600 bg-gray-50/60 p-2.5 rounded-xl border border-gray-100">
+              <div class="truncate">
+                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Contact</span>
+                <span class="text-gray-700 font-medium truncate block">{{ store.email || '—' }}</span>
+                <a *ngIf="store.phone" [href]="'tel:' + store.phone" class="text-primary font-bold hover:underline block truncate">{{ store.phone }}</a>
+              </div>
+              <div class="truncate">
+                <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Adresse</span>
+                <span class="text-gray-700 font-medium truncate block">{{ store.address || '—' }}</span>
+              </div>
+            </div>
+
+            <!-- Action buttons: touch-friendly bar -->
+            <div class="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-gray-50">
+              <button (click)="openStatsModal(store)"
+                      class="flex-1 py-2 px-2 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 border-none cursor-pointer hover:bg-blue-100 active:scale-95 transition-all">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Stats
+              </button>
+              <button (click)="openResetPasswordModal(store)"
+                      class="py-2 px-3 bg-amber-50 text-amber-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 border-none cursor-pointer hover:bg-amber-100 active:scale-95 transition-all"
+                      title="Changer mot de passe">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                </svg>
+              </button>
+              <button (click)="openEditModal(store)"
+                      class="py-2 px-3 bg-gray-100 text-gray-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 border-none cursor-pointer hover:bg-gray-200 active:scale-95 transition-all">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Modifier
+              </button>
+              <button (click)="removeStore(store._id!)"
+                      class="py-2 px-3 bg-red-50 text-red-600 rounded-xl font-bold text-xs flex items-center justify-center border-none cursor-pointer hover:bg-red-100 active:scale-95 transition-all"
+                      title="Supprimer">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Table (hidden md:block) -->
+        <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 border-b border-gray-100">
@@ -199,8 +272,8 @@ import { NotificationService } from '../../services/notification.service';
       </div>
 
       <!-- ─── ADD / EDIT MODAL ─────────────────────────────────────────────── -->
-      <div *ngIf="showModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-2xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto">
+      <div *ngIf="showModal()" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-t-3xl sm:rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-2xl p-5 sm:p-6 border border-gray-100 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-black text-gray-900 tracking-tight">
               {{ editingStoreId() ? 'Modifier la Boutique' : 'Nouvelle Boutique' }}
@@ -320,8 +393,8 @@ import { NotificationService } from '../../services/notification.service';
       </div>
 
       <!-- ─── STATS MODAL ──────────────────────────────────────────────────── -->
-      <div *ngIf="showStatsModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-2xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto">
+      <div *ngIf="showStatsModal()" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-t-3xl sm:rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-2xl p-5 sm:p-6 border border-gray-100 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto">
           <div class="flex justify-between items-center mb-6">
             <div>
               <h2 class="text-2xl font-black text-gray-900 tracking-tight">Statistiques</h2>
@@ -380,7 +453,7 @@ import { NotificationService } from '../../services/notification.service';
             </div>
 
             <!-- Top products -->
-            <div *ngIf="storeStats()!.topProducts?.length">
+            <div *ngIf="storeStats()!.topProducts.length">
               <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Produits les plus vendus</p>
               <div class="space-y-2">
                 <div *ngFor="let p of storeStats()!.topProducts; let i = index"
@@ -392,14 +465,14 @@ import { NotificationService } from '../../services/notification.service';
                 </div>
               </div>
             </div>
-            <p *ngIf="!storeStats()!.topProducts?.length" class="text-sm text-gray-400 text-center py-4">Aucune vente enregistrée.</p>
+            <p *ngIf="!storeStats()!.topProducts.length" class="text-sm text-gray-400 text-center py-4">Aucune vente enregistrée.</p>
           </div>
         </div>
       </div>
 
       <!-- ─── RESET PASSWORD MODAL ─────────────────────────────────────────── -->
-      <div *ngIf="showResetModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-md p-6 border border-gray-100">
+      <div *ngIf="showResetModal()" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-t-3xl sm:rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-md p-5 sm:p-6 border border-gray-100">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-black text-gray-900 tracking-tight">Réinitialiser le mot de passe</h2>
             <button (click)="closeResetModal()" class="w-8 h-8 rounded-full bg-gray-100/50 text-gray-500 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all border-none cursor-pointer">

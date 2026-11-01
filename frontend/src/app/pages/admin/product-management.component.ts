@@ -14,199 +14,191 @@ import { LanguageService } from '../../services/language.service';
   standalone: true,
   imports: [CommonModule, CardComponent, ButtonComponent, FormsModule],
   template: `
-    <div class="p-6 max-w-7xl mx-auto">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div class="space-y-6 max-w-7xl mx-auto">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 font-inter">Gestion des Produits</h1>
-          <div class="flex bg-gray-100 p-1 rounded-xl gap-1 mt-2 w-fit">
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight font-inter m-0">Gestion des Produits</h1>
+          <!-- Gender Filters (Scrollable on small mobile screens) -->
+          <div class="flex bg-slate-100 p-1 rounded-xl gap-1 mt-2.5 w-full sm:w-fit overflow-x-auto">
             <button (click)="selectedGenderFilter.set(null)" 
-                    [class]="!selectedGenderFilter() ? 'bg-white shadow text-gray-900' : 'text-gray-400 hover:text-gray-600'"
-                    class="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border-none cursor-pointer">
+                    [class]="!selectedGenderFilter() ? 'bg-white shadow-xs text-slate-900' : 'text-slate-400 hover:text-slate-600'"
+                    class="px-3.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border-none cursor-pointer shrink-0">
               Tous
             </button>
             <button (click)="selectedGenderFilter.set('homme')" 
-                    [class]="selectedGenderFilter() === 'homme' ? 'bg-white shadow text-primary' : 'text-gray-400 hover:text-gray-600'"
-                    class="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border-none cursor-pointer flex items-center gap-2">
+                    [class]="selectedGenderFilter() === 'homme' ? 'bg-white shadow-xs text-primary' : 'text-slate-400 hover:text-slate-600'"
+                    class="px-3.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border-none cursor-pointer flex items-center gap-1.5 shrink-0">
               <span class="text-xs">♂</span> Homme
             </button>
             <button (click)="selectedGenderFilter.set('femme')" 
-                    [class]="selectedGenderFilter() === 'femme' ? 'bg-white shadow text-pink-600' : 'text-gray-400 hover:text-gray-600'"
-                    class="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border-none cursor-pointer flex items-center gap-2">
+                    [class]="selectedGenderFilter() === 'femme' ? 'bg-white shadow-xs text-pink-600' : 'text-slate-400 hover:text-slate-600'"
+                    class="px-3.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all border-none cursor-pointer flex items-center gap-1.5 shrink-0">
               <span class="text-xs">♀</span> Femme
             </button>
           </div>
         </div>
-        <div class="flex items-center gap-3">
-          <app-button variant="primary" size="md" (onClick)="showForm.set(true); currentProduct = null; resetForm()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        <div class="w-full sm:w-auto">
+          <button (click)="showForm.set(true); currentProduct = null; resetForm()"
+                  class="w-full sm:w-auto px-4 py-2.5 bg-primary text-white rounded-xl font-bold text-xs hover:bg-primary-light shadow-md shadow-primary/25 transition-all flex items-center justify-center gap-2 border-none cursor-pointer active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
             </svg>
-            Nouveau Produit
-          </app-button>
+            <span>Nouveau Produit</span>
+          </button>
         </div>
       </div>
 
-      <!-- Add/Edit Form Overlay -->
-      <div *ngIf="showForm()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 border border-gray-100 animate-in fade-in zoom-in duration-300">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-black text-gray-900 tracking-tight">{{ currentProduct ? 'Modifier le produit' : 'Nouveau Produit' }}</h2>
-            <button (click)="showForm.set(false)" class="w-8 h-8 rounded-full bg-gray-100/50 text-gray-500 flex items-center justify-center hover:bg-gray-100 hover:text-gray-900 transition-all border-none cursor-pointer">
+      <!-- Add/Edit Form Overlay (Bottom sheet on mobile, centered modal on laptop) -->
+      <div *ngIf="showForm()" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm transition-all">
+        <div class="bg-white rounded-t-3xl sm:rounded-[2rem] shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col border border-slate-100 animate-in fade-in slide-in-from-bottom duration-300 overflow-hidden">
+          
+          <!-- Sticky Modal Header -->
+          <div class="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+            <h2 class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight m-0">{{ currentProduct ? 'Modifier le produit' : 'Nouveau Produit' }}</h2>
+            <button (click)="showForm.set(false)" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 hover:bg-slate-200 flex items-center justify-center transition-all border-none cursor-pointer">
               <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </div>
 
-          <form (ngSubmit)="saveProduct()" class="space-y-4">
-            <div class="grid md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Nom du produit</label>
-                <input type="text" name="name" [(ngModel)]="formData.name" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none">
+          <!-- Scrollable Form Body -->
+          <form id="productForm" (ngSubmit)="saveProduct()" class="p-4 sm:p-6 space-y-4 overflow-y-auto custom-scrollbar flex-1">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
+              <div class="sm:col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Nom du produit</label>
+                <input type="text" name="name" [(ngModel)]="formData.name" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-medium">
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Catégorie</label>
-                <select name="category" [(ngModel)]="formData.category" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none h-[42px]">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Catégorie</label>
+                <select name="category" [(ngModel)]="formData.category" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none h-[42px] text-sm font-medium bg-white">
                   <option *ngFor="let cat of categories()" [value]="cat.name">{{ lang.translateCategory(cat.name, 'fr') }}</option>
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Sexe / Genre</label>
-                <div class="flex bg-gray-100 p-1 rounded-xl gap-1 h-[42px]">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Sexe / Genre</label>
+                <div class="flex bg-slate-100 p-1 rounded-xl gap-1 h-[42px]">
                   <button type="button" 
                           (click)="setGender('homme')"
-                          [class]="formGender() === 'homme' ? 'bg-white shadow text-primary ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'"
-                          class="flex-1 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all border-none cursor-pointer">
+                          [class]="formGender() === 'homme' ? 'bg-white shadow text-primary ring-1 ring-black/5' : 'text-slate-400 hover:text-slate-600'"
+                          class="flex-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-all border-none cursor-pointer">
                     <span class="text-xs">♂</span> Homme
                   </button>
                   <button type="button" 
                           (click)="setGender('femme')"
-                          [class]="formGender() === 'femme' ? 'bg-white shadow text-pink-600 ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'"
-                          class="flex-1 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all border-none cursor-pointer">
+                          [class]="formGender() === 'femme' ? 'bg-white shadow text-pink-600 ring-1 ring-black/5' : 'text-slate-400 hover:text-slate-600'"
+                          class="flex-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-all border-none cursor-pointer">
                     <span class="text-xs">♀</span> Femme
                   </button>
                   <button type="button" 
                           (click)="setGender('unisexe')"
-                          [class]="formGender() === 'unisexe' ? 'bg-white shadow text-gray-900 ring-1 ring-black/5' : 'text-gray-400 hover:text-gray-600'"
-                          class="flex-1 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all border-none cursor-pointer">
-                    <span class="text-xs">⚧</span> Tous
+                          [class]="formGender() === 'unisexe' ? 'bg-white shadow text-slate-900 ring-1 ring-black/5' : 'text-slate-400 hover:text-slate-600'"
+                          class="flex-1 rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-all border-none cursor-pointer">
+                    <span>Tous</span>
                   </button>
                 </div>
               </div>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Prix (MRU)</label>
-                <input type="number" name="price" [(ngModel)]="formData.price" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Prix (MRU)</label>
+                <input type="number" name="price" [(ngModel)]="formData.price" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-bold">
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Stock</label>
-                <input type="number" name="stock" [(ngModel)]="formData.stock" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Stock</label>
+                <input type="number" name="stock" [(ngModel)]="formData.stock" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-bold">
               </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Frais de livraison (MRU)</label>
-                <input type="number" name="shippingPrice" [(ngModel)]="formData.shippingPrice" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: 150">
-                <p class="text-[10px] text-gray-400 mt-1">Le prix le plus élevé sera appliqué si plusieurs produits</p>
+              <div class="col-span-2 md:col-span-1">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Frais de livraison (MRU)</label>
+                <input type="number" name="shippingPrice" [(ngModel)]="formData.shippingPrice" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="Ex: 150">
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Étoiles (Note / 5)</label>
-              <input type="number" step="0.1" min="0" max="5" name="rating" [(ngModel)]="formData.rating" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: 4.5">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Étoiles (Note / 5)</label>
+              <input type="number" step="0.1" min="0" max="5" name="rating" [(ngModel)]="formData.rating" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="Ex: 4.5">
             </div>
 
-            <!-- Main Image + Gallery -->
-            <div class="space-y-3">
-              <label class="block text-sm font-semibold text-gray-700">Photos du produit</label>
-              <p class="text-[10px] text-gray-400 -mt-2">La première photo est l'image principale. Ajoutez-en plusieurs pour les différentes couleurs.</p>
+            <!-- Photos Gallery -->
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-700 m-0">Photos du produit</label>
+              <p class="text-[10px] text-slate-400 m-0">La première photo est l'image principale visible dans le catalogue.</p>
 
-              <!-- Uploaded images grid -->
-              <div class="flex flex-wrap gap-3">
-                <!-- Existing images as thumbnails -->
+              <div class="flex flex-wrap gap-2.5 pt-1">
                 <div *ngFor="let img of formData.images; let i = index"
-                     class="relative w-24 h-24 rounded-xl overflow-hidden border-2 flex-shrink-0 group"
+                     class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 flex-shrink-0 group bg-slate-50"
                      [class.border-primary]="i === 0"
-                     [class.border-gray-200]="i !== 0">
+                     [class.border-slate-200]="i !== 0">
                   <img [src]="getImageUrl(img)" class="w-full h-full object-cover">
-                  <!-- Main badge -->
-                  <div *ngIf="i === 0" class="absolute bottom-0 left-0 right-0 bg-primary text-white text-[8px] font-black uppercase tracking-widest text-center py-0.5">
+                  <div *ngIf="i === 0" class="absolute bottom-0 left-0 right-0 bg-primary text-white text-[8px] font-black uppercase tracking-wider text-center py-0.5">
                     Principale
                   </div>
-                  <!-- Set as main button (only for non-first images) -->
                   <button *ngIf="i !== 0" type="button" (click)="setMainImage(i)"
-                          class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-[8px] font-black py-0.5 text-center border-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                    Principale
+                          class="absolute bottom-0 left-0 right-0 bg-slate-900/80 text-white text-[8px] font-black py-0.5 text-center border-none cursor-pointer">
+                    Définir
                   </button>
-                  <!-- Remove button -->
                   <button type="button" (click)="removeImage(i)"
-                          class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center border-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity shadow-md text-xs font-black">
+                          class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center border-none cursor-pointer shadow-md text-xs font-black">
                     ✕
                   </button>
                 </div>
 
-                <!-- Add image button -->
-                <div class="relative w-24 h-24 flex-shrink-0">
+                <div class="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
                   <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" id="productImage" #fileInput>
                   <label for="productImage"
-                         class="w-full h-full rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all"
+                         class="w-full h-full rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all"
                          [class.opacity-50]="uploading()" [class.pointer-events-none]="uploading()">
-                    <svg *ngIf="!uploading()" class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <svg *ngIf="!uploading()" class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     <svg *ngIf="uploading()" class="animate-spin h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide text-center leading-tight px-1">{{ uploading() ? '...' : 'Ajouter' }}</span>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wide text-center leading-tight px-1">{{ uploading() ? '...' : '+ Photo' }}</span>
                   </label>
                 </div>
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-              <textarea name="description" [(ngModel)]="formData.description" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none resize-none"></textarea>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Description</label>
+              <textarea name="description" [(ngModel)]="formData.description" rows="2" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-medium resize-none"></textarea>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Caractéristiques techniques (une par ligne)</label>
-              <textarea name="featuresText" [(ngModel)]="formData.featuresText" rows="2" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none resize-none" placeholder="Ex: Résistant à l'eau..."></textarea>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Caractéristiques techniques (une par ligne)</label>
+              <textarea name="featuresText" [(ngModel)]="formData.featuresText" rows="2" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-medium resize-none" placeholder="Ex: 100% Coton, Lavable en machine..."></textarea>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Couleurs disponibles</label>
-                <input type="text" name="colorsText" [(ngModel)]="formData.colorsText" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: Rouge, Bleu, Noir">
-                <p class="text-[10px] text-gray-400 mt-1">Séparées par des virgules</p>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Couleurs disponibles</label>
+                <input type="text" name="colorsText" [(ngModel)]="formData.colorsText" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="Ex: Rouge, Bleu, Noir">
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Tailles disponibles</label>
-                <input type="text" name="sizesText" [(ngModel)]="formData.sizesText" class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Ex: S, M, L, XL ou 38, 40">
-                <p class="text-[10px] text-gray-400 mt-1">Séparées par des virgules</p>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Tailles disponibles</label>
+                <input type="text" name="sizesText" [(ngModel)]="formData.sizesText" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="Ex: S, M, L, XL ou 38, 40">
               </div>
             </div>
 
-            <div *ngIf="authService.isAdmin()" class="flex items-center gap-3 bg-primary/5 p-4 rounded-2xl border border-primary/10">
+            <div *ngIf="authService.isAdmin()" class="flex items-center gap-3 bg-primary/5 p-3.5 rounded-2xl border border-primary/10">
               <input type="checkbox" name="isFeatured" [(ngModel)]="formData.isFeatured" id="isFeatured" class="w-5 h-5 accent-primary cursor-pointer">
-              <label for="isFeatured" class="text-sm font-bold text-gray-900 cursor-pointer flex flex-col">
-                <span class="flex items-center gap-2">🌟 {{ lang.isRTL() ? 'تمييز المنتج (Pépites)' : 'Mettre en avant (Nos Pépites)' }}</span>
-                <span class="text-[10px] text-gray-500 font-medium italic">{{ lang.isRTL() ? 'سيظهر المنتج في الصفحة الرئيسية بشكل افتراضي' : 'Le produit apparaîtra sur la page d\'accueil par défaut' }}</span>
+              <label for="isFeatured" class="text-xs font-bold text-slate-900 cursor-pointer flex flex-col">
+                <span class="flex items-center gap-1.5">🌟 Mettre en avant (Nos Pépites)</span>
+                <span class="text-[10px] text-slate-400 font-medium">Le produit apparaîtra en premier sur la page d'accueil</span>
               </label>
             </div>
-
-            <div class="flex justify-end gap-3 pt-4">
-              <app-button variant="outline" type="button" (onClick)="showForm.set(false)">
-                <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Annuler
-              </app-button>
-              <app-button variant="primary" type="submit" [disabled]="saving() || uploading()">
-                <svg *ngIf="saving() || uploading()" class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                </svg>
-                <svg *ngIf="!saving() && !uploading()" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                {{ uploading() ? 'Attente image...' : (saving() ? 'Enregistrement...' : 'Enregistrer') }}
-              </app-button>
-            </div>
           </form>
+
+          <!-- Sticky Modal Footer (Always visible without having to scroll down!) -->
+          <div class="p-3.5 sm:p-5 border-t border-slate-100 bg-white flex justify-end gap-2.5 shrink-0">
+            <button type="button" (click)="showForm.set(false)" class="px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors cursor-pointer border-none bg-transparent">
+              Annuler
+            </button>
+            <button type="submit" form="productForm" [disabled]="saving() || uploading()" class="px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary-light shadow-md shadow-primary/20 transition-all border-none cursor-pointer flex items-center gap-2 disabled:opacity-50">
+              <svg *ngIf="saving() || uploading()" class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              <span>{{ uploading() ? 'Attente image...' : (saving() ? 'Enregistrement...' : 'Enregistrer le produit') }}</span>
+            </button>
+          </div>
+
         </div>
       </div>
 

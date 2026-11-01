@@ -10,69 +10,102 @@ import { NotificationService } from '../../services/notification.service';
   standalone: true,
   imports: [CommonModule, CardComponent, FormsModule],
   template: `
-    <div class="p-6 max-w-7xl mx-auto">
+    <div class="space-y-6 max-w-7xl mx-auto font-inter">
       
       <!-- Reset Password Modal -->
-      <div *ngIf="selectedUser()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm transition-all">
-        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-md p-8 relative animate-in fade-in zoom-in duration-300 border border-gray-100">
-          <button (click)="selectedUser.set(null)" class="absolute top-6 right-6 w-8 h-8 rounded-full bg-gray-100/50 flex items-center justify-center hover:bg-gray-100 transition-colors border-none cursor-pointer">
-            <svg class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      <div *ngIf="selectedUser()" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-sm transition-all">
+        <div class="bg-white rounded-t-3xl sm:rounded-[2rem] shadow-2xl w-full max-w-md p-5 sm:p-7 relative animate-in fade-in slide-in-from-bottom duration-300 border border-slate-100">
+          <button (click)="selectedUser.set(null)" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors border-none cursor-pointer">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
 
-          <div class="text-center mb-6">
-            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary text-2xl">🔑</div>
-            <h2 class="text-xl font-black text-gray-900">Réinitialiser le mot de passe</h2>
-            <p class="text-sm text-gray-500">Pour : <b>{{selectedUser()?.name}}</b></p>
+          <div class="text-center mb-5">
+            <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-3 text-primary text-2xl">🔑</div>
+            <h2 class="text-lg sm:text-xl font-black text-slate-900 m-0">Réinitialiser le mot de passe</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Pour : <b>{{selectedUser()?.name}}</b></p>
           </div>
 
           <div class="space-y-4">
             <div>
-              <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Nouveau Mot de Passe</label>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 px-1">Nouveau Mot de Passe</label>
               <input type="password" [(ngModel)]="newPassword" 
                 placeholder="Minimum 6 caractères"
-                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none font-bold text-sm">
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none font-bold text-sm">
             </div>
             
             <button (click)="resetPassword()" [disabled]="newPassword.length < 6 || loading()"
-              class="w-full bg-primary text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:bg-primary-dark transition-all disabled:opacity-50 disabled:grayscale cursor-pointer border-none mt-2">
-              {{ loading() ? 'Chargement...' : 'Enregistrer' }}
+              class="w-full bg-primary text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-primary/20 hover:bg-primary-light transition-all disabled:opacity-50 disabled:grayscale cursor-pointer border-none mt-2">
+              {{ loading() ? 'Chargement...' : 'Enregistrer le mot de passe' }}
             </button>
           </div>
         </div>
       </div>
 
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 class="text-3xl font-black text-gray-900 tracking-tight">Gestion des Utilisateurs</h1>
-          <p class="text-sm text-gray-500 font-medium">Consultez et gérez les comptes de vos clients.</p>
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight m-0">Gestion des Utilisateurs</h1>
+          <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1">Consultez et gérez les comptes clients et administrateurs.</p>
         </div>
-        <div class="bg-primary/5 px-4 py-2 rounded-xl border border-primary/10 flex items-center gap-2">
-          <span class="text-primary font-black text-lg">{{users().length}}</span>
-          <span class="text-[10px] font-black text-primary/60 uppercase tracking-widest">Utilisateurs inscrits</span>
+        <div class="bg-primary/5 px-3 py-1.5 rounded-xl border border-primary/10 flex items-center gap-2 self-start sm:self-auto">
+          <span class="text-primary font-black text-base">{{users().length}}</span>
+          <span class="text-[10px] font-black text-primary/70 uppercase tracking-widest">Inscrits</span>
         </div>
       </div>
 
       <app-card>
         <!-- Toolbar -->
-        <div class="flex flex-col md:flex-row gap-4 mb-6">
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
           <div class="flex-1 relative">
-            <svg class="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="h-5 w-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input type="text" [(ngModel)]="searchTerm" placeholder="Rechercher par nom ou téléphone..." 
-              class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all font-medium">
+              class="w-full pl-11 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none transition-all text-xs sm:text-sm font-medium">
           </div>
-          <select [(ngModel)]="roleFilter" class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-bold text-gray-600 focus:ring-2 focus:ring-primary">
+          <select [(ngModel)]="roleFilter" class="px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-bold text-xs sm:text-sm text-slate-700 focus:ring-2 focus:ring-primary shrink-0">
             <option value="all">Tous les rôles</option>
             <option value="user">Clients (User)</option>
             <option value="admin">Administrateurs</option>
           </select>
         </div>
 
-        <!-- Users Table -->
-        <div class="overflow-x-auto">
+        <!-- MOBILE USER CARDS (< 768px) -->
+        <div class="md:hidden space-y-3">
+          <div *ngFor="let user of filteredUsers" class="p-3.5 bg-white rounded-2xl border border-slate-200/90 shadow-xs flex flex-col gap-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-xs shrink-0">
+                  {{user.name.charAt(0).toUpperCase()}}
+                </div>
+                <div class="min-w-0">
+                  <p class="font-bold text-sm text-slate-900 leading-tight truncate m-0">{{user.name}}</p>
+                  <a *ngIf="user.phone" [href]="'tel:' + user.phone" class="text-xs text-slate-400 font-semibold mt-0.5 inline-block no-underline">{{user.phone}}</a>
+                </div>
+              </div>
+              <span [class]="user.role === 'admin' ? 'bg-terracotta text-white' : 'bg-emerald-100 text-emerald-800'"
+                    class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0">
+                {{user.role}}
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 text-[10px] text-slate-400">
+              <span>Inscrit: {{user.createdAt | date:'dd MMM yyyy'}}</span>
+              <button (click)="openResetModal(user)" 
+                class="bg-slate-100 hover:bg-slate-200 text-slate-800 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border-none active:scale-95">
+                Changer mot de passe
+              </button>
+            </div>
+          </div>
+
+          <div *ngIf="filteredUsers.length === 0" class="py-12 text-center text-slate-400 text-xs italic">
+            Aucun utilisateur ne correspond à votre recherche.
+          </div>
+        </div>
+
+        <!-- DESKTOP TABLE (>= 768px) -->
+        <div class="overflow-x-auto hidden md:block">
           <table class="w-full text-left text-sm">
-            <thead class="bg-gray-50 text-gray-600 font-black uppercase text-[10px] tracking-widest border-b border-gray-100">
+            <thead class="bg-slate-50 text-slate-600 font-black uppercase text-[10px] tracking-widest border-b border-slate-100">
               <tr>
                 <th class="px-6 py-4">Utilisateur</th>
                 <th class="px-6 py-4">Rôle</th>
@@ -80,40 +113,40 @@ import { NotificationService } from '../../services/notification.service';
                 <th class="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody class="text-gray-900">
-              <tr *ngFor="let user of filteredUsers" class="border-b border-gray-100 hover:bg-gray-50/50 transition-colors group">
+            <tbody class="text-slate-900 divide-y divide-slate-100">
+              <tr *ngFor="let user of filteredUsers" class="hover:bg-slate-50/60 transition-colors group">
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm">
+                    <div class="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-xs">
                       {{user.name.charAt(0).toUpperCase()}}
                     </div>
                     <div>
-                      <p class="font-black text-gray-900 leading-tight">{{user.name}}</p>
-                      <p class="text-xs text-gray-400 font-bold mt-0.5">{{user.phone}}</p>
-                      <p *ngIf="user.email" class="text-[10px] text-primary font-bold lowercase opacity-70">{{user.email}}</p>
+                      <p class="font-bold text-slate-900 leading-tight m-0">{{user.name}}</p>
+                      <p class="text-xs text-slate-400 font-bold m-0 mt-0.5">{{user.phone}}</p>
+                      <p *ngIf="user.email" class="text-[10px] text-primary font-bold lowercase opacity-70 m-0">{{user.email}}</p>
                     </div>
                   </div>
                 </td>
                 <td class="px-6 py-4">
-                  <span [class]="user.role === 'admin' ? 'bg-terracotta text-white' : 'bg-green-100 text-green-700'"
+                  <span [class]="user.role === 'admin' ? 'bg-terracotta text-white' : 'bg-emerald-100 text-emerald-800'"
                     class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest">
                     {{user.role}}
                   </span>
                 </td>
-                <td class="px-6 py-4 text-gray-400 text-xs font-bold whitespace-nowrap">
+                <td class="px-6 py-4 text-slate-400 text-xs font-bold whitespace-nowrap">
                   {{user.createdAt | date:'dd MMM yyyy'}}
                 </td>
                 <td class="px-6 py-4 text-right">
                   <button (click)="openResetModal(user)" 
-                    class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-primary hover:text-primary transition-all cursor-pointer shadow-sm active:scale-95">
+                    class="bg-white border border-slate-200 text-slate-700 px-3.5 py-1.5 rounded-xl text-xs font-bold hover:border-primary hover:text-primary transition-all cursor-pointer shadow-xs active:scale-95">
                     Changer Password
                   </button>
                 </td>
               </tr>
               <tr *ngIf="filteredUsers.length === 0">
-                <td colspan="4" class="py-20 text-center">
-                  <div class="text-gray-300 text-4xl mb-2">🔍</div>
-                  <p class="text-gray-400 italic">Aucun utilisateur ne correspond à votre recherche.</p>
+                <td colspan="4" class="py-16 text-center">
+                  <div class="text-slate-300 text-3xl mb-1">🔍</div>
+                  <p class="text-slate-400 text-xs italic">Aucun utilisateur ne correspond à votre recherche.</p>
                 </td>
               </tr>
             </tbody>

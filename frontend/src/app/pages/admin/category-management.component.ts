@@ -97,8 +97,8 @@ import { LanguageService } from '../../services/language.service';
       </div>
 
       <!-- Add/Edit Modal -->
-      <div *ngIf="showModal()" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-        <div class="bg-white rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-lg p-6 border border-gray-100 animate-in fade-in zoom-in duration-300">
+      <div *ngIf="showModal()" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-gray-900/40 backdrop-blur-sm">
+        <div class="bg-white rounded-t-3xl sm:rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] w-full max-w-lg p-5 sm:p-6 border border-gray-100 max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-300">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-black text-gray-900 tracking-tight">
               {{ editingCategoryId() ? 'Modifier la Catégorie' : 'Nouvelle Catégorie' }}

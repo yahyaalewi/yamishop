@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { CardComponent } from '../../components/ui/card.component';
 import { OrderService, Order } from '../../services/order.service';
 import { ProductService } from '../../services/product.service';
@@ -7,279 +8,327 @@ import { ProductService } from '../../services/product.service';
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
-    <div class="space-y-8 animate-fade-in pb-12 font-inter">
+    <div class="space-y-6 sm:space-y-8 animate-fade-in font-inter max-w-7xl mx-auto">
+      
       <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 sm:p-7 md:p-8 rounded-2xl sm:rounded-[2rem] border border-slate-200/80 shadow-xs relative overflow-hidden">
         <div class="absolute right-0 top-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
         <div class="relative z-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 sm:mb-3">
             <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-            En direct
+            Supervision Globale
           </div>
-          <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Tableau de Bord</h1>
-          <p class="text-gray-500 mt-2 font-medium">Analysez les performances et la croissance de YamiShop.</p>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight m-0">Tableau de Bord</h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">Vue d'ensemble des performances, des ventes et des commandes de YamiShop.</p>
         </div>
-        <div class="relative z-10 flex gap-3">
-          <button class="px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            Exporter
-          </button>
+        <div class="relative z-10 flex items-center gap-2.5">
+          <a routerLink="/admin/orders" class="px-4 py-2.5 rounded-xl bg-primary text-white font-bold text-xs shadow-md shadow-primary/25 hover:bg-primary-light transition-all flex items-center gap-2 no-underline">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            Toutes les commandes
+          </a>
         </div>
       </div>
 
-      <!-- KPI Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 xl:gap-6">
+      <!-- KPI Cards Grid (2 cols on mobile, 3 on tablet, 6 on xl desktop) -->
+      <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 xl:gap-6">
         
-        <!-- Revenus -->
-        <div class="xl:col-span-2 bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden flex flex-col justify-between min-h-[160px]">
-          <div class="absolute -right-6 -top-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
+        <!-- Revenus Total -->
+        <div class="col-span-2 sm:col-span-1 xl:col-span-2 bg-gradient-to-br from-primary to-primary-dark text-white p-5 rounded-2xl sm:rounded-[2rem] shadow-md flex flex-col justify-between min-h-[140px] sm:min-h-[160px] relative overflow-hidden group">
+          <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
           <div class="flex items-start justify-between relative z-10">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary flex items-center justify-center shadow-inner">
-               <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/15 backdrop-blur-md text-white flex items-center justify-center shadow-inner">
+               <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full">Confirmé</span>
           </div>
-          <div class="relative z-10 mt-4">
-            <p class="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-1">Revenus Total</p>
-            <p class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ revenue() | number }} <span class="text-base text-primary font-bold">MRU</span></p>
+          <div class="relative z-10 mt-3">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-1">Revenus Total</p>
+            <p class="text-2xl sm:text-3xl font-black text-white tracking-tight">{{ revenue() | number }} <span class="text-xs sm:text-sm font-bold text-slate-200">MRU</span></p>
           </div>
         </div>
 
         <!-- Panier Moyen -->
-        <div class="xl:col-span-2 bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden flex flex-col justify-between min-h-[160px]">
-          <div class="absolute -right-6 -top-6 w-32 h-32 bg-gray-900/5 rounded-full blur-2xl group-hover:bg-gray-900/10 transition-colors"></div>
+        <div class="col-span-2 sm:col-span-1 xl:col-span-2 bg-white p-5 rounded-2xl sm:rounded-[2rem] border border-slate-200/80 shadow-xs flex flex-col justify-between min-h-[140px] sm:min-h-[160px] relative overflow-hidden group">
           <div class="flex items-start justify-between relative z-10">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-900/20 to-gray-900/5 text-gray-900 flex items-center justify-center shadow-inner">
-               <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-slate-100 text-slate-800 flex items-center justify-center shadow-inner">
+               <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             </div>
+            <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">Moyenne</span>
           </div>
-          <div class="relative z-10 mt-4">
-            <p class="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-1">Panier Moyen</p>
-            <p class="text-3xl font-extrabold text-gray-900 tracking-tight">{{ averageOrderValue() | number:'1.0-0' }} <span class="text-base text-gray-900 font-bold">MRU</span></p>
+          <div class="relative z-10 mt-3">
+            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Panier Moyen</p>
+            <p class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">{{ averageOrderValue() | number:'1.0-0' }} <span class="text-xs sm:text-sm text-slate-500 font-bold">MRU</span></p>
           </div>
         </div>
 
         <!-- En Attente -->
-        <div class="xl:col-span-1 bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden flex flex-col justify-between min-h-[160px]">
-          <div class="absolute -right-6 -top-6 w-24 h-24 bg-terracotta/10 rounded-full blur-2xl group-hover:bg-terracotta/20 transition-colors"></div>
-          <div class="relative z-10">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-terracotta/30 to-terracotta/10 text-terracotta flex items-center justify-center shadow-inner mb-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-[2rem] border border-orange-200/80 shadow-xs flex flex-col justify-between min-h-[130px] sm:min-h-[160px] bg-gradient-to-br from-orange-50/40 to-white">
+          <div class="relative z-10 flex items-center justify-between">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center shadow-inner">
                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
-            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">En Attente</p>
-            <p class="text-2xl font-extrabold text-gray-900 tracking-tight">{{ pendingOrdersCount() }}</p>
+          </div>
+          <div class="relative z-10 mt-2">
+            <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">En Attente</p>
+            <p class="text-2xl font-black text-orange-600 tracking-tight">{{ pendingOrdersCount() }}</p>
           </div>
         </div>
 
         <!-- Confirmées -->
-        <div class="xl:col-span-1 bg-white p-6 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group relative overflow-hidden flex flex-col justify-between min-h-[160px]">
-          <div class="absolute -right-6 -top-6 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
-          <div class="relative z-10">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary flex items-center justify-center shadow-inner mb-4">
+        <div class="bg-white p-4 sm:p-5 rounded-2xl sm:rounded-[2rem] border border-teal-200/80 shadow-xs flex flex-col justify-between min-h-[130px] sm:min-h-[160px] bg-gradient-to-br from-teal-50/40 to-white">
+          <div class="relative z-10 flex items-center justify-between">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shadow-inner">
                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
-            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Confirmées</p>
-            <p class="text-2xl font-extrabold text-gray-900 tracking-tight">{{ confirmedOrdersCount() }} <span class="text-sm text-gray-400 font-medium">/ {{ orders().length }}</span></p>
+          </div>
+          <div class="relative z-10 mt-2">
+            <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Confirmées</p>
+            <p class="text-2xl font-black text-teal-600 tracking-tight">{{ confirmedOrdersCount() }} <span class="text-xs text-slate-400 font-bold">/ {{ orders().length }}</span></p>
           </div>
         </div>
 
       </div>
 
       <!-- Secondary KPIs Row -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 xl:gap-6">
+      <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:gap-6">
          <!-- Ce Mois -->
-         <div class="bg-white p-5 rounded-[1.5rem] border border-gray-100/50 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-full bg-primary/5 text-primary flex items-center justify-center shrink-0">
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+         <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
             </div>
-            <div>
-              <p class="text-[11px] font-black uppercase tracking-widest text-gray-400">Ce Mois-ci</p>
-              <p class="text-xl font-extrabold text-gray-900">{{ monthOrdersCount() }} <span class="text-sm font-medium text-gray-500">commandes</span></p>
+            <div class="min-w-0">
+              <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 truncate">Ce Mois-ci</p>
+              <p class="text-lg sm:text-xl font-black text-slate-900 mt-0.5">{{ monthOrdersCount() }} <span class="text-xs font-semibold text-slate-400">commandes</span></p>
             </div>
          </div>
          <!-- Clients -->
-         <div class="bg-white p-5 rounded-[1.5rem] border border-gray-100/50 shadow-[0_4px_20px_rgb(0,0,0,0.03)] flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-full bg-terracotta/5 text-terracotta flex items-center justify-center shrink-0">
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+         <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-terracotta/10 text-terracotta flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             </div>
-            <div>
-              <p class="text-[11px] font-black uppercase tracking-widest text-gray-400">Clients Uniques</p>
-              <p class="text-xl font-extrabold text-gray-900">{{ uniqueClients() }} <span class="text-sm font-medium text-gray-500">personnes</span></p>
+            <div class="min-w-0">
+              <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 truncate">Clients Uniques</p>
+              <p class="text-lg sm:text-xl font-black text-slate-900 mt-0.5">{{ uniqueClients() }} <span class="text-xs font-semibold text-slate-400">clients</span></p>
             </div>
          </div>
       </div>
 
       <!-- Graph & Top Products Row -->
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 sm:gap-6">
         
-        <!-- Graph -->
-        <div class="xl:col-span-2 bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-[480px] flex flex-col relative overflow-hidden group">
-          <div class="absolute right-0 top-0 w-64 h-64 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-full pointer-events-none"></div>
-          
-          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-8 relative z-10 gap-4">
+        <!-- Graph (7 Jours) -->
+        <div class="xl:col-span-2 bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-[2rem] border border-slate-200/80 shadow-xs flex flex-col relative overflow-hidden min-h-[340px] sm:min-h-[400px]">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-6 relative z-10 gap-2">
             <div>
-              <h2 class="text-xl font-extrabold text-gray-900 flex items-center gap-3">
-                <span class="w-1.5 h-6 bg-primary rounded-full"></span>
+              <h2 class="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2 m-0">
+                <span class="w-2 h-5 bg-primary rounded-full"></span>
                 Performance (7 Jours)
               </h2>
-              <p class="text-sm text-gray-500 mt-1 pl-4">Évolution quotidienne des ventes confirmées</p>
+              <p class="text-xs text-slate-400 mt-1 pl-4">Évolution quotidienne des ventes confirmées</p>
             </div>
-            <div class="bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100 text-right shrink-0">
-              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Période</p>
-              <p class="text-xl font-extrabold text-primary">{{ recentChartTotal() | number }} <span class="text-sm">MRU</span></p>
+            <div class="bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 self-start sm:self-auto text-right">
+              <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Total Période: </span>
+              <span class="text-sm font-black text-primary">{{ recentChartTotal() | number }} MRU</span>
             </div>
           </div>
 
-          <div class="flex-grow flex items-end gap-3 md:gap-6 relative z-10 pb-2">
+          <div class="flex-grow flex items-end gap-2 sm:gap-4 md:gap-6 relative z-10 pb-2">
             <!-- Grid Lines -->
-            <div class="absolute inset-0 flex flex-col justify-between pb-8 pointer-events-none opacity-30">
-               <div class="w-full border-b border-gray-200 border-dashed flex-1"></div>
-               <div class="w-full border-b border-gray-200 border-dashed flex-1"></div>
-               <div class="w-full border-b border-gray-200 border-dashed flex-1"></div>
-               <div class="w-full border-b border-gray-200 border-solid flex-1"></div>
+            <div class="absolute inset-0 flex flex-col justify-between pb-8 pointer-events-none opacity-25">
+               <div class="w-full border-b border-slate-300 border-dashed flex-1"></div>
+               <div class="w-full border-b border-slate-300 border-dashed flex-1"></div>
+               <div class="w-full border-b border-slate-300 border-dashed flex-1"></div>
+               <div class="w-full border-b border-slate-300 border-solid flex-1"></div>
             </div>
 
             <!-- Bars -->
-            <div *ngFor="let col of recentChartData()" class="flex-1 flex flex-col items-center justify-end h-full gap-3 group/bar relative z-10">
-              <!-- Tooltip -->
-              <div class="opacity-0 group-hover/bar:opacity-100 transition-all duration-300 bg-gray-900 text-white text-[11px] font-bold px-3 py-2 rounded-xl mb-2 whitespace-nowrap shadow-xl absolute bottom-[100%] z-20 pointer-events-none translate-y-2 group-hover/bar:translate-y-0 flex flex-col items-center">
-                <span>{{ col.revenue | number }} MRU</span>
-                <div class="w-2 h-2 bg-gray-900 rotate-45 absolute -bottom-1"></div>
-              </div>
+            <div *ngFor="let col of recentChartData()" class="flex-1 flex flex-col items-center justify-end h-full gap-2 group/bar relative z-10">
+              <!-- Value tag -->
+              <span class="text-[9px] sm:text-[10px] font-extrabold text-slate-600 whitespace-nowrap mb-1">
+                {{ col.revenue > 0 ? ((col.revenue / 1000).toFixed(col.revenue >= 1000 ? 1 : 0) + 'k') : '0' }}
+              </span>
               
-              <div class="w-full max-w-[3.5rem] relative flex items-end h-full rounded-t-xl overflow-hidden bg-transparent">
-                 <div class="w-full bg-gradient-to-t from-primary to-primary-light rounded-t-xl hover:opacity-90 transition-all duration-500 relative shadow-[0_4px_15px_rgba(15,77,92,0.2)] group-hover/bar:from-primary-light group-hover/bar:to-primary"
+              <div class="w-full max-w-[2.5rem] sm:max-w-[3.5rem] relative flex items-end h-[160px] sm:h-[220px] rounded-t-xl overflow-hidden bg-slate-100/60">
+                 <div class="w-full bg-gradient-to-t from-primary to-primary-light rounded-t-xl hover:opacity-90 transition-all duration-500 relative shadow-sm"
                       [style.height]="col.heightPercentage">
-                    <div class="absolute inset-x-0 top-0 h-1.5 bg-white/30 rounded-t-xl"></div>
+                    <div class="absolute inset-x-0 top-0 h-1 bg-white/40 rounded-t-xl"></div>
                  </div>
               </div>
             </div>
           </div>
 
           <!-- Axis Labels -->
-          <div class="flex justify-between items-center px-0 pt-4 relative z-10 border-t border-gray-100">
-            <div *ngFor="let col of recentChartData()" class="flex-1 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+          <div class="flex justify-between items-center px-0 pt-3 relative z-10 border-t border-slate-100">
+            <div *ngFor="let col of recentChartData()" class="flex-1 text-center text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               {{col.label}}
             </div>
           </div>
         </div>
 
         <!-- Top Selling Products -->
-        <div class="xl:col-span-1 bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col h-[480px] relative overflow-hidden">
-          <div class="absolute right-0 top-0 w-64 h-64 bg-gradient-to-bl from-terracotta/5 to-transparent rounded-bl-full pointer-events-none"></div>
-          
-          <h2 class="text-xl font-extrabold text-gray-900 flex items-center gap-3 mb-6 relative z-10">
-            <span class="w-1.5 h-6 bg-terracotta rounded-full"></span>
+        <div class="xl:col-span-1 bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-[2rem] border border-slate-200/80 shadow-xs flex flex-col min-h-[340px] sm:min-h-[400px]">
+          <h2 class="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2 mb-4 sm:mb-6">
+            <span class="w-2 h-5 bg-terracotta rounded-full"></span>
             Top Produits
           </h2>
           
-          <div class="flex-grow overflow-y-auto pr-2 space-y-3 custom-scrollbar relative z-10">
-             <div *ngFor="let prod of topProducts(); let i = index" class="flex items-center gap-4 bg-white border border-gray-100 p-3 rounded-2xl hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm hover:shadow">
-                <div class="relative w-14 h-14 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-100">
-                  <div class="absolute top-0 left-0 bg-gray-900/80 backdrop-blur-sm text-white text-[10px] font-extrabold w-6 h-6 flex items-center justify-center rounded-br-xl z-10">
+          <div class="flex-grow overflow-y-auto space-y-2.5 custom-scrollbar pr-1">
+             <div *ngFor="let prod of topProducts(); let i = index" class="flex items-center gap-3 bg-slate-50 hover:bg-slate-100/80 border border-slate-100 p-2.5 sm:p-3 rounded-xl transition-all">
+                <div class="relative w-12 h-12 rounded-xl overflow-hidden bg-white shrink-0 border border-slate-200">
+                  <div class="absolute top-0 left-0 bg-slate-900 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-br-lg z-10">
                     #{{i + 1}}
                   </div>
-                  <img [src]="prod.image" class="w-full h-full object-cover transition-transform hover:scale-110 duration-500">
+                  <img [src]="prod.image" class="w-full h-full object-cover">
                 </div>
                 <div class="min-w-0 flex-grow">
-                  <p class="text-sm font-bold text-gray-900 truncate" [title]="prod.name">{{prod.name}}</p>
-                  <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 flex items-center gap-1">
-                    <svg class="w-3 h-3 text-terracotta" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                  <p class="text-xs sm:text-sm font-bold text-slate-900 truncate m-0" [title]="prod.name">{{prod.name}}</p>
+                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5 flex items-center gap-1">
                     {{prod.qty}} ventes
                   </p>
                 </div>
-                <div class="text-right shrink-0 bg-gray-50 px-2 py-1.5 rounded-xl">
-                  <p class="text-sm font-black text-terracotta">{{(prod.rev / 1000).toFixed(1)}}k</p>
-                  <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">MRU</p>
+                <div class="text-right shrink-0 bg-white px-2 py-1 rounded-lg border border-slate-100">
+                  <p class="text-xs sm:text-sm font-black text-terracotta m-0">{{(prod.rev / 1000).toFixed(1)}}k</p>
+                  <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest m-0">MRU</p>
                 </div>
              </div>
 
              <!-- Empty state -->
-             <div *ngIf="topProducts().length === 0" class="flex flex-col items-center justify-center h-full text-center p-6 text-gray-400">
-                 <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
-                   <svg class="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+             <div *ngIf="topProducts().length === 0" class="flex flex-col items-center justify-center h-full text-center p-6 text-slate-400">
+                 <div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-2">
+                   <svg class="w-6 h-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                  </div>
-                 <p class="text-sm font-medium">Pas de données disponibles</p>
+                 <p class="text-xs font-medium">Pas de données disponibles</p>
              </div>
           </div>
         </div>
       </div>
 
-      <!-- Recent Orders List -->
-      <div class="mt-8 bg-white rounded-[2rem] border border-gray-100/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-        <div class="p-6 md:p-8 border-b border-gray-100 flex items-center justify-between">
-          <h2 class="text-xl font-extrabold text-gray-900 flex items-center gap-3">
-            <span class="w-1.5 h-6 bg-gray-900 rounded-full"></span>
+      <!-- Recent Orders Section -->
+      <div class="bg-white rounded-2xl sm:rounded-[2rem] border border-slate-200/80 shadow-xs overflow-hidden">
+        <div class="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-base sm:text-xl font-black text-slate-900 flex items-center gap-2 m-0">
+            <span class="w-2 h-5 bg-slate-900 rounded-full"></span>
             Commandes Récentes
           </h2>
-          <button class="text-primary text-sm font-bold hover:underline">Voir tout</button>
+          <a routerLink="/admin/orders" class="text-primary text-xs sm:text-sm font-bold hover:underline no-underline">Voir tout →</a>
         </div>
         
-        <div class="overflow-x-auto" *ngIf="orders().length > 0; else noOrders">
-          <table class="w-full text-left text-sm text-gray-600">
-            <thead class="bg-gray-50/80 text-gray-500 font-black text-[10px] uppercase tracking-widest whitespace-nowrap">
-              <tr>
-                <th class="px-6 py-4">ID Commande</th>
-                <th class="px-6 py-4">Client</th>
-                <th class="px-6 py-4 text-center">Date & Heure</th>
-                <th class="px-6 py-4 text-center">Montant Total</th>
-                <th class="px-6 py-4 text-center">Statut</th>
-                <th class="px-6 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-              <tr *ngFor="let order of orders().slice(0, 8)" class="hover:bg-gray-50/50 transition-colors group">
-                <td class="px-6 py-5 font-black text-gray-900">#{{order._id.substring(order._id.length-6).toUpperCase()}}</td>
-                <td class="px-6 py-5">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
-                      {{ (order.user?.name || 'C').charAt(0).toUpperCase() }}
-                    </div>
-                    <span class="font-bold text-gray-900">{{order.user?.name || 'Client Supprimé'}}</span>
-                  </div>
-                </td>
-                <td class="px-6 py-5 text-center">
-                  <div class="flex flex-col">
-                    <span class="font-bold text-gray-900">{{order.createdAt | date:'shortDate'}}</span>
-                    <span class="text-[10px] text-gray-500 font-medium">{{order.createdAt | date:'shortTime'}}</span>
-                  </div>
-                </td>
-                <td class="px-6 py-5 text-center">
-                  <span class="font-black text-primary text-base">{{order.totalPrice | number}} <span class="text-xs text-gray-400">MRU</span></span>
-                </td>
-                <td class="px-6 py-5 text-center">
-                  <span [class]="getStatusClass(order)" class="py-1.5 px-3 rounded-full text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1.5">
-                    <div class="w-1.5 h-1.5 rounded-full" [class.bg-primary]="order.isConfirmed" [class.bg-terracotta]="!order.isConfirmed" [class.animate-pulse]="!order.isConfirmed"></div>
+        <div *ngIf="orders().length > 0; else noOrders">
+          
+          <!-- MOBILE VIEW: Dedicated Touch-friendly Cards (< 768px) -->
+          <div class="md:hidden divide-y divide-slate-100 p-2 space-y-2">
+            <div *ngFor="let order of orders().slice(0, 8)" class="p-3.5 bg-slate-50/70 rounded-xl border border-slate-100 flex flex-col gap-2.5">
+              
+              <!-- Row 1: ID, status, date -->
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="font-black text-xs text-slate-900">#{{order._id.substring(order._id.length-6).toUpperCase()}}</span>
+                  <span [class]="getStatusClass(order)" class="py-0.5 px-2 rounded-full text-[9px] font-black uppercase tracking-wider">
                     {{ order.isConfirmed ? 'Confirmée' : 'En Attente' }}
                   </span>
-                </td>
-                <td class="px-6 py-5 text-right">
-                  <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button *ngIf="!order.isConfirmed" 
-                      (click)="confirmOrder(order._id)"
-                      title="Confirmer"
-                      class="text-primary hover:text-white hover:bg-primary font-bold bg-primary/10 p-2 rounded-xl cursor-pointer transition-all active:scale-95">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                    </button>
-                    <button (click)="deleteOrder(order._id)"
-                      title="Supprimer"
-                      class="text-terracotta hover:text-white hover:bg-terracotta font-bold bg-terracotta/10 p-2 rounded-xl cursor-pointer transition-all active:scale-95">
-                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
+                </div>
+                <span class="text-[10px] text-slate-400 font-medium">{{order.createdAt | date:'shortDate'}} {{order.createdAt | date:'shortTime'}}</span>
+              </div>
+
+              <!-- Row 2: Customer & Price -->
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                    {{ (order.user?.name || 'C').charAt(0).toUpperCase() }}
                   </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <ng-template #noOrders>
-          <div class="py-20 text-center flex flex-col items-center bg-gray-50/50">
-            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-               <svg class="w-10 h-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                  <span class="font-bold text-xs text-slate-800 truncate">{{order.user?.name || 'Client Supprimé'}}</span>
+                </div>
+                <span class="font-black text-primary text-sm whitespace-nowrap">{{order.totalPrice | number}} MRU</span>
+              </div>
+
+              <!-- Row 3: Action Buttons (Touch Friendly & Always Visible) -->
+              <div class="flex items-center justify-end gap-2 pt-1 border-t border-slate-200/50">
+                <button *ngIf="!order.isConfirmed" 
+                        (click)="confirmOrder(order._id)"
+                        class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all border-none cursor-pointer flex items-center gap-1 active:scale-95">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                  <span>Confirmer</span>
+                </button>
+                <button (click)="deleteOrder(order._id)"
+                        class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-all border-none cursor-pointer flex items-center gap-1 active:scale-95">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  <span>Supprimer</span>
+                </button>
+              </div>
+
             </div>
-            <p class="font-bold text-gray-900 text-lg">Aucune commande</p>
-            <p class="text-gray-500 text-sm mt-1">Les nouvelles commandes apparaîtront ici.</p>
+          </div>
+
+          <!-- DESKTOP VIEW: Full Table (>= 768px) -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50/80 text-slate-500 font-black text-[10px] uppercase tracking-widest whitespace-nowrap border-b border-slate-100">
+                <tr>
+                  <th class="px-6 py-4">ID Commande</th>
+                  <th class="px-6 py-4">Client</th>
+                  <th class="px-6 py-4 text-center">Date & Heure</th>
+                  <th class="px-6 py-4 text-center">Montant Total</th>
+                  <th class="px-6 py-4 text-center">Statut</th>
+                  <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr *ngFor="let order of orders().slice(0, 8)" class="hover:bg-slate-50/60 transition-colors group">
+                  <td class="px-6 py-4 font-black text-slate-900">#{{order._id.substring(order._id.length-6).toUpperCase()}}</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                        {{ (order.user?.name || 'C').charAt(0).toUpperCase() }}
+                      </div>
+                      <span class="font-bold text-slate-900">{{order.user?.name || 'Client Supprimé'}}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <div class="flex flex-col">
+                      <span class="font-bold text-slate-800 text-xs">{{order.createdAt | date:'shortDate'}}</span>
+                      <span class="text-[10px] text-slate-400 font-medium">{{order.createdAt | date:'shortTime'}}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="font-black text-primary text-sm">{{order.totalPrice | number}} <span class="text-xs text-slate-400">MRU</span></span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span [class]="getStatusClass(order)" class="py-1 px-2.5 rounded-full text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full" [class.bg-primary]="order.isConfirmed" [class.bg-terracotta]="!order.isConfirmed" [class.animate-pulse]="!order.isConfirmed"></span>
+                      {{ order.isConfirmed ? 'Confirmée' : 'En Attente' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end gap-1.5">
+                      <button *ngIf="!order.isConfirmed" 
+                        (click)="confirmOrder(order._id)"
+                        title="Confirmer"
+                        class="text-emerald-700 hover:text-white hover:bg-emerald-600 font-bold bg-emerald-50 p-2 rounded-xl cursor-pointer transition-all active:scale-95 border border-emerald-200">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                      </button>
+                      <button (click)="deleteOrder(order._id)"
+                        title="Supprimer"
+                        class="text-red-600 hover:text-white hover:bg-red-500 font-bold bg-red-50 p-2 rounded-xl cursor-pointer transition-all active:scale-95 border border-red-200">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <ng-template #noOrders>
+          <div class="py-16 text-center flex flex-col items-center bg-slate-50/50">
+            <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-xs mb-3">
+               <svg class="w-7 h-7 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+            </div>
+            <p class="font-bold text-slate-800 text-base">Aucune commande</p>
+            <p class="text-slate-400 text-xs mt-0.5">Les nouvelles commandes apparaîtront ici.</p>
           </div>
         </ng-template>
       </div>
