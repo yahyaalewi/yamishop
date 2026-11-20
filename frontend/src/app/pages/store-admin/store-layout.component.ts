@@ -24,6 +24,27 @@ import { LanguageService } from '../../services/language.service';
       transform: translateY(-2px);
       filter: drop-shadow(0 2px 6px rgba(15, 77, 92, 0.3));
     }
+    /* Tooltip pour mode réduit */
+    .sidebar-tooltip {
+      position: relative;
+    }
+    .sidebar-tooltip:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1e293b;
+      color: #f1f5f9;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      padding: 5px 10px;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
   `],
   template: `
     <div class="min-h-screen bg-slate-50 flex flex-col lg:flex-row text-slate-800 antialiased" dir="ltr">
@@ -37,8 +58,11 @@ import { LanguageService } from '../../services/language.service';
         class="hidden lg:flex bg-slate-900 text-slate-100 flex-col shadow-2xl border-r border-slate-800 transition-all duration-300 ease-in-out lg:static lg:h-screen lg:shrink-0">
         
         <!-- Sidebar Brand Header -->
-        <div class="p-5 flex items-center justify-between border-b border-slate-800/80 bg-slate-950/40">
-          <a routerLink="/store-admin/dashboard" class="flex items-center gap-3 no-underline group min-w-0">
+        <div [ngClass]="isDesktopCollapsed() ? 'p-3 justify-center' : 'p-5 justify-between'"
+             class="flex items-center border-b border-slate-800/80 bg-slate-950/40">
+          <a routerLink="/store-admin/dashboard" 
+             [ngClass]="isDesktopCollapsed() ? 'justify-center' : 'gap-3'"
+             class="flex items-center no-underline group min-w-0">
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-emerald-500/25 shrink-0 group-hover:scale-105 transition-transform">
               🏪
             </div>
@@ -53,14 +77,26 @@ import { LanguageService } from '../../services/language.service';
             </div>
           </a>
 
-          <!-- Collapse on desktop -->
-          <div class="flex items-center gap-1">
-            <button (click)="toggleDesktopSidebar()" [title]="isDesktopCollapsed() ? 'Agrandir' : 'Réduire'" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors border-none bg-transparent cursor-pointer">
-              <svg class="w-4 h-4 transition-transform" [class.rotate-180]="isDesktopCollapsed()" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-              </svg>
-            </button>
-          </div>
+          <!-- Collapse button -->
+          <button *ngIf="!isDesktopCollapsed()"
+                  (click)="toggleDesktopSidebar()" 
+                  title="Réduire" 
+                  class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors border-none bg-transparent cursor-pointer shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Expand button when collapsed -->
+        <div *ngIf="isDesktopCollapsed()" class="flex justify-center pt-3 pb-1">
+          <button (click)="toggleDesktopSidebar()" 
+                  title="Agrandir" 
+                  class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors border-none bg-transparent cursor-pointer">
+            <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+            </svg>
+          </button>
         </div>
 
         <!-- Navigation Links -->
@@ -73,8 +109,10 @@ import { LanguageService } from '../../services/language.service';
               <a routerLink="/store-admin/dashboard" 
                  routerLinkActive="nav-item-active" 
                  [routerLinkActiveOptions]="{exact: true}"
-                 class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
-                 [title]="'Tableau de bord'">
+                 [ngClass]="isDesktopCollapsed() ? 'justify-center px-2 py-3' : 'gap-3 px-3.5 py-3'"
+                 class="sidebar-tooltip flex items-center rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
+                 [attr.data-tip]="isDesktopCollapsed() ? 'Tableau de bord' : null"
+                 title="Tableau de bord">
                 <svg class="h-5 w-5 shrink-0 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
@@ -84,8 +122,10 @@ import { LanguageService } from '../../services/language.service';
               <!-- Products -->
               <a routerLink="/store-admin/products" 
                  routerLinkActive="nav-item-active"
-                 class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
-                 [title]="'Produits & Stock'">
+                 [ngClass]="isDesktopCollapsed() ? 'justify-center px-2 py-3' : 'gap-3 px-3.5 py-3'"
+                 class="sidebar-tooltip flex items-center rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
+                 [attr.data-tip]="isDesktopCollapsed() ? 'Produits & Stock' : null"
+                 title="Produits & Stock">
                 <svg class="h-5 w-5 shrink-0 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
@@ -95,8 +135,10 @@ import { LanguageService } from '../../services/language.service';
               <!-- Orders -->
               <a routerLink="/store-admin/orders" 
                  routerLinkActive="nav-item-active"
-                 class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
-                 [title]="'Commandes'">
+                 [ngClass]="isDesktopCollapsed() ? 'justify-center px-2 py-3' : 'gap-3 px-3.5 py-3'"
+                 class="sidebar-tooltip flex items-center rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
+                 [attr.data-tip]="isDesktopCollapsed() ? 'Commandes' : null"
+                 title="Commandes">
                 <svg class="h-5 w-5 shrink-0 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
@@ -111,7 +153,10 @@ import { LanguageService } from '../../services/language.service';
             <p *ngIf="!isDesktopCollapsed()" class="px-3 text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-2">Visite client</p>
             <a [routerLink]="['/store', store()?._id]" 
                target="_blank"
-               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 hover:bg-emerald-900/40 transition-all no-underline group">
+               [ngClass]="isDesktopCollapsed() ? 'justify-center px-2 py-2.5' : 'gap-3 px-3.5 py-2.5'"
+               class="sidebar-tooltip flex items-center rounded-xl text-xs font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/20 hover:bg-emerald-900/40 transition-all no-underline group"
+               [attr.data-tip]="isDesktopCollapsed() ? 'Voir ma boutique' : null"
+               title="Voir ma boutique en ligne">
               <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
               </svg>
@@ -122,17 +167,29 @@ import { LanguageService } from '../../services/language.service';
 
         <!-- Sidebar User Footer -->
         <div class="p-3 border-t border-slate-800 bg-slate-950/40">
-          <div class="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-800/40">
+          <!-- Mode étendu -->
+          <div *ngIf="!isDesktopCollapsed()" class="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-800/40">
             <div class="flex items-center gap-2.5 min-w-0">
               <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-md">
                 {{ initials() }}
               </div>
-              <div *ngIf="!isDesktopCollapsed()" class="min-w-0 flex-1">
+              <div class="min-w-0 flex-1">
                 <p class="text-xs font-bold text-white truncate m-0 leading-tight">{{ firstName() }}</p>
                 <p class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider mt-0.5">Admin Boutique</p>
               </div>
             </div>
             <button (click)="logout()" class="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors border-none bg-transparent cursor-pointer shrink-0" title="Déconnexion">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+              </svg>
+            </button>
+          </div>
+          <!-- Mode réduit : avatar + logout centrés -->
+          <div *ngIf="isDesktopCollapsed()" class="flex flex-col items-center gap-2">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white font-black text-xs flex items-center justify-center shadow-md" [title]="firstName()">
+              {{ initials() }}
+            </div>
+            <button (click)="logout()" class="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors border-none bg-transparent cursor-pointer" title="Déconnexion">
               <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
               </svg>
