@@ -246,7 +246,9 @@ export class StoreDashboardComponent implements OnInit {
     return this.productService.getImageUrl(src);
   }
 
-  logout() {
+  async logout() {
+    const confirmed = await this.notificationService.confirm('Êtes-vous sûr de vouloir quitter votre espace boutique ?');
+    if (!confirmed) return;
     this.authService.logout();
     this.router.navigate(['/login']);
   }

@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/rou
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { LanguageService } from '../../services/language.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -363,6 +364,7 @@ export class AdminLayoutComponent {
   isDesktopCollapsed = signal(false);
 
   authService = inject(AuthService);
+  notificationService = inject(NotificationService);
   lang = inject(LanguageService);
   router = inject(Router);
 
@@ -380,7 +382,12 @@ export class AdminLayoutComponent {
     this.isDesktopCollapsed.update(val => !val);
   }
 
-  logout() {
+  async logout() {
+    const msg = this.lang.isRTL() 
+      ? 'هل أنت متأكد من رغبتك في تسجيل الخروج؟' 
+      : 'Êtes-vous sûr de vouloir vous déconnecter ?';
+    const confirmed = await this.notificationService.confirm(msg);
+    if (!confirmed) return;
     this.authService.logout();
     this.router.navigate(['/login']);
   }

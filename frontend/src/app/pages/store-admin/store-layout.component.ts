@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { StoreService, Store } from '../../services/store.service';
 import { LanguageService } from '../../services/language.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-store-layout',
@@ -333,6 +334,7 @@ export class StoreAdminLayoutComponent implements OnInit {
 
   authService = inject(AuthService);
   storeService = inject(StoreService);
+  notificationService = inject(NotificationService);
   lang = inject(LanguageService);
   router = inject(Router);
 
@@ -361,7 +363,12 @@ export class StoreAdminLayoutComponent implements OnInit {
     this.isDesktopCollapsed.update(val => !val);
   }
 
-  logout() {
+  async logout() {
+    const msg = this.lang.isRTL() 
+      ? 'هل أنت متأكد من رغبتك في الخروج من لوحة التحكم؟' 
+      : 'Êtes-vous sûr de vouloir quitter votre espace boutique ?';
+    const confirmed = await this.notificationService.confirm(msg);
+    if (!confirmed) return;
     this.authService.logout();
     this.router.navigate(['/login']);
   }

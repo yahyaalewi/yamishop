@@ -133,7 +133,12 @@ export class HeaderComponent {
     return user ? user.name.split(' ')[0] : '';
   });
 
-  logout() {
+  async logout() {
+    const msg = this.lang.isRTL() 
+      ? 'هل أنت متأكد من رغبتك في تسجيل الخروج؟' 
+      : 'Êtes-vous sûr de vouloir vous déconnecter ?';
+    const confirmed = await this.notificationService.confirm(msg);
+    if (!confirmed) return;
     this.authService.logout();
     this.notificationService.show(this.lang.translate('msg.logged_out'));
     this.router.navigate(['/login']);
