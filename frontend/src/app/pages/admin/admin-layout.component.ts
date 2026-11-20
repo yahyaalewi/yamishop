@@ -188,22 +188,6 @@ import { LanguageService } from '../../services/language.service';
             </div>
           </div>
 
-          <!-- Public site link -->
-          <div>
-            <p *ngIf="!isDesktopCollapsed()" class="px-3 text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mb-2">Vitrine</p>
-            <a routerLink="/home" 
-               target="_blank"
-               [ngClass]="isDesktopCollapsed() ? 'justify-center px-2 py-2.5' : 'gap-3 px-3.5 py-2.5'"
-               class="sidebar-tooltip flex items-center rounded-xl text-xs font-bold text-primary-light bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-all no-underline group"
-               [attr.data-tip]="isDesktopCollapsed() ? 'Voir le site en direct' : null"
-               title="Voir le site en direct">
-              <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-              </svg>
-              <span *ngIf="!isDesktopCollapsed()" class="truncate">Voir le site en direct</span>
-            </a>
-          </div>
-
         </nav>
 
         <!-- Sidebar User Footer -->
