@@ -277,6 +277,31 @@ exports.getMyStore = async (req, res) => {
   }
 };
 
+// ─── Store Admin: Update own store profile ──────────────────────────────────
+exports.updateMyStore = async (req, res) => {
+  try {
+    if (!req.user.storeId) {
+      return res.status(404).json({ message: 'Aucune boutique associée à ce compte.' });
+    }
+    const store = await Store.findById(req.user.storeId);
+    if (!store) return res.status(404).json({ message: 'Boutique non trouvée.' });
+
+    const { name, logo, description, address, phone, email } = req.body;
+
+    if (name && name.trim()) store.name = name.trim();
+    if (logo !== undefined) store.logo = logo;
+    if (description !== undefined) store.description = description;
+    if (address !== undefined) store.address = address;
+    if (phone !== undefined) store.phone = phone;
+    if (email !== undefined) store.email = email;
+
+    const updatedStore = await store.save();
+    res.json(updatedStore);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // ─── Store Admin: Get own store stats ────────────────────────────────────────
 exports.getMyStoreStats = async (req, res) => {
   try {

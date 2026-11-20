@@ -98,6 +98,10 @@ export class StoreService {
     return this.http.get<Store>(`${this.apiUrl}/me`);
   }
 
+  updateMyStore(payload: Partial<Store>): Observable<Store> {
+    return this.http.put<Store>(`${this.apiUrl}/me`, payload);
+  }
+
   getMyStoreStats(): Observable<StoreStats> {
     return this.http.get<StoreStats>(`${this.apiUrl}/my-stats`);
   }

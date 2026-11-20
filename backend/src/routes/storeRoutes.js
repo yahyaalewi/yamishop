@@ -10,6 +10,7 @@ const {
   getStoreStats,
   resetStoreAdminPassword,
   getMyStore,
+  updateMyStore,
   getPublicStores,
   getPublicStoreById,
   getMyStoreStats,
@@ -22,6 +23,7 @@ router.get('/public/:id', getPublicStoreById);
 
 // ─── Store Admin routes ──────────────────────────────────────────────────────
 router.get('/me', protect, storeAdmin, getMyStore);
+router.put('/me', protect, storeAdmin, updateMyStore);
 router.get('/my-stats', protect, storeAdmin, getMyStoreStats);
 
 // ─── Super Admin routes ──────────────────────────────────────────────────────

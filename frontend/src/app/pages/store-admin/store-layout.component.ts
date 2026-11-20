@@ -146,6 +146,19 @@ import { NotificationService } from '../../services/notification.service';
                 <span *ngIf="!isDesktopCollapsed()" class="truncate">Commandes</span>
               </a>
 
+              <!-- Store Profile -->
+              <a routerLink="/store-admin/dashboard" 
+                 [queryParams]="{ tab: 'profile' }"
+                 [ngClass]="isDesktopCollapsed() ? 'justify-center px-2 py-3' : 'gap-3 px-3.5 py-3'"
+                 class="sidebar-tooltip flex items-center rounded-xl text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all no-underline group"
+                 [attr.data-tip]="isDesktopCollapsed() ? 'Profil Boutique' : null"
+                 title="Profil Boutique">
+                <svg class="h-5 w-5 shrink-0 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                <span *ngIf="!isDesktopCollapsed()" class="truncate">Profil Boutique</span>
+              </a>
+
             </div>
           </div>
 
@@ -294,23 +307,21 @@ import { NotificationService } from '../../services/notification.service';
           <!-- Tab 3: Orders -->
           <a routerLink="/store-admin/orders" 
              routerLinkActive="bottom-tab-active" 
-             class="flex flex-col items-center justify-center gap-1 py-1 px-3 text-slate-400 no-underline transition-all active:scale-95 flex-1 min-w-0">
+             class="flex flex-col items-center justify-center gap-1 py-1 px-2 text-slate-400 no-underline transition-all active:scale-95 flex-1 min-w-0">
             <svg class="w-5 h-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
             <span class="text-[10px] tracking-tight truncate">Commandes</span>
           </a>
 
-          <!-- Tab 4: Store Public View -->
-          <a *ngIf="store()?._id" 
-             [routerLink]="['/store', store()?._id]" 
-             target="_blank"
-             class="flex flex-col items-center justify-center gap-1 py-1 px-3 text-emerald-600 no-underline transition-all active:scale-95 flex-1 min-w-0">
+          <!-- Tab 4: Store Profile -->
+          <a routerLink="/store-admin/dashboard" 
+             [queryParams]="{ tab: 'profile' }"
+             class="flex flex-col items-center justify-center gap-1 py-1 px-2 text-slate-400 no-underline transition-all active:scale-95 flex-1 min-w-0">
             <svg class="w-5 h-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
-            <span class="text-[10px] font-bold tracking-tight truncate">Boutique</span>
+            <span class="text-[10px] tracking-tight truncate">Profil</span>
           </a>
 
           <!-- Tab 5: Logout Action -->
