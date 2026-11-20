@@ -37,9 +37,31 @@ import { LanguageService } from '../services/language.service';
           <!-- Phone -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">{{ lang.translate('checkout.phone') }} *</label>
-            <input type="tel" name="phone" [(ngModel)]="phone" placeholder="+222 4X XX XX XX"
-              class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-              [class.border-red-400]="phoneError()">
+            <div class="flex items-stretch">
+              <!-- Préfixe pays fixe -->
+              <div class="flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-xl shrink-0">
+                <span class="text-base mr-1">🇲🇷</span>
+                <span class="text-sm font-bold text-gray-500">+222</span>
+              </div>
+              <!-- Champ numéro (8 chiffres uniquement) -->
+              <input type="tel" name="phone" [(ngModel)]="phone"
+                (input)="onPhoneInput($event)"
+                placeholder="XX XX XX XX"
+                maxlength="11"
+                class="flex-1 px-4 py-3 border border-gray-200 rounded-r-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                [class.border-red-400]="phoneError()">
+            </div>
+            <!-- Indicateur de validation en temps réel -->
+            <div class="mt-1 flex items-center gap-1.5" *ngIf="phone.length > 0">
+              <span *ngIf="isPhoneValid()" class="text-xs text-green-600 font-semibold flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                Numéro valide
+              </span>
+              <span *ngIf="!isPhoneValid() && rawPhone.length >= 8" class="text-xs text-red-500 font-semibold flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                Doit commencer par 2, 3 ou 4
+              </span>
+            </div>
             <p *ngIf="phoneError()" class="text-xs text-red-500 mt-1">{{ phoneError() }}</p>
           </div>
 
@@ -95,22 +117,45 @@ export class RegisterComponent {
 
   constructor() {}
 
+  /** Filtre la saisie : chiffres uniquement, max 8, formatage XX XX XX XX */
+  onPhoneInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let val = input.value.replace(/\D/g, '');
+    if (val.length > 8) val = val.slice(0, 8);
+    const parts = val.match(/(\d{1,2})(\d{0,2})(\d{0,2})(\d{0,2})/);
+    if (parts) {
+      this.phone = [parts[1], parts[2], parts[3], parts[4]].filter(Boolean).join(' ');
+    } else {
+      this.phone = val;
+    }
+    input.value = this.phone;
+  }
+
+  /** Retourne les 8 chiffres bruts sans espaces */
+  get rawPhone(): string {
+    return this.phone.replace(/\D/g, '');
+  }
+
+  /** Validation en temps réel */
+  isPhoneValid(): boolean {
+    return /^[234]\d{7}$/.test(this.rawPhone);
+  }
+
   onSubmit() {
     this.nameError.set('');
     this.phoneError.set('');
     this.passwordError.set('');
     this.confirmError.set('');
 
-    const trimmedPhone = this.phone.trim();
     let valid = true;
     if (!this.name) { this.nameError.set(this.lang.translate('auth.error_required')); valid = false; }
     
-    const phoneRegex = /^(?:\+222)?(2|3|4)\d{7}$/;
-    if (!trimmedPhone) { 
+    const digits = this.rawPhone;
+    if (!digits) { 
       this.phoneError.set(this.lang.translate('auth.error_required')); 
       valid = false; 
-    } else if (!phoneRegex.test(trimmedPhone)) {
-      this.phoneError.set(this.lang.translate('auth.error_phone'));
+    } else if (!this.isPhoneValid()) {
+      this.phoneError.set('Numéro invalide. Doit commencer par 2, 3 ou 4 et contenir 8 chiffres.');
       valid = false;
     }
 
@@ -119,7 +164,8 @@ export class RegisterComponent {
     if (!valid) return;
 
     this.loading.set(true);
-    this.authService.register(this.name, trimmedPhone, this.password).subscribe({
+    // Envoie le numéro normalisé (8 chiffres) au backend
+    this.authService.register(this.name, digits, this.password).subscribe({
       next: () => {
         this.loading.set(false);
         this.notificationService.show(this.lang.translate('msg.register_success'));

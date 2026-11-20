@@ -12,18 +12,38 @@ const generateToken = (id) => {
   });
 };
 
+/**
+ * Normalise un numéro mauritanien :
+ * - Accepte : 2XXXXXXX, 3XXXXXXX, 4XXXXXXX (8 chiffres)
+ *             +2222XXXXXXX, 2222XXXXXXX (avec indicatif)
+ * - Retourne toujours le format court sans indicatif : 8 chiffres ex: "22012345"
+ * - Retourne null si invalide
+ */
+const normalizeMauritanianPhone = (raw) => {
+  if (!raw) return null;
+  // Supprime espaces, tirets, points
+  let phone = String(raw).replace(/[\s\-\.]/g, '');
+  // Retire le + initial
+  if (phone.startsWith('+')) phone = phone.slice(1);
+  // Retire l'indicatif 222 s'il est présent
+  if (phone.startsWith('222')) phone = phone.slice(3);
+  // Valide : doit commencer par 2, 3 ou 4 et faire exactement 8 chiffres
+  if (/^[234]\d{7}$/.test(phone)) return phone;
+  return null;
+};
+
 const registerSchema = Joi.object({
   name: Joi.string().required(),
-  phone: Joi.string().trim().regex(/^(?:\+222)?(2|3|4)\d{7}$/).required().messages({
-    'string.pattern.base': 'Veuillez entrer un numéro de téléphone mauritanien valide (ex: 2XXXXXXX, 3XXXXXXX, 4XXXXXXX)'
+  phone: Joi.string().trim().required().messages({
+    'string.empty': 'Le numéro de téléphone est requis'
   }),
   password: Joi.string().min(6).required(),
   email: Joi.string().email().optional()
 });
 
 const loginSchema = Joi.object({
-  phone: Joi.string().trim().regex(/^(?:\+222)?(2|3|4)\d{7}$/).required().messages({
-    'string.pattern.base': 'Format de numéro invalide'
+  phone: Joi.string().trim().required().messages({
+    'string.empty': 'Le numéro de téléphone est requis'
   }),
   password: Joi.string().required()
 });
@@ -38,19 +58,27 @@ const registerUser = async (req, res) => {
     const { error } = registerSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const { name, phone, password, email } = req.body;
+    const { name, password, email } = req.body;
 
-    const userExists = await User.findOne({ phone });
+    // Normalise le numéro mauritanien (retire +222 / 222 si présent)
+    const normalizedPhone = normalizeMauritanianPhone(req.body.phone);
+    if (!normalizedPhone) {
+      return res.status(400).json({ 
+        message: 'Numéro invalide. Entrez un numéro mauritanien valide (ex: 22012345, 36001234, 46001234)' 
+      });
+    }
+
+    const userExists = await User.findOne({ phone: normalizedPhone });
     if (userExists) {
       return res.status(400).json({ message: 'User with this phone number already exists' });
     }
 
     const user = await User.create({
       name,
-      phone,
+      phone: normalizedPhone,
       password,
       email,
-      role: 'user' // Force role to user to prevent privilege escalation
+      role: 'user'
     });
 
     if (user) {
@@ -79,9 +107,16 @@ const loginUser = async (req, res) => {
     const { error } = loginSchema.validate(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
 
-    const { phone, password } = req.body;
+    // Normalise le numéro mauritanien
+    const normalizedPhone = normalizeMauritanianPhone(req.body.phone);
+    if (!normalizedPhone) {
+      return res.status(400).json({ 
+        message: 'Numéro invalide. Entrez un numéro mauritanien (ex: 22012345, 36001234)' 
+      });
+    }
+    const { password } = req.body;
 
-    const user = await User.findOne({ phone });
+    const user = await User.findOne({ phone: normalizedPhone });
 
     if (user && (await user.matchPassword(password))) {
       if (user.role === 'admin' || user.role === 'store_admin') {

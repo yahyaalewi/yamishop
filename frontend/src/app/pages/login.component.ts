@@ -29,15 +29,30 @@ import { LanguageService } from '../services/language.service';
           <!-- Phone (Hidden if OTP required) -->
           <div *ngIf="!requiresOtp()">
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">{{ lang.translate('checkout.phone') }}</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
+            <div class="relative flex items-stretch">
+              <!-- Préfixe pays fixe -->
+              <div class="flex items-center px-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-xl shrink-0">
+                <span class="text-base mr-1">🇲🇷</span>
+                <span class="text-sm font-bold text-gray-500">+222</span>
               </div>
-              <input type="tel" name="phone" [(ngModel)]="phone" placeholder="+222 4X XX XX XX"
-                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+              <!-- Champ numéro (8 chiffres uniquement) -->
+              <input type="tel" name="phone" [(ngModel)]="phone"
+                (input)="onPhoneInput($event)"
+                placeholder="XX XX XX XX"
+                maxlength="11"
+                class="flex-1 px-4 py-3 border border-gray-200 rounded-r-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                 [class.border-red-400]="phoneError()">
+            </div>
+            <!-- Indicateur de validation en temps réel -->
+            <div class="mt-1 flex items-center gap-1.5" *ngIf="phone.length > 0">
+              <span *ngIf="isPhoneValid()" class="text-xs text-green-600 font-semibold flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                Numéro valide
+              </span>
+              <span *ngIf="!isPhoneValid() && phone.length >= 8" class="text-xs text-red-500 font-semibold flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                Doit commencer par 2, 3 ou 4
+              </span>
             </div>
             <p *ngIf="phoneError()" class="text-xs text-red-500 mt-1">{{ phoneError() }}</p>
           </div>
@@ -144,6 +159,32 @@ export class LoginComponent {
 
   constructor() {}
 
+  /** Filtre la saisie : chiffres uniquement, max 8 */
+  onPhoneInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    // Garde uniquement les chiffres
+    let val = input.value.replace(/\D/g, '');
+    if (val.length > 8) val = val.slice(0, 8);
+    // Formatage visuel XX XX XX XX
+    const parts = val.match(/(\d{1,2})(\d{0,2})(\d{0,2})(\d{0,2})/);
+    if (parts) {
+      this.phone = [parts[1], parts[2], parts[3], parts[4]].filter(Boolean).join(' ');
+    } else {
+      this.phone = val;
+    }
+    input.value = this.phone;
+  }
+
+  /** Retourne les 8 chiffres bruts sans espaces */
+  get rawPhone(): string {
+    return this.phone.replace(/\D/g, '');
+  }
+
+  /** Validation en temps réel */
+  isPhoneValid(): boolean {
+    return /^[234]\d{7}$/.test(this.rawPhone);
+  }
+
   private navigateAfterLogin(role: string) {
     const returnUrl = this.route.snapshot.queryParams['returnUrl'];
     if (returnUrl) {
@@ -185,20 +226,21 @@ export class LoginComponent {
       return;
     }
 
-    const trimmedPhone = this.phone.trim();
-    const phoneRegex = /^(?:\+222)?(2|3|4)\d{7}$/;
-    if (!trimmedPhone) { 
+    const digits = this.rawPhone;
+    if (!digits) { 
       this.phoneError.set(this.lang.translate('auth.error_required')); 
       return; 
-    } else if (!phoneRegex.test(trimmedPhone)) {
-      this.phoneError.set(this.lang.translate('auth.error_phone'));
+    }
+    if (!this.isPhoneValid()) {
+      this.phoneError.set('Numéro invalide. Doit commencer par 2, 3 ou 4 et contenir 8 chiffres.');
       return;
     }
     
     if (!this.password) { this.passwordError.set(this.lang.translate('auth.error_required')); return; }
 
     this.loading.set(true);
-    this.authService.login(trimmedPhone, this.password).subscribe({
+    // Envoie le numéro normalisé (8 chiffres) au backend
+    this.authService.login(digits, this.password).subscribe({
       next: (res) => {
         this.loading.set(false);
         if (res.requiresOtp) {
@@ -238,8 +280,7 @@ export class LoginComponent {
     if (this.countdown() > 0) return;
     
     this.loading.set(true);
-    const trimmedPhone = this.phone.trim();
-    this.authService.login(trimmedPhone, this.password).subscribe({
+    this.authService.login(this.rawPhone, this.password).subscribe({
       next: (res) => {
         this.loading.set(false);
         this.notificationService.show(this.lang.translate('auth.otp_msg'));
